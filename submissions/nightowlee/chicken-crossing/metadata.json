@@ -17,5 +17,6 @@
   "windowComponent": "ChickenCrossingWindow.tsx",
   "setupComponent": "ChickenCrossingSetupCard.tsx",
   "configFile": "chickenGameConfig.ts",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "submittedAt": "2025-02-28"
 }

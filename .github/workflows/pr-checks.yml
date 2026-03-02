@@ -107,9 +107,29 @@ jobs:
           }
 
           # Required string fields
-          for field in team gameName displayTitle description version mainComponent windowComponent setupComponent; do
+          for field in team gameName displayTitle description version mainComponent windowComponent setupComponent submittedAt; do
             check_field "$field"
           done
+
+          # submittedAt must be a valid YYYY-MM-DD date
+          SUBMITTED=$(jq -r '.submittedAt // empty' "$METADATA")
+          if [ -n "$SUBMITTED" ]; then
+            if echo "$SUBMITTED" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
+              echo "✓ submittedAt = $SUBMITTED (valid date format)"
+            else
+              echo "::error::submittedAt must be a YYYY-MM-DD date string but got \"$SUBMITTED\""
+              FAIL=1
+            fi
+          fi
+
+          # approvedAt must not be set on submission (only set by maintainers)
+          APPROVED=$(jq -r '.approvedAt // empty' "$METADATA")
+          if [ -n "$APPROVED" ]; then
+            echo "::error::approvedAt must not be set on submission — this is set by maintainers upon approval"
+            FAIL=1
+          else
+            echo "✓ approvedAt is not set (correct for new submissions)"
+          fi
 
           # thumbnail must equal /[gameName]/card.png
           THUMB=$(jq -r '.thumbnail // empty' "$METADATA")

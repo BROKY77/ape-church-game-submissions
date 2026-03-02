@@ -96,7 +96,8 @@ Every submission requires a `metadata.json` file. Copy this template and fill in
   "windowComponent": "YourGameWindow.tsx",
   "setupComponent": "YourGameSetupCard.tsx",
   "configFile": "yourGameConfig.ts",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "submittedAt": "YYYY-MM-DD"
 }
 ```
 
@@ -106,6 +107,8 @@ Every submission requires a `metadata.json` file. Copy this template and fill in
 - `thumbnail` must be `/your-game-name/card.png`
 - `banner` must be `/your-game-name/banner.png`
 - `status` must be `"pending"` on submission — do not change this
+- `submittedAt` must be the date you open your PR in `YYYY-MM-DD` format
+- Do **not** include `approvedAt` — this is set by maintainers upon approval
 
 ---
 

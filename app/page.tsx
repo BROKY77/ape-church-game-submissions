@@ -44,6 +44,11 @@ export default async function Page() {
                 )}
               </p>
               <p className="text-sm text-card-foreground mt-2 line-clamp-2">{game.description}</p>
+              {game.submittedAt && (
+                <p className="text-xs text-muted-foreground/60 mt-2">
+                  Submitted {new Date(game.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                </p>
+              )}
               <div className="flex flex-wrap gap-1.5 mt-3">
                 {game.tags?.slice(0, 3).map((tag) => (
                   <span

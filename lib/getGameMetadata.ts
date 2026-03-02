@@ -21,6 +21,8 @@ export interface GameMetadata {
     mainComponent: string
     windowComponent: string
     setupComponent: string
+    submittedAt: string
+    approvedAt?: string
 }
 
 export async function getAllGameMetadata(): Promise<GameMetadata[]> {
