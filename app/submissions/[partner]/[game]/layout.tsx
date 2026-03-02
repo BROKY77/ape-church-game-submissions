@@ -23,10 +23,22 @@ export default async function GameLayout({ params, children }: Props) {
                 Back to all game submissions
             </Link>
 
-            <div className="flex items-center gap-3 mb-4 sm:mb-6">
+            <div className="flex items-center gap-3 mb-1 sm:mb-2">
                 <h1 className="text-3xl font-semibold">{title}</h1>
                 {metadata?.status && <StatusBadge status={metadata.status} />}
             </div>
+
+            {metadata?.authors && metadata.authors.length > 0 && (
+                <p className="text-sm text-muted-foreground mb-4 sm:mb-6">
+                    by {metadata.authors.map((a) => a.name).join(', ')}
+                    {metadata.version && (
+                        <span className="ml-2 text-xs text-muted-foreground/60">
+                            v{metadata.version}
+                        </span>
+                    )}
+                </p>
+            )}
+
             {children}
         </div>
     )

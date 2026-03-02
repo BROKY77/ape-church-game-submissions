@@ -37,7 +37,12 @@ export default async function Page() {
             )}
             <div className="p-4">
               <h2 className="font-semibold text-lg">{game.displayTitle}</h2>
-              <p className="text-sm text-muted-foreground mt-1">{game.team}</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                {game.team}
+                {game.version && (
+                  <span className="ml-1.5 text-xs text-muted-foreground/60">v{game.version}</span>
+                )}
+              </p>
               <p className="text-sm text-card-foreground mt-2 line-clamp-2">{game.description}</p>
               <div className="flex flex-wrap gap-1.5 mt-3">
                 {game.tags?.slice(0, 3).map((tag) => (
