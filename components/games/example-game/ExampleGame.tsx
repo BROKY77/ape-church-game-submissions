@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Gamepad2 } from "lucide-react";
 import { getPayout, randomBytes } from "@/lib/games";
 import { exampleGame } from "./exampleGameConfig";
 import GameWindow from "@/components/shared/GameWindow";
@@ -257,6 +256,7 @@ const ExampleGameComponent: React.FC = () => {
                     isUserOriginalPlayer={true}
                     showPNL={shouldShowPNL}
                     isGamePaused={false}
+                    resultModalDelayMs={1200}
                 >
                     <ExampleGameWindow
                         game={game}
