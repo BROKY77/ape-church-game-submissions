@@ -389,35 +389,23 @@ const ChickenCrossing: React.FC = () => {
         });
     }, [musicMuted, sfxMuted]);
 
+    const handleMusicMutedFromWindow = useCallback((muted: boolean) => {
+        setMusicMuted(muted);
+    }, []);
+
+    const handleSfxMutedFromWindow = useCallback((muted: boolean) => {
+        setSfxMuted(muted);
+    }, []);
+
     useEffect(() => {
-        const handleDocumentClick = (event: MouseEvent) => {
-            const target = event.target as HTMLElement | null;
-            const muteButton = target?.closest(
-                'button[title="Mute sound"], button[title="Unmute sound"]'
-            );
-
-            if (muteButton) {
-                const nextMuted = !(musicMuted && sfxMuted);
-                setMusicMuted(nextMuted);
-                setSfxMuted(nextMuted);
-                return;
-            }
-
-            tryResumeLoopAudio();
-        };
-
-        const handleDocumentKeydown = () => {
-            tryResumeLoopAudio();
-        };
-
-        document.addEventListener("click", handleDocumentClick, true);
-        document.addEventListener("keydown", handleDocumentKeydown, true);
-
+        const handleInteraction = () => tryResumeLoopAudio();
+        document.addEventListener("click", handleInteraction, true);
+        document.addEventListener("keydown", handleInteraction, true);
         return () => {
-            document.removeEventListener("click", handleDocumentClick, true);
-            document.removeEventListener("keydown", handleDocumentKeydown, true);
+            document.removeEventListener("click", handleInteraction, true);
+            document.removeEventListener("keydown", handleInteraction, true);
         };
-    }, [musicMuted, sfxMuted, tryResumeLoopAudio]);
+    }, [tryResumeLoopAudio]);
 
     const difficultyMaxSafeLanes = getDifficultyMaxSafeLanes(difficulty);
     const difficultyFinishLane = getDifficultyFinishLane(difficulty);
@@ -873,6 +861,10 @@ const ChickenCrossing: React.FC = () => {
                     isUserOriginalPlayer={true}
                     showPNL={shouldShowPNL}
                     isGamePaused={false}
+                    disableBuiltInSong
+                    onMusicMutedChange={handleMusicMutedFromWindow}
+                    onSfxMutedChange={handleSfxMutedFromWindow}
+                    resultModalDelayMs={1200}
                 >
                     <ChickenCrossingWindow
                         currentLane={currentLane}
@@ -922,10 +914,6 @@ const ChickenCrossing: React.FC = () => {
                     finishLane={difficultyFinishLane}
                     autoJumpEnabled={autoJumpEnabled}
                     onToggleAutoJump={toggleAutoJumpEnabled}
-                    musicMuted={musicMuted}
-                    sfxMuted={sfxMuted}
-                    onToggleMusicMuted={toggleMusicMuted}
-                    onToggleSfxMuted={toggleSfxMuted}
                 />
             </div>
         </div>

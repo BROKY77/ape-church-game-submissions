@@ -43,10 +43,6 @@ interface ChickenCrossingSetupCardProps {
     finishLane: number;
     autoJumpEnabled: boolean;
     onToggleAutoJump: () => void;
-    musicMuted: boolean;
-    sfxMuted: boolean;
-    onToggleMusicMuted: () => void;
-    onToggleSfxMuted: () => void;
 }
 
 const FEATHER_PARTICLES = [
@@ -190,10 +186,6 @@ const ChickenCrossingSetupCard: React.FC<ChickenCrossingSetupCardProps> = ({
     finishLane,
     autoJumpEnabled,
     onToggleAutoJump,
-    musicMuted,
-    sfxMuted,
-    onToggleMusicMuted,
-    onToggleSfxMuted,
 }) => {
     const themeColorBackground = game.themeColorBackground;
     const [usdMode, setUsdMode] = useState(false);
@@ -239,50 +231,6 @@ const ChickenCrossingSetupCard: React.FC<ChickenCrossingSetupCardProps> = ({
                         </p>
                         <p className="text-sm">Values shown in APE</p>
                     </div>
-                </div>
-
-                {/* stats */}
-                <div className="grid grid-cols-2 gap-2">
-                    <button
-                        type="button"
-                        onClick={onToggleMusicMuted}
-                        aria-pressed={!musicMuted}
-                        className="rounded-lg border px-3 py-2 text-left transition-colors"
-                        style={{
-                            borderColor: musicMuted ? "rgba(145,152,156,0.25)" : `${themeColorBackground}66`,
-                            backgroundColor: musicMuted ? "rgba(255,255,255,0.02)" : `${themeColorBackground}14`,
-                        }}
-                    >
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#91989C]">
-                            Music
-                        </p>
-                        <p
-                            className="mt-1 text-xs font-semibold"
-                            style={{ color: musicMuted ? "#DCE2E6" : themeColorBackground }}
-                        >
-                            {musicMuted ? "Muted" : "On"}
-                        </p>
-                    </button>
-                    <button
-                        type="button"
-                        onClick={onToggleSfxMuted}
-                        aria-pressed={!sfxMuted}
-                        className="rounded-lg border px-3 py-2 text-left transition-colors"
-                        style={{
-                            borderColor: sfxMuted ? "rgba(145,152,156,0.25)" : `${themeColorBackground}66`,
-                            backgroundColor: sfxMuted ? "rgba(255,255,255,0.02)" : `${themeColorBackground}14`,
-                        }}
-                    >
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#91989C]">
-                            SFX
-                        </p>
-                        <p
-                            className="mt-1 text-xs font-semibold"
-                            style={{ color: sfxMuted ? "#DCE2E6" : themeColorBackground }}
-                        >
-                            {sfxMuted ? "Muted" : "On"}
-                        </p>
-                    </button>
                 </div>
 
                 <div className="w-full flex flex-col items-center gap-2 font-medium text-xs text-[#91989C]">
@@ -370,37 +318,37 @@ const ChickenCrossingSetupCard: React.FC<ChickenCrossingSetupCardProps> = ({
 
                     <div className="grow"></div>
 
-                    <div className="w-full px-6 font-roboto">
-                        <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 backdrop-blur-[1px]">
-                            <div className="mb-3 flex items-center justify-between">
-                                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#91989C]">
+                    <div className="w-full font-roboto mt-6">
+                        <div className="rounded-xl border border-white/5 bg-white/2 px-3 py-3 sm:px-4 sm:py-4 backdrop-blur-[1px]">
+                            <div className="mb-2 sm:mb-3 flex items-center justify-between">
+                                <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.22em] text-[#91989C]">
                                     Road Intel
                                 </p>
                                 <div
-                                    className="h-[2px] w-14 rounded-full"
+                                    className="h-[2px] w-10 sm:w-14 rounded-full"
                                     style={{
                                         background: `linear-gradient(90deg, ${themeColorBackground}00 0%, ${themeColorBackground}AA 100%)`,
                                     }}
                                 />
                             </div>
 
-                            <div className="space-y-2 text-sm font-medium text-[#91989C]">
-                                <div className="flex items-center justify-between gap-3">
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 sm:grid-cols-1 sm:space-y-0 sm:gap-y-2 text-xs sm:text-sm font-medium text-[#91989C]">
+                                <div className="flex items-center justify-between gap-2">
                                     <p>Finish Line</p>
                                     <p className="text-[#DCE2E6]">{finishLane}</p>
                                 </div>
-                                <div className="flex items-center justify-between gap-3">
-                                    <p>Crash Chance (Start)</p>
+                                <div className="flex items-center justify-between gap-2">
+                                    <p className="truncate">Crash Chance</p>
                                     <p className="text-[#DCE2E6]">{Math.round(currentCrashChance * 100)}%</p>
                                 </div>
-                                <div className="flex items-center justify-between gap-3">
-                                    <p>Max Road Multiplier</p>
+                                <div className="flex items-center justify-between gap-2">
+                                    <p className="truncate">Max Multiplier</p>
                                     <p style={{ color: themeColorBackground }}>
                                         {currentMaxRoadMultiplier.toFixed(2)}x
                                     </p>
                                 </div>
-                                <div className="flex items-center justify-between gap-3">
-                                    <p>Max Bet Per Game</p>
+                                <div className="flex items-center justify-between gap-2">
+                                    <p>Max Bet</p>
                                     <p className="text-[#DCE2E6]">
                                         {maxBet.toLocaleString()} APE
                                     </p>
