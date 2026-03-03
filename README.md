@@ -84,7 +84,7 @@ Every submission requires a `metadata.json` file. Copy this template and fill in
   "authors": [
     {
       "name": "Your Name",
-      "email": "your@email.com"
+      "telegram": "your_telegram_username"
     }
   ],
   "status": "pending",

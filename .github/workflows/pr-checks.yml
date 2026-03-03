@@ -190,18 +190,18 @@ jobs:
             echo "✓ tags ($TAG_COUNT entries)"
           fi
 
-          # authors must be a non-empty array with name and email on each entry
+          # authors must be a non-empty array with name and telegram on each entry
           AUTHOR_COUNT=$(jq '.authors | if type == "array" then length else 0 end' "$METADATA")
           if [ "$AUTHOR_COUNT" -eq 0 ]; then
             echo "::error::authors must be a non-empty array"
             FAIL=1
           else
-            BAD_AUTHORS=$(jq '[.authors[] | select(.name == null or .name == "" or .email == null or .email == "")] | length' "$METADATA")
+            BAD_AUTHORS=$(jq '[.authors[] | select(.name == null or .name == "" or .telegram == null or .telegram == "")] | length' "$METADATA")
             if [ "$BAD_AUTHORS" -gt 0 ]; then
-              echo "::error::Every author must have a non-empty \"name\" and \"email\""
+              echo "::error::Every author must have a non-empty \"name\" and \"telegram\""
               FAIL=1
             else
-              echo "✓ authors ($AUTHOR_COUNT entries, all have name + email)"
+              echo "✓ authors ($AUTHOR_COUNT entries, all have name + telegram)"
             fi
           fi
 

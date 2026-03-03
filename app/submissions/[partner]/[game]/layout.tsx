@@ -30,7 +30,24 @@ export default async function GameLayout({ params, children }: Props) {
 
             {metadata?.authors && metadata.authors.length > 0 && (
                 <p className="text-sm text-muted-foreground mb-4 sm:mb-6">
-                    by {metadata.authors.map((a) => a.name).join(', ')}
+                    by{' '}
+                    {metadata.authors.map((a, i) => (
+                        <span key={a.telegram ?? a.name}>
+                            {i > 0 && ', '}
+                            {a.telegram ? (
+                                <a
+                                    href={`https://t.me/${a.telegram}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-primary hover:underline"
+                                >
+                                    {a.name}
+                                </a>
+                            ) : (
+                                a.name
+                            )}
+                        </span>
+                    ))}
                     {metadata.version && (
                         <span className="ml-2 text-xs text-muted-foreground/60">
                             v{metadata.version}

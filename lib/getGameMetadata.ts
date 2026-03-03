@@ -3,7 +3,7 @@ import path from 'path'
 
 export interface GameAuthor {
     name: string
-    email: string
+    telegram: string
 }
 
 export interface GameMetadata {
