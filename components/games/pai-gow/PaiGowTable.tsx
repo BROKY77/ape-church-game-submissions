@@ -117,7 +117,7 @@ type PaiGowTableProps = {
   desktopSidebarHostId?: string;
 };
 
-function CardSlot({ filled = false }: { filled?: boolean }) {
+function CardSlot({ filled = false, visible = true }: { filled?: boolean; visible?: boolean }) {
   return (
     <div
       aria-hidden
@@ -128,6 +128,8 @@ function CardSlot({ filled = false }: { filled?: boolean }) {
         border: filled ? "1px solid rgba(0,0,0,0)" : "1px solid rgba(215,225,230,0.18)",
         background: filled ? "transparent" : "rgba(0,0,0,0.18)",
         boxShadow: filled ? "none" : "inset 0 1px 0 rgba(255,255,255,0.06)",
+        opacity: visible ? 1 : 0,
+        pointerEvents: "none",
       }}
     />
   );
@@ -1081,42 +1083,34 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
               </div>
             </div>
 
-            {/* Always reserve the arranged layout space so the dealer area never "drops" down on split. */}
+            {/* Dealer: show the 7-card rack first. Keep enough height reserved so later arranged High/Low doesn't shift the layout. */}
             <div style={{ display: "grid", gap: 10, flex: 1 }}>
-              <div>
-                <div style={{ fontWeight: 900, opacity: 0.75, letterSpacing: 0.6, fontSize: 12, marginBottom: 8 }}>HIGH (5)</div>
-                <div className="cardsRow cardsRowScroll">
-                  {(dealerArranged ? view.houseSplit.high : dealerSlotHigh).map((c, i) =>
-                    c ? (
-                      <CardFace
-                        key={`house-high-${i}`}
-                        card={c}
-                        faceDown={dealerSlotsFaceDown}
-                        tone={dealerArranged ? "high" : "neutral"}
-                      />
-                    ) : (
-                      <CardSlot key={`house-high-slot-${i}`} />
-                    ),
-                  )}
+              {!dealerArranged ? (
+                <div className="cardsRow cardsRowScroll" style={{ minHeight: "calc(var(--cardH, 100px) + 18px)" }}>
+                  {view.house7.map((c, i) => (
+                    <CardFace key={`house-${i}`} card={c} faceDown={!dealerFlipped[i]} />
+                  ))}
                 </div>
-              </div>
-              <div>
-                <div style={{ fontWeight: 900, opacity: 0.75, letterSpacing: 0.6, fontSize: 12, marginBottom: 8 }}>LOW (2)</div>
-                <div className="cardsRow cardsRowScroll">
-                  {(dealerArranged ? view.houseSplit.low : dealerSlotLow).map((c, i) =>
-                    c ? (
-                      <CardFace
-                        key={`house-low-${i}`}
-                        card={c}
-                        faceDown={dealerSlotsFaceDown}
-                        tone={dealerArranged ? "low" : "neutral"}
-                      />
-                    ) : (
-                      <CardSlot key={`house-low-slot-${i}`} />
-                    ),
-                  )}
-                </div>
-              </div>
+              ) : (
+                <>
+                  <div>
+                    <div style={{ fontWeight: 900, opacity: 0.75, letterSpacing: 0.6, fontSize: 12, marginBottom: 8 }}>HIGH (5)</div>
+                    <div className="cardsRow cardsRowScroll">
+                      {view.houseSplit.high.map((c, i) => (
+                        <CardFace key={`house-high-${i}`} card={c} faceDown={false} tone="high" />
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 900, opacity: 0.75, letterSpacing: 0.6, fontSize: 12, marginBottom: 8 }}>LOW (2)</div>
+                    <div className="cardsRow cardsRowScroll">
+                      {view.houseSplit.low.map((c, i) => (
+                        <CardFace key={`house-low-${i}`} card={c} faceDown={false} tone="low" />
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -1178,7 +1172,7 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
                         <CardFace key={i} card={view.player7[i]} tone="low" onClick={() => removeFromLow(i)} />
                       ))}
                       {Array.from({ length: Math.max(0, 2 - lowIdx.length) }).map((_, k) => (
-                        <CardSlot key={`low-slot-${k}`} />
+                        <CardSlot key={`low-slot-${k}`} visible={canSplit} />
                       ))}
                     </div>
                   </div>
@@ -1189,7 +1183,7 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
                         <CardFace key={i} card={view.player7[i]} tone="high" onClick={() => removeFromHigh(i)} />
                       ))}
                       {Array.from({ length: Math.max(0, 5 - highIdx.length) }).map((_, k) => (
-                        <CardSlot key={`high-slot-${k}`} />
+                        <CardSlot key={`high-slot-${k}`} visible={canSplit} />
                       ))}
                     </div>
                   </div>
@@ -1220,7 +1214,7 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
                         <CardFace key={i} card={view.player7[i]} tone="low" onClick={() => removeFromLow(i)} />
                       ))}
                       {Array.from({ length: Math.max(0, 2 - lowIdx.length) }).map((_, k) => (
-                        <CardSlot key={`m-low-slot-${k}`} />
+                        <CardSlot key={`m-low-slot-${k}`} visible={canSplit} />
                       ))}
                     </div>
                   </div>
@@ -1231,7 +1225,7 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
                         <CardFace key={i} card={view.player7[i]} tone="high" onClick={() => removeFromHigh(i)} />
                       ))}
                       {Array.from({ length: Math.max(0, 5 - highIdx.length) }).map((_, k) => (
-                        <CardSlot key={`m-high-slot-${k}`} />
+                        <CardSlot key={`m-high-slot-${k}`} visible={canSplit} />
                       ))}
                     </div>
                   </div>
