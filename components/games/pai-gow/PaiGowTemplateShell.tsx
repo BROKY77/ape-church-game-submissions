@@ -47,12 +47,12 @@ export default function PaiGowTemplateShell() {
         which can make the outer frame too tall. We constrain the frame height here
         so the bottom doesn't have a huge dead area (leave room for audio buttons).
       */}
-      <div
-        className="pgWindowWrap"
-        style={{
-          height: "min(860px, calc(100vh - 220px))",
-        }}
-      >
+      <style>{`
+        .pgWindowWrap{ height: min(860px, calc(100vh - 220px)); display:flex; }
+        /* GameWindow root is the first child div; force it to respect our wrapper height */
+        .pgWindowWrap > div{ height: 100%; }
+      `}</style>
+      <div className="pgWindowWrap">
       <GameWindow
         game={paiGow}
         isLoading={!!status?.isLoading}
