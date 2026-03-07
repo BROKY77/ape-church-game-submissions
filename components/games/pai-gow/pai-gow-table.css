@@ -132,7 +132,7 @@
 .table{
   max-width: 1200px;
   margin: 0 auto;
-  padding: 18px 18px 26px;
+  padding: 8px 8px 10px;
 }
 
 .felt{
@@ -203,8 +203,14 @@
 
 /* Desktop: let dealer/player art hit the rounded felt edges (no inner letterbox padding). */
 @media (min-width: 700px){
+  /* Reduce inset so the table content reaches the felt edges (match template framing). */
   .dealerZone,
-  .playerZone{ padding: 8px; }
+  .playerZone{ padding: 4px; }
+
+  .zoneHeader{ margin-bottom: 6px; }
+
+  /* Reduce right-side breathing room so rows visually touch the side rails. */
+  .cardsRowScroll{ padding-right: 0; }
 }
 
 /* Add subtle art back into dealer/player zones (provided assets) */

@@ -1094,7 +1094,7 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
               ) : (
                 <>
                   <div>
-                    <div style={{ fontWeight: 900, opacity: 0.75, letterSpacing: 0.6, fontSize: 12, marginBottom: 8 }}>HIGH (5)</div>
+                    <div style={{ fontWeight: 900, opacity: 0.75, letterSpacing: 0.6, fontSize: 12, marginBottom: 4 }}>HIGH (5)</div>
                     <div className="cardsRow cardsRowScroll">
                       {view.houseSplit.high.map((c, i) => (
                         <CardFace key={`house-high-${i}`} card={c} faceDown={false} tone="high" />
@@ -1102,7 +1102,7 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
                     </div>
                   </div>
                   <div>
-                    <div style={{ fontWeight: 900, opacity: 0.75, letterSpacing: 0.6, fontSize: 12, marginBottom: 8 }}>LOW (2)</div>
+                    <div style={{ fontWeight: 900, opacity: 0.75, letterSpacing: 0.6, fontSize: 12, marginBottom: 4 }}>LOW (2)</div>
                     <div className="cardsRow cardsRowScroll">
                       {view.houseSplit.low.map((c, i) => (
                         <CardFace key={`house-low-${i}`} card={c} faceDown={false} tone="low" />
@@ -1166,7 +1166,7 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
               <div style={{ display: "grid", gridTemplateColumns: "1fr 260px", gap: 10, marginTop: 6, alignItems: "start" }}>
                 <div style={{ display: "grid", gap: 10 }}>
                   <div>
-                    <div style={{ fontWeight: 900, opacity: 0.85, letterSpacing: 0.6, fontSize: 12, marginBottom: 8 }}>LOW (2)</div>
+                    <div style={{ fontWeight: 900, opacity: 0.85, letterSpacing: 0.6, fontSize: 12, marginBottom: 4 }}>LOW (2)</div>
                     <div className="cardsRow">
                       {lowIdx.map((i) => (
                         <CardFace key={i} card={view.player7[i]} tone="low" onClick={() => removeFromLow(i)} />
@@ -1177,7 +1177,7 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
                     </div>
                   </div>
                   <div>
-                    <div style={{ fontWeight: 900, opacity: 0.85, letterSpacing: 0.6, fontSize: 12, marginBottom: 8 }}>HIGH (5)</div>
+                    <div style={{ fontWeight: 900, opacity: 0.85, letterSpacing: 0.6, fontSize: 12, marginBottom: 4 }}>HIGH (5)</div>
                     <div className="cardsRow">
                       {highIdx.map((i) => (
                         <CardFace key={i} card={view.player7[i]} tone="high" onClick={() => removeFromHigh(i)} />
@@ -1208,7 +1208,7 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
               <>
                 <div style={{ display: "grid", gap: 10, marginTop: 10 }}>
                   <div>
-                    <div style={{ fontWeight: 900, opacity: 0.85, letterSpacing: 0.6, fontSize: 12, marginBottom: 8 }}>LOW (2)</div>
+                    <div style={{ fontWeight: 900, opacity: 0.85, letterSpacing: 0.6, fontSize: 12, marginBottom: 4 }}>LOW (2)</div>
                     <div className="cardsRow">
                       {lowIdx.map((i) => (
                         <CardFace key={i} card={view.player7[i]} tone="low" onClick={() => removeFromLow(i)} />
@@ -1219,7 +1219,7 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
                     </div>
                   </div>
                   <div>
-                    <div style={{ fontWeight: 900, opacity: 0.85, letterSpacing: 0.6, fontSize: 12, marginBottom: 8 }}>HIGH (5)</div>
+                    <div style={{ fontWeight: 900, opacity: 0.85, letterSpacing: 0.6, fontSize: 12, marginBottom: 4 }}>HIGH (5)</div>
                     <div className="cardsRow">
                       {highIdx.map((i) => (
                         <CardFace key={i} card={view.player7[i]} tone="high" onClick={() => removeFromHigh(i)} />
