@@ -51,7 +51,8 @@ export default function PaiGowTemplateShell() {
 
           /* Left square: clamp by height, keep 1:1 ratio (prevents “expanding down”). */
           .pgGameWrap{
-            height: min(760px, calc(100vh - 260px));
+            /* Target: match the big “full” square like your reference screenshot (maximal height without pushing content below). */
+            height: min(860px, calc(100vh - 190px));
             aspect-ratio: 1 / 1;
             width: auto;
             flex: 0 0 auto;
