@@ -490,10 +490,11 @@
   border-radius: 12px;
   border: 1px solid rgba(215,225,230,0.18);
   background: rgba(20,20,20,0.80);
-  color: var(--text);
-  font-weight: 800;
+  color: rgba(255,255,255,0.96);
+  font-weight: 900;
   cursor: pointer;
   backdrop-filter: blur(4px);
+  text-shadow: 0 1px 0 rgba(0,0,0,0.65);
 }
 
 .btn:disabled{
