@@ -16,7 +16,7 @@ export default async function GameLayout({ params, children }: Props) {
     // Pai Gow desktop layout wants more horizontal room (Blackjack+ style: big left square + right panel).
     // Keep all other games on the normal max-width container.
     const containerClass = game === 'pai-gow'
-        ? 'w-full max-w-none mx-auto'
+        ? 'w-full max-w-[1400px] mx-auto'
         : 'w-full max-w-6xl mx-auto'
 
     return (

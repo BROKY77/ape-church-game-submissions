@@ -46,11 +46,17 @@ export default function PaiGowTemplateShell() {
         /* Desktop layout: square game window + separate right sidebar panel (Blackjack+ style). */
         .pgDesktopWrap{ width: 100%; }
         @media (min-width: 700px){
-          /* Use CSS grid so the sidebar always hugs the game (no mystery gaps). */
-          .pgDesktopWrap{ display:grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items:start; }
+          /* Desktop: size the main square by HEIGHT (so it expands right without getting taller than the viewport). */
+          .pgDesktopWrap{ display:flex; align-items:flex-start; gap: 16px; }
 
-          /* Left square: fill all remaining space; stay 1:1. */
-          .pgGameWrap{ width: 100%; aspect-ratio: 1 / 1; display:flex; min-width: 0; }
+          /* Left square: clamp by height, keep 1:1 ratio (prevents “expanding down”). */
+          .pgGameWrap{
+            height: min(760px, calc(100vh - 260px));
+            aspect-ratio: 1 / 1;
+            width: auto;
+            flex: 0 0 auto;
+            display:flex;
+          }
           .pgGameWrap > div{ width: 100%; height: 100%; }
 
           .pgSidebarHost{
