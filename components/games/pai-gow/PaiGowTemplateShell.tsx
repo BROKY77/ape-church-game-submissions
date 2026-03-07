@@ -47,7 +47,8 @@ export default function PaiGowTemplateShell() {
         .pgDesktopWrap{ width: 100%; }
         @media (min-width: 700px){
           .pgDesktopWrap{ display:flex; align-items:flex-start; gap: 16px; }
-          .pgGameWrap{ flex: 0 0 auto; width: min(760px, calc(100vw - 420px)); aspect-ratio: 1 / 1; display:flex; }
+          /* Match Blackjack+ proportions: make the left square as large as we can while preserving space for the sidebar. */
+          .pgGameWrap{ flex: 1 1 auto; width: min(940px, calc(100vw - 420px)); aspect-ratio: 1 / 1; display:flex; }
           .pgGameWrap > div{ width: 100%; height: 100%; }
           .pgSidebarHost{
             flex: 0 0 380px;
