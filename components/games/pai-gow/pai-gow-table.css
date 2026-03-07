@@ -564,13 +564,8 @@
     align-items: flex-start;
     gap: 10px;
     flex-wrap: wrap;
-    /* Mobile (Telegram iPhone): use the original header art + crop higher so the top copy is visible. */
-    background-image: url('/submissions/pai-gow/header-bg-mobile.jpg');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: 50% 6%;
-
-    min-height: 190px;
+    /* Mobile/tablet: give the header art a bit more vertical room */
+    min-height: 176px;
   }
 
   .brand{
@@ -666,6 +661,15 @@
     /* Slightly larger so facedown cards don't look tiny; still fits 7 across on iPhone. */
     --cardW: 48px;
     --cardH: 66px;
+  }
+
+  /* iPhone (Telegram): use the original header art (desktop version crops wrong) */
+  .rail{
+    background-image: url('/submissions/pai-gow/header-bg-mobile.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: 50% 6%;
+    min-height: 190px;
   }
 
   /* iPhone: make the PLAYER control row wrap cleanly (no right-edge clipping). */
