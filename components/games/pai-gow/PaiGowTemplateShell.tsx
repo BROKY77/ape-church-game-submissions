@@ -42,28 +42,53 @@ export default function PaiGowTemplateShell() {
 
   return (
     <div className="pgShell">
-      <GameWindow
-        game={paiGow}
-        isLoading={!!status?.isLoading}
-        // We show our own Pai Gow breakdown modal (includes side bet hit + multiplier).
-        isGameFinished={false}
-        betAmount={betAmount}
-        payout={payout}
-        inReplayMode={false}
-        isUserOriginalPlayer={true}
-        showPNL={false}
-        onReset={onReset}
-        onPlayAgain={onPlayAgain}
-        onRewatch={onRewatch}
-        currentGameId={gameId}
-        disableBuiltInSong={true}
-      >
-        {/* GameWindow renders a background image; mount Pai Gow UI as an overlay on top of it. */}
-        <div style={{ position: "absolute", inset: 0, zIndex: 10 }}>
-          <PaiGowTable ref={tableRef} onStatusChange={onStatusChange} />
-        </div>
+      <style>{`
+        /* Desktop layout: square game window + separate right sidebar panel (Blackjack+ style). */
+        .pgDesktopWrap{ width: 100%; }
+        @media (min-width: 700px){
+          .pgDesktopWrap{ display:flex; align-items:flex-start; gap: 16px; }
+          .pgGameWrap{ flex: 0 0 auto; width: min(760px, calc(100vw - 420px)); aspect-ratio: 1 / 1; display:flex; }
+          .pgGameWrap > div{ width: 100%; height: 100%; }
+          .pgSidebarHost{
+            flex: 0 0 380px;
+            width: 380px;
+            border-radius: 12px;
+            border: 4.68px solid #2A3640;
+            overflow: hidden;
+            background: rgba(18,24,28,0.55);
+            backdrop-filter: blur(2px);
+          }
+        }
+      `}</style>
 
-        {showResults ? (() => {
+      <div className="pgDesktopWrap">
+        <div className="pgGameWrap">
+          <GameWindow
+            game={paiGow}
+            isLoading={!!status?.isLoading}
+            // We show our own Pai Gow breakdown modal (includes side bet hit + multiplier).
+            isGameFinished={false}
+            betAmount={betAmount}
+            payout={payout}
+            inReplayMode={false}
+            isUserOriginalPlayer={true}
+            showPNL={false}
+            onReset={onReset}
+            onPlayAgain={onPlayAgain}
+            onRewatch={onRewatch}
+            currentGameId={gameId}
+            disableBuiltInSong={true}
+          >
+            {/* GameWindow renders a background image; mount Pai Gow UI as an overlay on top of it. */}
+            <div style={{ position: "absolute", inset: 0, zIndex: 10 }}>
+              <PaiGowTable
+                ref={tableRef}
+                onStatusChange={onStatusChange}
+                desktopSidebarHostId="pgSidebarHost"
+              />
+            </div>
+
+            {showResults ? (() => {
           const isWin = payout > 0;
           const toneBg = isWin
             ? "linear-gradient(135deg, rgba(51,183,123,0.95), rgba(16,185,129,0.92))"
@@ -201,8 +226,13 @@ export default function PaiGowTemplateShell() {
               </div>
             </div>
           );
-        })() : null}
-      </GameWindow>
+            })() : null}
+          </GameWindow>
+        </div>
+
+        {/* Desktop-only: sidebar host for banner + bets + chips (ported from PaiGowTable). */}
+        <div id="pgSidebarHost" className="pgSidebarHost" />
+      </div>
     </div>
   );
 }
