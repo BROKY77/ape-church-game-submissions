@@ -146,16 +146,25 @@ export default function PaiGowTemplateShell() {
           >
             {/* GameWindow renders a background image; mount Pai Gow UI as an overlay on top of it. */}
             <div
+              className="pgOverlay"
               style={{
                 position: "absolute",
                 inset: 0,
                 zIndex: 10,
-                overflowY: "auto",
-                overflowX: "hidden",
-                WebkitOverflowScrolling: "touch",
+                overflow: "hidden",
                 paddingBottom: 64, // keep bet chips clear of the bottom-right audio buttons
               }}
             >
+              {/* Mobile-only: allow scrolling inside the GameWindow so BETS/chips are reachable. */}
+              <style>{`
+                @media (max-width: 640px){
+                  .pgOverlay{
+                    overflow-y: auto;
+                    overflow-x: hidden;
+                    -webkit-overflow-scrolling: touch;
+                  }
+                }
+              `}</style>
               <PaiGowTable
                 ref={tableRef}
                 onStatusChange={onStatusChange}
