@@ -145,7 +145,17 @@ export default function PaiGowTemplateShell() {
             resultModalDelayMs={900}
           >
             {/* GameWindow renders a background image; mount Pai Gow UI as an overlay on top of it. */}
-            <div style={{ position: "absolute", inset: 0, zIndex: 10 }}>
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                zIndex: 10,
+                overflowY: "auto",
+                overflowX: "hidden",
+                WebkitOverflowScrolling: "touch",
+                paddingBottom: 64, // keep bet chips clear of the bottom-right audio buttons
+              }}
+            >
               <PaiGowTable
                 ref={tableRef}
                 onStatusChange={onStatusChange}
