@@ -564,9 +564,13 @@
     align-items: flex-start;
     gap: 10px;
     flex-wrap: wrap;
-    /* Mobile: give the header art a bit more vertical room + bias the crop upward */
-    min-height: 220px;
-    background-position: 55% 0%;
+    /* Mobile: use the original header art (desktop version crops wrong on iPhone). */
+    background-image: url('/submissions/pai-gow/header-bg-mobile.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: 50% 20%;
+
+    min-height: 176px;
   }
 
   .brand{
@@ -591,6 +595,16 @@
   .zoneHeader{
     align-items: flex-start;
     flex-wrap: wrap;
+    max-width: 100%;
+  }
+
+  /* Prevent long button rows / inline controls from forcing horizontal overflow */
+  .zoneHeader > div{
+    max-width: 100%;
+  }
+
+  .zoneHeader button{
+    max-width: 100%;
   }
 
   /* Mobile: bets as a 2x2 grid so nothing gets cut off */
@@ -652,6 +666,15 @@
     /* Slightly larger so facedown cards don't look tiny; still fits 7 across on iPhone. */
     --cardW: 48px;
     --cardH: 66px;
+  }
+
+  /* iPhone: make the PLAYER control row wrap cleanly (no right-edge clipping). */
+  .playerZone .zoneHeader > div{
+    justify-content: flex-start !important;
+  }
+  .playerZone .zoneHeader > div button{
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   /* chip footer: keep everything visible + stop right-edge clipping */
