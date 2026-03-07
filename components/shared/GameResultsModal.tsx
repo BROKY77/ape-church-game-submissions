@@ -16,6 +16,9 @@ type GameResultsModalProps = {
     isLoading: boolean;
     gameTitle?: string
 
+    /** Optional extra content shown between payout and actions (e.g. custom breakdown). */
+    extraContent?: React.ReactNode;
+
     onReset: () => void;
     onPlayAgain: () => void;
     onRewatch?: () => void;
@@ -45,6 +48,7 @@ const GameResultsModal: React.FC<GameResultsModalProps> = ({
     resetButtonText = "Change Bet",
     playAgainButtonText = "Play Again",
     rewatchButtonText = "Rewatch",
+    extraContent,
 }) => {
     const [minimizeResultsModal, setMinimizeResultsModal] = useState(false);
     const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
@@ -333,6 +337,18 @@ const GameResultsModal: React.FC<GameResultsModalProps> = ({
                                                 </p>
                                             </motion.div>
                                         )}
+
+                                        {/* Extra content (optional) */}
+                                        {extraContent ? (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 18 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: 0.55, duration: 0.25 }}
+                                                className="w-full"
+                                            >
+                                                {extraContent}
+                                            </motion.div>
+                                        ) : null}
 
                                         {/* Buttons */}
                                         <motion.div

@@ -23,6 +23,9 @@ type GameWindowProps = {
     showPNL: boolean;
     isGamePaused?: boolean;
 
+    /** Optional extra content injected into the results modal (keeps animation/style consistent). */
+    resultsExtraContent?: React.ReactNode;
+
     onReset: () => void;
     onPlayAgain?: () => void;
     playAgainText?: string;
@@ -63,6 +66,7 @@ const GameWindow: React.FC<GameWindowProps> = ({
     onSfxMutedChange,
 
     resultModalDelayMs = 0,
+    resultsExtraContent,
 }) => {
     const audioRef = useRef<Howl | null>(null);
     const [muteMusic, setMuteMusic] = useState(false);
@@ -163,6 +167,7 @@ const GameWindow: React.FC<GameWindowProps> = ({
                         apePrice={1}
                         isLoading={isLoading}
                         gameTitle={game.title}
+                        extraContent={resultsExtraContent}
                         onReset={onReset}
                         onPlayAgain={onPlayAgain}
                         playAgainButtonText={playAgainText}
