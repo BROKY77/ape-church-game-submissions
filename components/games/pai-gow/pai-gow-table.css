@@ -28,8 +28,15 @@
 
 /* Desktop: fill the GameWindow like other Ape.church games (game left, betting sidebar right) */
 @media (min-width: 700px){
-  /* Desktop: smaller cards so split + result always fit in the fixed GameWindow square */
-  :root{ --cardW: 52px; --cardH: 72px; }
+  /* Desktop: keep dealer sizing stable; tighten ONLY the player area so nothing clips. */
+  :root{ --cardW: 56px; --cardH: 78px; }
+
+  .playerZone{
+    --cardW: 50px;
+    --cardH: 70px;
+  }
+
+  .playerZone .cardsRow{ gap: 8px; }
 
   /* Reserve status line height so the header doesn't reflow when text changes. */
   .dealerStatus{ min-height: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
