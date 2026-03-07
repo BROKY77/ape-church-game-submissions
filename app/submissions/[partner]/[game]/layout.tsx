@@ -13,14 +13,8 @@ export default async function GameLayout({ params, children }: Props) {
     const metadata = await getGameMetadata(partner, game)
     const title = metadata?.displayTitle ?? game
 
-    // Pai Gow desktop layout wants more horizontal room (Blackjack+ style: big left square + right panel).
-    // Keep all other games on the normal max-width container.
-    const containerClass = game === 'pai-gow'
-        ? 'w-full max-w-[1400px] mx-auto'
-        : 'w-full max-w-6xl mx-auto'
-
     return (
-        <div className={containerClass}>
+        <div className="w-full max-w-6xl mx-auto">
             <Link
                 href="/"
                 className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"

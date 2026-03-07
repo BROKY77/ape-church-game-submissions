@@ -42,37 +42,9 @@ export default function PaiGowTemplateShell() {
 
   return (
     <div className="pgShell">
-      <style>{`
-        /* Desktop layout: square game window + separate right sidebar panel (Blackjack+ style). */
-        .pgDesktopWrap{ width: 100%; }
-        @media (min-width: 700px){
-          /* Desktop: size the main square by HEIGHT (so it expands right without getting taller than the viewport). */
-          .pgDesktopWrap{ display:flex; align-items:flex-start; gap: 16px; }
-
-          /* Left square: clamp by height, keep 1:1 ratio (prevents “expanding down”). */
-          .pgGameWrap{
-            /* Target: match the big “full” square like your reference screenshot (maximal height without pushing content below). */
-            height: min(860px, calc(100vh - 190px));
-            aspect-ratio: 1 / 1;
-            width: auto;
-            flex: 0 0 auto;
-            display:flex;
-          }
-          .pgGameWrap > div{ width: 100%; height: 100%; }
-
-          .pgSidebarHost{
-            width: 340px;
-            border-radius: 12px;
-            border: 4.68px solid #2A3640;
-            overflow: hidden;
-            background: rgba(18,24,28,0.55);
-            backdrop-filter: blur(2px);
-          }
-        }
-      `}</style>
-
-      <div className="pgDesktopWrap">
-        <div className="pgGameWrap">
+      {/* Match the platform template: GameWindow on the left, setup/bets panel on the right (desktop). */}
+      <div className="flex flex-col lg:flex-row gap-4 sm:gap-8 lg:gap-10">
+        <div className="flex-1 min-w-0">
           <GameWindow
             game={paiGow}
             isLoading={!!status?.isLoading}
@@ -240,8 +212,11 @@ export default function PaiGowTemplateShell() {
           </GameWindow>
         </div>
 
-        {/* Desktop-only: sidebar host for banner + bets + chips (ported from PaiGowTable). */}
-        <div id="pgSidebarHost" className="pgSidebarHost" />
+        {/* Setup/Bets panel (right). Desktop gets portal content; mobile ignores this and uses the in-table layout. */}
+        <div
+          id="pgSidebarHost"
+          className="w-full lg:w-[380px] rounded-[12px] border-[2.25px] sm:border-[3.75px] lg:border-[4.68px] border-[#2A3640] overflow-hidden"
+        />
       </div>
     </div>
   );
