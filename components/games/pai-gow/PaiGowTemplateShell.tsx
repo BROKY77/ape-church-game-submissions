@@ -43,7 +43,7 @@ export default function PaiGowTemplateShell() {
   return (
     <div className="pgShell">
       {/* Match the platform template: GameWindow on the left, setup/bets panel on the right (desktop). */}
-      <div className="flex flex-col lg:flex-row gap-4 sm:gap-8 lg:gap-10">
+      <div className="flex flex-col lg:flex-row lg:items-stretch gap-4 sm:gap-8 lg:gap-10">
         <div className="flex-1 min-w-0">
           <GameWindow
             game={paiGow}
@@ -215,7 +215,7 @@ export default function PaiGowTemplateShell() {
         {/* Setup/Bets panel (right). Desktop gets portal content; mobile ignores this and uses the in-table layout. */}
         <div
           id="pgSidebarHost"
-          className="w-full lg:w-[380px] rounded-[12px] border-[2.25px] sm:border-[3.75px] lg:border-[4.68px] border-[#2A3640] overflow-hidden"
+          className="w-full lg:w-[380px] self-stretch rounded-[12px] border-[2.25px] sm:border-[3.75px] lg:border-[4.68px] border-[#2A3640] overflow-hidden"
         />
       </div>
     </div>
