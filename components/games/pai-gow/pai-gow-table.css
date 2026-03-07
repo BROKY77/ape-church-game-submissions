@@ -104,8 +104,19 @@
 
     flex: 1 1 auto;
     min-height: 0;
-    overflow: auto;
     background: transparent;
+
+    /* Keep chip rack visible inside the pinned sidebar height */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .betZone .zoneHeader{ flex: 0 0 auto; }
+  .betZone .betLane{ flex: 1 1 auto; overflow: auto; padding-bottom: 8px; }
+  .betZone .betFooterRow{
+    flex: 0 0 auto;
+    padding-top: 6px;
   }
 
   .controls .btn{
@@ -126,15 +137,16 @@
   .betSpotBonus,
   .betSpotPush{
     width: 100% !important;
-    height: 92px;
+    height: 86px;
   }
 
-  .betSpotMain{ height: 104px; }
+  .betSpotMain{ height: 96px; }
 
   /* Sidebar chip rack: tighten so all chips fit within the pinned sidebar height */
-  .chipRack{ gap: 6px; padding-top: 6px; }
-  .chip{ width: 46px; height: 46px; }
+  .chipRack{ gap: 6px; padding-top: 4px; }
+  .chip{ width: 44px; height: 44px; }
 }
+
 
 
 .table{
