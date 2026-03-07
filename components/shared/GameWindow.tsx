@@ -157,6 +157,7 @@ const GameWindow: React.FC<GameWindowProps> = ({
                     <GameResultsModal
                         key={currentGameId.toString()}
                         isOpen={showResults}
+                        onClose={() => setShowResults(false)}
                         payout={payout}
                         betAmount={betAmount}
                         usdMode={false}

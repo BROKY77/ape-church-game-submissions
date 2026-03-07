@@ -37,8 +37,20 @@ export default function PaiGowTemplateShell() {
   const betAmount = status?.betAmount ?? 0;
   const payout = status?.payout ?? 0;
 
-  const showResults = !!status?.isGameFinished;
+  const isFinished = !!status?.isGameFinished;
   const breakdown = status?.breakdown;
+
+  const [showResultsModal, setShowResultsModal] = useState(false);
+
+  // Show results modal when the hand finishes, but allow user to dismiss it
+  // to view the in-table RESULT panel underneath.
+  useEffect(() => {
+    if (isFinished) {
+      setShowResultsModal(true);
+      return;
+    }
+    setShowResultsModal(false);
+  }, [isFinished]);
 
   const format = (n: number | undefined) => (Number.isFinite(n as number) ? String(n) : "0");
 
@@ -102,7 +114,7 @@ export default function PaiGowTemplateShell() {
               />
             </div>
 
-            {showResults ? (() => {
+            {showResultsModal ? (() => {
           const isWin = payout > 0;
           const toneBg = isWin
             ? "linear-gradient(135deg, rgba(51,183,123,0.95), rgba(16,185,129,0.92))"
@@ -113,6 +125,7 @@ export default function PaiGowTemplateShell() {
             <div
               role="dialog"
               aria-label="Pai Gow results"
+              onClick={() => setShowResultsModal(false)}
               style={{
                 position: "absolute",
                 inset: 0,
@@ -122,9 +135,11 @@ export default function PaiGowTemplateShell() {
                 background: "rgba(18,24,28,0.75)",
                 backdropFilter: "blur(6px)",
                 padding: 16,
+                cursor: "pointer",
               }}
             >
               <div
+                onClick={(e) => e.stopPropagation()}
                 style={{
                   width: "min(520px, calc(100vw - 28px))",
                   borderRadius: 24,
@@ -134,6 +149,7 @@ export default function PaiGowTemplateShell() {
                   padding: 18,
                   color: "rgba(255,255,255,0.96)",
                   transform: "rotate(-1deg)",
+                  cursor: "default",
                 }}
               >
                 <div style={{ textAlign: "center" }}>
