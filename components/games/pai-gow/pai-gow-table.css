@@ -533,6 +533,17 @@
 
   .table{
     padding: 12px 10px 18px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .rail,
+  .felt,
+  .betZone{
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .rail{
@@ -543,9 +554,9 @@
   }
 
   .brand{
-    flex: 1 1 240px;
-    min-width: 240px;
-    padding-right: 160px; /* leave space for top-right controls */
+    flex: 1 1 auto;
+    min-width: 0;
+    padding-right: 140px; /* leave space for top-right controls */
   }
 
   .controls{

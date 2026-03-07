@@ -133,6 +133,7 @@ const GameWindow: React.FC<GameWindowProps> = ({
             className={cn(
                 "lg:basis-2/3 w-full rounded-[12px] border-[2.25px] sm:border-[3.75px] lg:border-[4.68px] border-[#2A3640] relative overflow-hidden",
             )}
+            style={customHeightMobile ? { minHeight: customHeightMobile } : undefined}
         >
 
             {isGamePaused && (
@@ -196,9 +197,6 @@ const GameWindow: React.FC<GameWindowProps> = ({
                     width={719}
                     height={719}
                     className="w-full h-full object-cover rounded-[8px] opacity-75"
-                    style={{
-                        minHeight: customHeightMobile ? customHeightMobile : "100%",
-                    }}
                     priority
                 />
             )}
