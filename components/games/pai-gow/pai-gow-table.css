@@ -558,7 +558,19 @@
       padding-left: 12px;
     }
 
+    .brand{
+      flex: 1 1 auto;
+      min-width: 0;
+      padding-right: 0; /* cancel the 160px reserve used by the absolute desktop-style controls */
+    }
+
     .controls{
+      /* override max-820 absolute positioning that causes right-edge clipping */
+      position: static;
+      top: auto;
+      right: auto;
+      transform: none;
+
       width: 100%;
       display: flex;
       gap: 10px;
