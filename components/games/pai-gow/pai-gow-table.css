@@ -609,6 +609,10 @@
       box-sizing: border-box;
     }
 
+    /* Dealer: start size should match player's pre-split rack size.
+       Once dealer is arranged (HIGH/LOW split), it can use the larger default size. */
+    .dealerZone[data-arranged="false"]{ --cardW: 44px; --cardH: 66px; }
+
 
     /* Critical: flex children must be allowed to shrink (prevents right-edge clipping in iOS/TG) */
     .brand,

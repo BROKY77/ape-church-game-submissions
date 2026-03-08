@@ -1083,6 +1083,7 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
           <div className="felt" style={desktopLayout ? ({ gridColumn: 1, marginTop: 0 } as React.CSSProperties) : undefined}>
           <div
             className="zone dealerZone"
+            data-arranged={dealerArranged}
             style={
               desktopLayout
                 ? ({ minHeight: 220, display: "flex", flexDirection: "column" } as React.CSSProperties)
