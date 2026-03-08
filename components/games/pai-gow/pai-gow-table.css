@@ -549,6 +549,25 @@
       background-position: 50% 50% !important;
       background-color: rgba(0,0,0,0.10);
       min-height: 210px;
+
+      /* Critical: mobile header must not be a 2-col grid (causes right-edge clipping in TG/iOS) */
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto auto;
+      row-gap: 10px;
+      padding-right: 12px;
+      padding-left: 12px;
+    }
+
+    .controls{
+      width: 100%;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+    .controls .btn{
+      flex: 1 1 140px;
+      min-width: 0;
     }
 
     /* Prevent any horizontal drift */
