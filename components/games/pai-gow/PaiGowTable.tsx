@@ -1148,6 +1148,7 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
 
           <div
             className="zone playerZone"
+            data-split={lowIdx.length === 2 && highIdx.length === 5}
             style={
               desktopLayout
                 ? ({ minHeight: 360, display: "flex", flexDirection: "column" } as React.CSSProperties)

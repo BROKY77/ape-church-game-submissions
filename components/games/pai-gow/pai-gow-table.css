@@ -615,6 +615,12 @@
        Once dealer is arranged (HIGH/LOW split), it can use the larger default size. */
     .dealerZone[data-arranged="false"]{ --cardW: 44px; --cardH: 66px; }
 
+    /* Player: keep 7 cards fitting across until the user has actually split (then allow larger) */
+    .playerZone[data-split="false"]{ --cardW: 44px; --cardH: 66px; }
+
+    /* Slightly tighter spacing in the 7-card rack rows */
+    .playerZone .cardsRow,
+    .dealerZone .cardsRow{ gap: 6px; }
 
     /* Critical: flex children must be allowed to shrink (prevents right-edge clipping in iOS/TG) */
     .brand,
