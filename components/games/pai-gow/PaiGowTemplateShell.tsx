@@ -90,49 +90,90 @@ export default function PaiGowTemplateShell() {
               breakdown ? (
                 <div
                   style={{
-                    marginTop: 6,
-                    padding: 12,
-                    borderRadius: 18,
+                    marginTop: 14,
+                    padding: 16,
+                    borderRadius: 22,
                     border: "1px solid rgba(255,255,255,0.18)",
-                    background: "rgba(0,0,0,0.20)",
+                    background: "rgba(0,0,0,0.18)",
                     width: "100%",
                   }}
                 >
-                  <div style={{ display: "grid", gap: 8, fontSize: 13 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
-                      <div style={{ fontWeight: 900, opacity: 0.9 }}>Main</div>
-                      <div>
-                        {format(breakdown.main.wager)} → <strong>{format(breakdown.main.payout)}</strong>
-                      </div>
+                  <div style={{ fontWeight: 950, letterSpacing: 2.2, opacity: 0.85, fontSize: 14 }}>
+                    BREAKDOWN
+                  </div>
+
+                  <div
+                    style={{
+                      marginTop: 12,
+                      display: "grid",
+                      gap: 0,
+                      borderRadius: 18,
+                      background: "rgba(0,0,0,0.16)",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {(
+                      [
+                        {
+                          k: "Total wager",
+                          w: breakdown.totalWager,
+                          p: undefined,
+                        },
+                        { k: "Main bet", w: breakdown.main.wager, p: breakdown.main.payout },
+                        { k: "Bonus bet", w: breakdown.bonus.wager, p: breakdown.bonus.payout },
+                        { k: "Push bet", w: breakdown.push.wager, p: breakdown.push.payout },
+                        { k: "Net payout", w: breakdown.totalWager, p: payout },
+                      ] as Array<{ k: string; w: number; p?: number }>
+                    ).map((row, idx) => {
+                      const isNet = row.k === "Net payout";
+                      const pay = typeof row.p === "number" ? row.p : undefined;
+                      const payColor = pay === undefined ? "rgba(255,255,255,0.75)" : pay >= row.w ? "rgba(140,255,0,0.95)" : "rgba(255,90,90,0.92)";
+
+                      return (
+                        <div
+                          key={row.k}
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns: "1fr auto auto",
+                            gap: 14,
+                            alignItems: "center",
+                            padding: "14px 14px",
+                            borderTop: idx === 0 ? "0" : "1px solid rgba(255,255,255,0.08)",
+                            fontSize: 14,
+                          }}
+                        >
+                          <div style={{ fontWeight: 900, opacity: 0.92 }}>{row.k}</div>
+                          <div style={{ fontWeight: 950, opacity: 0.90, minWidth: 64, textAlign: "right" }}>
+                            {format(row.w)}
+                          </div>
+                          <div
+                            style={{
+                              fontWeight: 950,
+                              minWidth: 64,
+                              textAlign: "right",
+                              color: isNet ? "rgba(140,255,0,0.98)" : payColor,
+                            }}
+                          >
+                            {pay === undefined ? "—" : format(pay)}
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    <div style={{ padding: "12px 14px", borderTop: "1px solid rgba(255,255,255,0.08)", fontSize: 13, opacity: 0.85 }}>
+                      Outcome: <strong style={{ opacity: 0.98 }}>{breakdown.outcome ?? "—"}</strong>
+                      {breakdown.dealerAceHighPaiGow ? " • Dealer Ace High Pai Gow" : ""}
+                      {breakdown.bonus.hit ? (
+                        <span style={{ marginLeft: 8 }}>
+                          • Bonus: <strong>{breakdown.bonus.hit.name}</strong> x{breakdown.bonus.hit.multiplier}
+                        </span>
+                      ) : null}
+                      {breakdown.push.hit ? (
+                        <span style={{ marginLeft: 8 }}>
+                          • Push: <strong>{breakdown.push.hit.name}</strong> x{breakdown.push.hit.multiplier}
+                        </span>
+                      ) : null}
                     </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
-                      <div style={{ fontWeight: 900, opacity: 0.9 }}>Bonus</div>
-                      <div>
-                        {format(breakdown.bonus.wager)} → <strong>{format(breakdown.bonus.payout)}</strong>
-                        {breakdown.bonus.hit ? (
-                          <span style={{ opacity: 0.85, marginLeft: 8 }}>
-                            ({breakdown.bonus.hit.name} x{breakdown.bonus.hit.multiplier})
-                          </span>
-                        ) : null}
-                      </div>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
-                      <div style={{ fontWeight: 900, opacity: 0.9 }}>Push</div>
-                      <div>
-                        {format(breakdown.push.wager)} → <strong>{format(breakdown.push.payout)}</strong>
-                        {breakdown.push.hit ? (
-                          <span style={{ opacity: 0.85, marginLeft: 8 }}>
-                            ({breakdown.push.hit.name} x{breakdown.push.hit.multiplier})
-                          </span>
-                        ) : null}
-                      </div>
-                    </div>
-                    {breakdown.outcome ? (
-                      <div style={{ marginTop: 2, fontSize: 12, opacity: 0.85 }}>
-                        Outcome: <strong>{breakdown.outcome}</strong>
-                        {breakdown.dealerAceHighPaiGow ? " • Dealer Ace High Pai Gow" : ""}
-                      </div>
-                    ) : null}
                   </div>
                 </div>
               ) : null
