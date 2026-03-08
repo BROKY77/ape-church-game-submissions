@@ -1130,8 +1130,25 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
                 <div
                   style={
                     dealerArranged
-                      ? { fontWeight: 900, opacity: 0.75, letterSpacing: 0.6, fontSize: 12, marginBottom: 4 }
-                      : ({ fontWeight: 900, opacity: 0.75, letterSpacing: 0.6, fontSize: 12, marginBottom: 4, visibility: "hidden" } as React.CSSProperties)
+                      ? {
+                          fontWeight: 950,
+                          opacity: 1,
+                          letterSpacing: 0.8,
+                          fontSize: 12,
+                          marginBottom: 4,
+                          color: "#FFFFFF",
+                          textShadow: "0 1px 0 rgba(0,0,0,0.75)",
+                        }
+                      : ({
+                          fontWeight: 950,
+                          opacity: 1,
+                          letterSpacing: 0.8,
+                          fontSize: 12,
+                          marginBottom: 4,
+                          color: "#FFFFFF",
+                          textShadow: "0 1px 0 rgba(0,0,0,0.75)",
+                          visibility: "hidden",
+                        } as React.CSSProperties)
                   }
                 >
                   HIGH (5)
@@ -1152,7 +1169,7 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
 
               {/* LOW row (kept in layout even before arranged, but hidden) */}
               <div style={!dealerArranged ? ({ visibility: "hidden" } as React.CSSProperties) : undefined}>
-                <div style={{ fontWeight: 900, opacity: 0.75, letterSpacing: 0.6, fontSize: 12, marginBottom: 4 }}>LOW (2)</div>
+                <div style={{ fontWeight: 900, opacity: 1, letterSpacing: 0.6, fontSize: 12, marginBottom: 4, color: "#FFFFFF" }}>LOW (2)</div>
                 <div className="cardsRow cardsRowScroll">
                   {(dealerArranged ? view.houseSplit.low : [view.house7[0], view.house7[1]]).map((c, i) => (
                     <CardFace
