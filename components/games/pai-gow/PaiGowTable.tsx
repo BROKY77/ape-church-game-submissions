@@ -155,7 +155,7 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
   useEffect(() => {
     // NOTE: use absolute /public path (Next.js-safe)
     const s = new Howl({
-      src: ["/submissions/pai-gow/audio/flipcard.wav"],
+      src: ["/submissions/pai-gow/audio/flipcard.mp3", "/submissions/pai-gow/audio/flipcard.wav"],
       volume: 0.75,
       preload: true,
     });
