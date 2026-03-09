@@ -125,7 +125,9 @@
   }
 
   .betZone .zoneHeader{ flex: 0 0 auto; }
-  .betZone .betLane{ flex: 1 1 auto; overflow: auto; padding-bottom: 8px; }
+  /* Allow chip stacks to render above the bet spots without being clipped.
+     We already reserve headroom via padding-top on .betLane. */
+  .betZone .betLane{ flex: 1 1 auto; overflow: visible; padding-bottom: 8px; }
   .betZone .betFooterRow{
     flex: 0 0 auto;
     padding-top: 6px;
