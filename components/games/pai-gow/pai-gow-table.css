@@ -963,9 +963,9 @@
 
 .resFine{
   margin-top: 10px;
-  font-size: 14px;
-  opacity: 0.76;
-  line-height: 1.25;
+  font-size: 16px; /* make Outcome line easier to read */
+  opacity: 0.80;
+  line-height: 1.35;
 }
 
 @media (max-width: 520px){
@@ -976,6 +976,7 @@
   .resNet{ font-size: 26px; }
   .resKey{ font-size: 15px; }
   .resVal{ font-size: 15px; }
+  .resFine{ font-size: 15px; }
   .resActions .btn{ font-size: 14px; padding: 11px 12px; }
 }
 
