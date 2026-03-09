@@ -1196,10 +1196,12 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
               <div
                 className="dealerStatus"
                 style={{
-                  fontSize: 12,
+                  fontSize: 13,
+                  fontWeight: 900,
+                  letterSpacing: 0.2,
                   opacity: 1,
-                  color: "rgba(255,255,255,0.92)",
-                  textShadow: "0 1px 0 rgba(0,0,0,0.75)",
+                  color: "#FFFFFF",
+                  textShadow: "0 1px 0 rgba(0,0,0,0.95), 0 2px 8px rgba(0,0,0,0.55)",
                 }}
               >
                 {!dealerRevealed
