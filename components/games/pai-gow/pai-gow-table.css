@@ -813,14 +813,11 @@
    Results modal
 --------------------------- */
 .resModalOverlay{
-  /* Render inside GameWindow (which is position:relative + overflow:hidden) */
-  position: absolute;
+  position: fixed;
   inset: 0;
   z-index: 9999;
   display: grid;
   place-items: center;
-  padding: 14px;
-  box-sizing: border-box;
 }
 
 .resModalBg{
@@ -833,8 +830,8 @@
 
 .resModal{
   position: relative;
-  width: min(520px, calc(100% - 0px));
-  max-height: 100%; /* constrained by .resModalOverlay padding inside the square */
+  width: min(520px, calc(100vw - 26px));
+  max-height: calc(100vh - 26px); /* keep the modal fully on-screen / in the square */
   border-radius: 18px;
   border: 1px solid rgba(215,225,230,0.16);
   background: linear-gradient(180deg, rgba(18,18,18,0.96), rgba(10,10,10,0.88));
@@ -858,16 +855,16 @@
 
 .resTitle{
   font-weight: 950;
-  letter-spacing: 1.2px;
+  letter-spacing: 1.6px;
   opacity: 0.92;
-  font-size: 24px; /* keep headline readable but leave room for breakdown */
+  font-size: 28px; /* bigger outcome headline */
   line-height: 1.05;
 }
 
 .resSub{
   margin-top: 6px;
-  font-size: 14px;
-  opacity: 0.78;
+  font-size: 15px; /* bigger body text */
+  opacity: 0.75;
   line-height: 1.25;
 }
 
@@ -902,9 +899,9 @@
 }
 
 .resNet{
-  font-size: 34px; /* big, but less vertical hog */
+  font-size: 38px; /* bigger payout number */
   font-weight: 1000;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.8px;
   line-height: 1.05;
   text-shadow: 0 1px 0 rgba(0,0,0,0.65), 0 0 16px rgba(0,0,0,0.55);
 }
@@ -974,13 +971,13 @@
 
 /* iPhone: keep it big, but avoid overflowing the screen */
 @media (max-width: 520px){
-  .resModal{ padding: 12px 12px 10px; }
-  .resTitle{ font-size: 20px; }
-  .resSub{ font-size: 13px; }
-  .resNet{ font-size: 28px; }
+  .resModal{ padding: 16px 16px 14px; }
+  .resTitle{ font-size: 24px; }
+  .resSub{ font-size: 14px; }
+  .resNet{ font-size: 32px; }
   .resKey{ font-size: 13px; }
   .resVal{ font-size: 14px; }
-  .resActions .btn{ font-size: 14px; padding: 11px 12px; }
+  .resActions .btn{ font-size: 15px; padding: 12px 14px; }
 }
 
 /* Mobile/tablet: keep controls visible (no clipping in iOS in-app browsers) */
