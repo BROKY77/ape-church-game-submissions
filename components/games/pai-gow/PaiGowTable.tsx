@@ -1193,7 +1193,15 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
           >
             <div className="zoneHeader">
               <div className="zoneLabel">DEALER</div>
-              <div className="dealerStatus" style={{ fontSize: 12, opacity: 0.72 }}>
+              <div
+                className="dealerStatus"
+                style={{
+                  fontSize: 12,
+                  opacity: 1,
+                  color: "rgba(255,255,255,0.92)",
+                  textShadow: "0 1px 0 rgba(0,0,0,0.75)",
+                }}
+              >
                 {!dealerRevealed
                   ? "Waiting"
                   : !dealerArranged
