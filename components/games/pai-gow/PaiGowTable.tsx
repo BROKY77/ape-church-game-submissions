@@ -858,14 +858,16 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
             style={{ cursor: betsLocked ? "not-allowed" : "pointer" }}
           >
             <div className="chipStack" aria-hidden>
-              {sideChips.slice(0, 22).map((v, i) => {
+              {sideChips.slice(0, 18).map((v, i) => {
                 const w = wobbleStyle(v, i);
+                const step = 3;
+                const capped = Math.min(i, 14);
                 return (
                   <div
                     key={`side-${i}`}
                     className={`stackChip chipV${v}`}
                     style={{
-                      bottom: i * 4,
+                      bottom: capped * step,
                       left: `${w.x}px`,
                       transform: `rotate(${w.rot}deg) translateZ(0)`,
                     }}
@@ -916,14 +918,16 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
             style={{ cursor: betsLocked ? "not-allowed" : "pointer" }}
           >
             <div className="chipStack" aria-hidden>
-              {pushChips.slice(0, 22).map((v, i) => {
+              {pushChips.slice(0, 18).map((v, i) => {
                 const w = wobbleStyle(v, i);
+                const step = 3;
+                const capped = Math.min(i, 14);
                 return (
                   <div
                     key={`push-${i}`}
                     className={`stackChip chipV${v}`}
                     style={{
-                      bottom: i * 4,
+                      bottom: capped * step,
                       left: `${w.x}px`,
                       transform: `rotate(${w.rot}deg) translateZ(0)`,
                     }}
@@ -974,14 +978,16 @@ const PaiGowTable = forwardRef<PaiGowTableHandle, PaiGowTableProps>(function Pai
             style={{ cursor: betsLocked ? "not-allowed" : "pointer" }}
           >
             <div className="chipStack" aria-hidden>
-              {mainChips.slice(0, 22).map((v, i) => {
+              {mainChips.slice(0, 18).map((v, i) => {
                 const w = wobbleStyle(v, i);
+                const step = 3;
+                const capped = Math.min(i, 14);
                 return (
                   <div
                     key={`main-${i}`}
                     className={`stackChip chipV${v}`}
                     style={{
-                      bottom: i * 4,
+                      bottom: capped * step,
                       left: `${w.x}px`,
                       transform: `rotate(${w.rot}deg) translateZ(0)`,
                     }}

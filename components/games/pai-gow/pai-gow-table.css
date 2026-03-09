@@ -1086,9 +1086,10 @@
 .chipStack{
   position: absolute;
   left: 14px;
-  bottom: 12px;
+  bottom: 10px;
   width: 54px;
-  height: 74px;
+  height: 64px;
+  overflow: hidden; /* keep tall stacks from bleeding into the BETS header */
   pointer-events: none;
   filter: drop-shadow(0 10px 14px rgba(0,0,0,0.55));
 }
