@@ -69,46 +69,42 @@ submissions/
 
 > **One game per PR.** Do not include files from multiple games in a single pull request.
 
----
+**Using an AI agent to copy your files?**
 
-### Step 4 — Fill out metadata.json
+If you're using Claude Code, Cursor, or another AI coding agent, you can ask it to copy your files automatically. Clone this submissions repo locally, open your agent inside it, and send this prompt:
 
-Every submission requires a `metadata.json` file. Copy this template and fill in every field:
+```
+I have a game I built in the Ape Church game template repo.
+It is located at: [path to your template repo on your machine]
+e.g. ../my-game-repo or /Users/yourname/projects/my-game-repo
 
-```json
-{
-  "team": "your-team-name",
-  "gameName": "your-game-name",
-  "displayTitle": "Your Game Title",
-  "description": "A short description of your game. Three sentences max.",
-  "authors": [
-    {
-      "name": "Your Name",
-      "telegram": "your_telegram_username"
-    }
-  ],
-  "status": "pending",
-  "category": "arcade",
-  "tags": ["arcade", "example"],
-  "thumbnail": "/your-game-name/card.png",
-  "banner": "/your-game-name/banner.png",
-  "mainComponent": "YourGame.tsx",
-  "windowComponent": "YourGameWindow.tsx",
-  "setupComponent": "YourGameSetupCard.tsx",
-  "configFile": "yourGameConfig.ts",
-  "version": "1.0.0",
-  "submittedAt": "YYYY-MM-DD"
-}
+My game name is: [your-game-name] (kebab-case)
+My team name is: [your-team-name] (kebab-case)
+
+Please copy the following files from my template repo into
+this submissions repo in the correct structure:
+
+From template:
+  components/my-game/ → components/games/[your-game-name]/
+  public/my-game/ → public/submissions/[your-game-name]/
+  metadata.json → submissions/[your-team-name]/[your-game-name]/metadata.json
+
+Do not copy any other files. After copying, confirm what
+was moved and check that the folder names match exactly.
 ```
 
-**Field notes:**
-- `team` and `gameName` must be kebab-case and match your folder names exactly
-- `category` must be one of: `arcade`, `card`, `puzzle`, `strategy`, `other`
-- `thumbnail` must be `/your-game-name/card.png`
-- `banner` must be `/your-game-name/banner.png`
-- `status` must be `"pending"` on submission — do not change this
-- `submittedAt` must be the date you open your PR in `YYYY-MM-DD` format
-- Do **not** include `approvedAt` — this is set by maintainers upon approval
+After the agent runs, verify the structure matches the file tree above before moving on.
+
+---
+
+### Step 4 — Review your metadata.json
+
+Your `metadata.json` was copied over from the template in the previous step. Open `submissions/your-team-name/your-game-name/metadata.json` and verify:
+
+- All fields are filled in with your game's actual information
+- `team` and `gameName` match your folder names exactly
+- `submittedAt` is updated to today's date in `YYYY-MM-DD` format
+- `status` is `"pending"` — do not change this
 
 ---
 
