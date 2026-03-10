@@ -55,9 +55,9 @@ export default function PaiGowTemplateShell() {
 
   const audioPaths = useMemo(
     () => ({
-      bg: "/submissions/pai-gow/audio/PaiGow-Instrumental.mp3",
-      win: "/submissions/pai-gow/audio/Win.mp3",
-      lose: "/submissions/pai-gow/audio/Loose.mp3",
+      bg: "/submissions/pai-gow/audio/pai-gow-instrumental.mp3",
+      win: "/submissions/pai-gow/audio/win.mp3",
+      lose: "/submissions/pai-gow/audio/loose.mp3",
     }),
     [],
   );
@@ -66,7 +66,7 @@ export default function PaiGowTemplateShell() {
   useEffect(() => {
     const bg = new Howl({ src: [audioPaths.bg], loop: true, volume: 0.45, preload: true });
     const win = new Howl({ src: [audioPaths.win], volume: 0.85, preload: true });
-    const lose = new Howl({ src: [audioPaths.lose, "/submissions/pai-gow/audio/Loose.wav"], volume: 0.85, preload: true });
+    const lose = new Howl({ src: [audioPaths.lose], volume: 0.85, preload: true });
 
     bgMusicRef.current = bg;
     winSfxRef.current = win;
