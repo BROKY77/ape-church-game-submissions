@@ -245,17 +245,18 @@ export default function PaiGowTemplateShell() {
       <div className="flex flex-col lg:flex-row lg:items-start gap-4 sm:gap-8 lg:gap-10">
         <div
           ref={gameWrapRef}
-          className="flex-1 min-w-0"
+          className="flex-1 min-w-0 pgGameWrap"
+          style={{ "--pgMobileMinH": mobileGwHeight } as React.CSSProperties}
           // Arm audio on first touch anywhere (scrolling counts as a gesture on mobile).
           onPointerDownCapture={() => {
             if (!audioArmed) armAudio();
           }}
         >
+          <style>{`@media(max-width:640px){.pgGameWrap>div{min-height:var(--pgMobileMinH)}}`}</style>
           <GameWindow
             game={paiGow}
             isLoading={!!status?.isLoading}
             isGameFinished={showResults}
-            customHeightMobile={mobileGwHeight}
             betAmount={betAmount}
             payout={payout}
             inReplayMode={false}
