@@ -17,6 +17,9 @@ export default function PaiGowTemplateShell() {
   const [status, setStatus] = useState<PaiGowTableStatus | null>(null);
   const [gameId, setGameId] = useState<bigint>(() => BigInt(Date.now()));
 
+  // Track recent scroll activity so we don't change layout mid-scroll (iOS/TG can show "catch up" artifacts).
+  const lastScrollAtRef = useRef<number>(0);
+
   // Audio: Pai Gow custom music + win/lose stingers.
   const [muteMusic, setMuteMusic] = useState(false);
   const [muteSfx, setMuteSfx] = useState(false);
@@ -147,6 +150,9 @@ export default function PaiGowTemplateShell() {
       if (typeof window === "undefined") return;
       if (window.innerWidth > 640) return; // mobile-only
 
+      // Don't mutate height while the user is actively scrolling.
+      if (Date.now() - lastScrollAtRef.current < 250) return;
+
       const tableWrap = gameEl.querySelector<HTMLElement>(".tableWrap");
       if (!tableWrap) return;
 
@@ -183,6 +189,12 @@ export default function PaiGowTemplateShell() {
     };
 
     apply();
+
+    const onScroll = () => {
+      lastScrollAtRef.current = Date.now();
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+
     const ro = new ResizeObserver(() => apply());
     // Observe the whole game area; content changes will bubble into layout changes here.
     ro.observe(gameEl);
@@ -191,6 +203,7 @@ export default function PaiGowTemplateShell() {
     return () => {
       ro.disconnect();
       window.removeEventListener("resize", apply);
+      window.removeEventListener("scroll", onScroll);
     };
   }, [status?.isGameFinished, status?.betAmount, status?.payout]);
 
@@ -230,7 +243,14 @@ export default function PaiGowTemplateShell() {
     <div className="pgShell">
       {/* Match the platform template: GameWindow on the left, setup/bets panel on the right (desktop). */}
       <div className="flex flex-col lg:flex-row lg:items-start gap-4 sm:gap-8 lg:gap-10">
-        <div ref={gameWrapRef} className="flex-1 min-w-0">
+        <div
+          ref={gameWrapRef}
+          className="flex-1 min-w-0"
+          // Arm audio on first touch anywhere (scrolling counts as a gesture on mobile).
+          onPointerDownCapture={() => {
+            if (!audioArmed) armAudio();
+          }}
+        >
           <GameWindow
             game={paiGow}
             isLoading={!!status?.isLoading}
