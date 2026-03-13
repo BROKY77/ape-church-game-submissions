@@ -1,0 +1,31 @@
+{
+  "team": "nightowlee",
+  "gameName": "loot-tumble",
+  "displayTitle": "Loot Tumble",
+  "description": "A cluster-pays treasure slot with cascading wins, bonus free spins, and additive bonus multipliers.",
+  "authors": [
+    {
+      "name": "Nightowlee",
+      "telegram": "nightowlee"
+    }
+  ],
+  "revenueShare": [
+    {
+      "name": "Nightowlee",
+      "telegram": "nightowlee",
+      "address": "0xf8002D9c8B9a4582D207Eee355D99EB661168A97",
+      "share": 100
+    }
+  ],
+  "status": "pending",
+  "category": "other",
+  "tags": ["slots", "cluster-pays", "cascading", "bonus", "multipliers"],
+  "thumbnail": "/loot-tumble/card.png",
+  "banner": "/loot-tumble/banner.png",
+  "mainComponent": "LootTumble.tsx",
+  "windowComponent": "SlotsEngineWindow.tsx",
+  "setupComponent": "SlotsEngineSetupCard.tsx",
+  "configFile": "lootTumbleConfig.ts",
+  "version": "1.0.0",
+  "submittedAt": "2026-03-13"
+}
