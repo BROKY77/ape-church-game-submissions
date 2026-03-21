@@ -9,7 +9,7 @@ import { Game, randomBytes } from "@/lib/games";
 import MyGameSetupCard from "./StreetLookerSetupCard";
 import MyGameWindow from "./StreetLookerWindow";
 import {
-  myGame,
+  streetLooker,
   PUNCH_MACHINE_LIMITS,
   PunchPhase,
   ResolvedPunchRound,
@@ -17,7 +17,7 @@ import {
 } from "./streetLookerGameConfig";
 import "./street-looker.styles.css";
 
-interface MyGameComponentProps {
+interface StreetLookerProps {
   game?: Game;
 }
 
@@ -53,7 +53,7 @@ const createInitialState = (): MyGameState => ({
   userRandomWord: createRandomWord(),
 });
 
-const MyGameComponent: React.FC<MyGameComponentProps> = ({ game = myGame }) => {
+const StreetLooker: React.FC<StreetLookerProps> = ({ game = streetLooker }) => {
   const [currentView, setCurrentView] = useState<0 | 1 | 2>(0);
   const [gameState, setGameState] = useState<MyGameState>(createInitialState);
   const [muteSfx, setMuteSfx] = useState(false);
@@ -69,13 +69,13 @@ const MyGameComponent: React.FC<MyGameComponentProps> = ({ game = myGame }) => {
     Math.round(PUNCH_MACHINE_LIMITS.impactDurationMs * 0.45) - 375
   );
 
-  const [clickSfx] = useSound("/my-game/audio/click.mp3", {
+  const [clickSfx] = useSound("/submissions/street-looker/audio/click.mp3", {
     volume: sfxVolume,
     soundEnabled: !muteSfx,
     interrupt: true,
   });
   const [groundPunchSfx, { stop: stopGroundPunchSfx }] = useSound(
-    "/my-game/audio/ground_punch.mp3",
+    "/submissions/street-looker/audio/ground_punch.mp3",
     {
       volume: sfxVolume,
       soundEnabled: !muteSfx,
@@ -83,7 +83,7 @@ const MyGameComponent: React.FC<MyGameComponentProps> = ({ game = myGame }) => {
       loop: true,
     }
   );
-  const [crowdLoseSfx, { stop: stopCrowdLoseSfx }] = useSound("/my-game/audio/crowd_lose.mp3", {
+  const [crowdLoseSfx, { stop: stopCrowdLoseSfx }] = useSound("/submissions/street-looker/audio/crowd_lose.mp3", {
     volume: sfxVolume,
     soundEnabled: !muteSfx,
     interrupt: true,
@@ -91,18 +91,18 @@ const MyGameComponent: React.FC<MyGameComponentProps> = ({ game = myGame }) => {
       stopGroundPunchSfx();
     },
   });
-  const [crowdWinSfx, { stop: stopCrowdWinSfx }] = useSound("/my-game/audio/crowd_win.mp3", {
+  const [crowdWinSfx, { stop: stopCrowdWinSfx }] = useSound("/submissions/street-looker/audio/crowd_win.mp3", {
     volume: sfxVolume,
     soundEnabled: !muteSfx,
     interrupt: true,
   });
-  const [punchSfx, { stop: stopPunchSfx }] = useSound("/my-game/audio/punch.mp3", {
+  const [punchSfx, { stop: stopPunchSfx }] = useSound("/submissions/street-looker/audio/punch.mp3", {
     volume: sfxVolume,
     soundEnabled: !muteSfx,
     interrupt: true,
   });
   const [scoreCountupSfx, { stop: stopScoreCountupSfx }] = useSound(
-    "/my-game/audio/score_countup.mp3",
+    "/submissions/street-looker/audio/score_countup.mp3",
     {
       volume: sfxVolume,
       soundEnabled: !muteSfx,
@@ -111,7 +111,7 @@ const MyGameComponent: React.FC<MyGameComponentProps> = ({ game = myGame }) => {
     }
   );
   const [startingBellSfx, { stop: stopStartingBellSfx }] = useSound(
-    "/my-game/audio/starting_bell.mp3",
+    "/submissions/street-looker/audio/starting_bell.mp3",
     {
       volume: sfxVolume,
       soundEnabled: !muteSfx,
@@ -388,4 +388,4 @@ const MyGameComponent: React.FC<MyGameComponentProps> = ({ game = myGame }) => {
   );
 };
 
-export default MyGameComponent;
+export default StreetLooker;

@@ -9,6 +9,14 @@
       "telegram": "nightowlee"
     }
   ],
+  "revenueShare": [
+    {
+      "name": "Nightowlee",
+      "telegram": "nightowlee",
+      "address": "0x2eeebc5495fd58fc6ad532df984aa08f3080d9ee",
+      "share": 100
+    }
+  ],
   "status": "pending",
   "category": "arcade",
   "tags": ["arcade", "chicken", "crossing", "traffic", "cashout"],

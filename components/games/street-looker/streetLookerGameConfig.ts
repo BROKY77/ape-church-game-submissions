@@ -31,31 +31,31 @@ const createFramePath = (prefix: string, count: number): string[] =>
   });
 
 export const SCENE_FRAMES = {
-  machineStatic: "/my-game/boxing-machine/static.png",
-  machineImpact: createFramePath("/my-game/boxing-machine/hit", 24),
-  boxerIdle: createFramePath("/my-game/boxer/idle", 13),
-  boxerPunch: createFramePath("/my-game/boxer/punch", 13),
-  boxerWin: createFramePath("/my-game/boxer/win", 8),
-  boxerLoss: createFramePath("/my-game/boxer/loss", 13),
-  flash: createFramePath("/my-game/camera-flash", 20),
-  confetti: createFramePath("/my-game/confetti", 8),
-  explosion: createFramePath("/my-game/explosion", 20),
-  loseOverlay: "/my-game/lose-overlay.png",
+  machineStatic: "/submissions/street-looker/boxing-machine/static.png",
+  machineImpact: createFramePath("/submissions/street-looker/boxing-machine/hit", 24),
+  boxerIdle: createFramePath("/submissions/street-looker/boxer/idle", 13),
+  boxerPunch: createFramePath("/submissions/street-looker/boxer/punch", 13),
+  boxerWin: createFramePath("/submissions/street-looker/boxer/win", 8),
+  boxerLoss: createFramePath("/submissions/street-looker/boxer/loss", 13),
+  flash: createFramePath("/submissions/street-looker/camera-flash", 20),
+  confetti: createFramePath("/submissions/street-looker/confetti", 8),
+  explosion: createFramePath("/submissions/street-looker/explosion", 20),
+  loseOverlay: "/submissions/street-looker/lose-overlay.png",
   cheerleaders: {
     idle: [
-      createFramePath("/my-game/cheerleader/cheerleader-idle/v1", 11),
-      createFramePath("/my-game/cheerleader/cheerleader-idle/v2", 11),
-      createFramePath("/my-game/cheerleader/cheerleader-idle/v3", 11),
+      createFramePath("/submissions/street-looker/cheerleader/cheerleader-idle/v1", 11),
+      createFramePath("/submissions/street-looker/cheerleader/cheerleader-idle/v2", 11),
+      createFramePath("/submissions/street-looker/cheerleader/cheerleader-idle/v3", 11),
     ],
     celebration: [
-      createFramePath("/my-game/cheerleader/cheerleader-celebration/v1", 10),
-      createFramePath("/my-game/cheerleader/cheerleader-celebration/v2", 10),
-      createFramePath("/my-game/cheerleader/cheerleader-celebration/v3", 10),
+      createFramePath("/submissions/street-looker/cheerleader/cheerleader-celebration/v1", 10),
+      createFramePath("/submissions/street-looker/cheerleader/cheerleader-celebration/v2", 10),
+      createFramePath("/submissions/street-looker/cheerleader/cheerleader-celebration/v3", 10),
     ],
     disappointed: [
-      createFramePath("/my-game/cheerleader/cheerleader-dissapointed/v1", 12),
-      createFramePath("/my-game/cheerleader/cheerleader-dissapointed/v2", 12),
-      createFramePath("/my-game/cheerleader/cheerleader-dissapointed/v3", 12),
+      createFramePath("/submissions/street-looker/cheerleader/cheerleader-dissapointed/v1", 12),
+      createFramePath("/submissions/street-looker/cheerleader/cheerleader-dissapointed/v2", 12),
+      createFramePath("/submissions/street-looker/cheerleader/cheerleader-dissapointed/v3", 12),
     ],
   },
 } as const;
@@ -162,13 +162,13 @@ export const getMachineTierLabel = (roll: number): string => {
   return "Light tap";
 };
 
-export const myGame: Game = {
+export const streetLooker: Game = {
   title: PUNCH_MACHINE_COPY.title,
   description: PUNCH_MACHINE_COPY.description,
   gameAddress: "0x1234567890123456789012345678901234567890",
-  gameBackground: "/street-looker/background.jpg",
-  card: "/street-looker/card.jpg",
-  banner: "/street-looker/banner.jpg",
+  gameBackground: "/submissions/street-looker/background.png",
+  card: "/submissions/street-looker/card.png",
+  banner: "/submissions/street-looker/banner.png",
   themeColorBackground: MACHINE_THEME.accent,
   payouts: {
     0: {

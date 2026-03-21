@@ -2,10 +2,16 @@
 import { ComponentType } from 'react'
 import ExampleGame from '@/components/games/example-game/ExampleGame'
 import ChickenCrossing from '@/components/games/chicken-crossing/ChickenCrossing'
+import PaiGowGame from '@/components/games/pai-gow/PaiGowGame'
+import LootTumble from '@/components/games/loot-tumble/LootTumble'
+import StreetLooker from '@/components/games/street-looker/StreetLooker'
 
 const gameRegistry: Record<string, ComponentType> = {
   'example-game': ExampleGame,
   'chicken-crossing': ChickenCrossing,
+  'pai-gow': PaiGowGame,
+  'loot-tumble': LootTumble,
+  'street-looker': StreetLooker,
 }
 
 export { gameRegistry }

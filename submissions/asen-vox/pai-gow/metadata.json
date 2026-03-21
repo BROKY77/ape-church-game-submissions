@@ -9,6 +9,14 @@
       "telegram": "Man3Faces"
     }
   ],
+  "revenueShare": [
+    {
+      "name": "Asen Vox",
+      "telegram": "Man3Faces",
+      "address": "0x354845eBf9731Aa1448a6D87d8b0fAF302AD3F77",
+      "share": 100
+    }
+  ],
   "status": "pending",
   "category": "card",
   "tags": ["card", "pai-gow", "casino"],
