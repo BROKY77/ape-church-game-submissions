@@ -22,13 +22,22 @@
     </radialGradient>
 
     <linearGradient id="diceGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.12"/>
-      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.06"/>
+      <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.15"/>
     </linearGradient>
 
     <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="3" result="blur"/>
       <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="textGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
         <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
@@ -50,58 +59,58 @@
   <rect width="1920" height="1080" fill="url(#glow2)"/>
   <rect width="1920" height="1080" fill="url(#glow3)"/>
 
-  <!-- Floating dice outlines - top left cluster -->
-  <g transform="translate(80, 60) rotate(-15)" opacity="0.07">
-    <rect width="70" height="70" rx="10" fill="none" stroke="#0ea5e9" stroke-width="2"/>
+  <!-- Floating dice outlines - top left cluster (more visible) -->
+  <g transform="translate(80, 60) rotate(-15)" opacity="0.2">
+    <rect width="70" height="70" rx="10" fill="url(#diceGrad)" stroke="#0ea5e9" stroke-width="3"/>
     <text x="35" y="48" text-anchor="middle" fill="#0ea5e9" font-family="monospace" font-size="36" font-weight="bold">6</text>
   </g>
 
-  <g transform="translate(180, 140) rotate(8)" opacity="0.05">
-    <rect width="55" height="55" rx="8" fill="none" stroke="#22d3ee" stroke-width="1.5"/>
+  <g transform="translate(180, 140) rotate(8)" opacity="0.15">
+    <rect width="55" height="55" rx="8" fill="url(#diceGrad)" stroke="#22d3ee" stroke-width="3"/>
     <text x="27.5" y="38" text-anchor="middle" fill="#22d3ee" font-family="monospace" font-size="28" font-weight="bold">3</text>
   </g>
 
-  <!-- Top right -->
-  <g transform="translate(1700, 80) rotate(12)" opacity="0.06">
-    <rect width="65" height="65" rx="9" fill="none" stroke="#0ea5e9" stroke-width="1.5"/>
+  <!-- Top right (more visible) -->
+  <g transform="translate(1700, 80) rotate(12)" opacity="0.18">
+    <rect width="65" height="65" rx="9" fill="url(#diceGrad)" stroke="#0ea5e9" stroke-width="3"/>
     <text x="32.5" y="44" text-anchor="middle" fill="#0ea5e9" font-family="monospace" font-size="32" font-weight="bold">9</text>
   </g>
 
-  <g transform="translate(1780, 180) rotate(-8)" opacity="0.04">
-    <rect width="50" height="50" rx="7" fill="none" stroke="#06b6d4" stroke-width="1.5"/>
+  <g transform="translate(1780, 180) rotate(-8)" opacity="0.12">
+    <rect width="50" height="50" rx="7" fill="url(#diceGrad)" stroke="#06b6d4" stroke-width="3"/>
     <text x="25" y="35" text-anchor="middle" fill="#06b6d4" font-family="monospace" font-size="26" font-weight="bold">1</text>
   </g>
 
-  <!-- Bottom left -->
-  <g transform="translate(60, 900) rotate(20)" opacity="0.06">
-    <rect width="60" height="60" rx="8" fill="none" stroke="#22d3ee" stroke-width="1.5"/>
+  <!-- Bottom left (more visible) -->
+  <g transform="translate(60, 900) rotate(20)" opacity="0.18">
+    <rect width="60" height="60" rx="8" fill="url(#diceGrad)" stroke="#22d3ee" stroke-width="3"/>
     <text x="30" y="42" text-anchor="middle" fill="#22d3ee" font-family="monospace" font-size="30" font-weight="bold">7</text>
   </g>
 
-  <g transform="translate(160, 820) rotate(-10)" opacity="0.04">
-    <rect width="48" height="48" rx="7" fill="none" stroke="#0ea5e9" stroke-width="1.5"/>
+  <g transform="translate(160, 820) rotate(-10)" opacity="0.12">
+    <rect width="48" height="48" rx="7" fill="url(#diceGrad)" stroke="#0ea5e9" stroke-width="3"/>
     <text x="24" y="34" text-anchor="middle" fill="#0ea5e9" font-family="monospace" font-size="24" font-weight="bold">4</text>
   </g>
 
-  <!-- Bottom right -->
-  <g transform="translate(1720, 920) rotate(-18)" opacity="0.06">
-    <rect width="58" height="58" rx="8" fill="none" stroke="#06b6d4" stroke-width="1.5"/>
+  <!-- Bottom right (more visible) -->
+  <g transform="translate(1720, 920) rotate(-18)" opacity="0.18">
+    <rect width="58" height="58" rx="8" fill="url(#diceGrad)" stroke="#06b6d4" stroke-width="3"/>
     <text x="29" y="40" text-anchor="middle" fill="#06b6d4" font-family="monospace" font-size="30" font-weight="bold">5</text>
   </g>
 
-  <g transform="translate(1600, 850) rotate(5)" opacity="0.04">
-    <rect width="45" height="45" rx="6" fill="none" stroke="#22d3ee" stroke-width="1.5"/>
+  <g transform="translate(1600, 850) rotate(5)" opacity="0.12">
+    <rect width="45" height="45" rx="6" fill="url(#diceGrad)" stroke="#22d3ee" stroke-width="3"/>
     <text x="22.5" y="32" text-anchor="middle" fill="#22d3ee" font-family="monospace" font-size="22" font-weight="bold">8</text>
   </g>
 
-  <!-- Middle scattered dice -->
-  <g transform="translate(350, 450) rotate(-5)" opacity="0.035">
-    <rect width="80" height="80" rx="12" fill="url(#diceGrad)" stroke="#0ea5e9" stroke-width="1"/>
+  <!-- Middle scattered dice (more visible) -->
+  <g transform="translate(350, 450) rotate(-5)" opacity="0.12">
+    <rect width="80" height="80" rx="12" fill="url(#diceGrad)" stroke="#0ea5e9" stroke-width="2"/>
     <text x="40" y="55" text-anchor="middle" fill="#0ea5e9" font-family="monospace" font-size="42" font-weight="bold">2</text>
   </g>
 
-  <g transform="translate(1500, 400) rotate(10)" opacity="0.035">
-    <rect width="75" height="75" rx="11" fill="url(#diceGrad)" stroke="#06b6d4" stroke-width="1"/>
+  <g transform="translate(1500, 400) rotate(10)" opacity="0.12">
+    <rect width="75" height="75" rx="11" fill="url(#diceGrad)" stroke="#06b6d4" stroke-width="2"/>
     <text x="37.5" y="52" text-anchor="middle" fill="#06b6d4" font-family="monospace" font-size="40" font-weight="bold">8</text>
   </g>
 
@@ -113,7 +122,7 @@
   </g>
 
   <!-- Particle dots -->
-  <g opacity="0.15" fill="#0ea5e9">
+  <g opacity="0.3" fill="#0ea5e9">
     <circle cx="300" cy="200" r="1.5"/>
     <circle cx="520" cy="150" r="1"/>
     <circle cx="750" cy="300" r="1.5"/>
@@ -136,15 +145,15 @@
 
   <!-- Larger glowing dots -->
   <g filter="url(#glow)">
-    <circle cx="200" cy="300" r="2" fill="#0ea5e9" opacity="0.2"/>
-    <circle cx="1700" cy="450" r="2" fill="#06b6d4" opacity="0.15"/>
-    <circle cx="960" cy="200" r="2.5" fill="#22d3ee" opacity="0.12"/>
-    <circle cx="500" cy="750" r="2" fill="#0ea5e9" opacity="0.15"/>
-    <circle cx="1400" cy="800" r="2" fill="#06b6d4" opacity="0.18"/>
+    <circle cx="200" cy="300" r="2" fill="#0ea5e9" opacity="0.4"/>
+    <circle cx="1700" cy="450" r="2" fill="#06b6d4" opacity="0.35"/>
+    <circle cx="960" cy="200" r="2.5" fill="#22d3ee" opacity="0.3"/>
+    <circle cx="500" cy="750" r="2" fill="#0ea5e9" opacity="0.35"/>
+    <circle cx="1400" cy="800" r="2" fill="#06b6d4" opacity="0.4"/>
   </g>
 
   <!-- Diagonal light beams -->
-  <g opacity="0.02">
+  <g opacity="0.05">
     <line x1="0" y1="400" x2="800" y2="0" stroke="#0ea5e9" stroke-width="80"/>
     <line x1="1120" y1="1080" x2="1920" y2="680" stroke="#06b6d4" stroke-width="60"/>
   </g>
