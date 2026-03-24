@@ -24,8 +24,8 @@
     "arcade",
     "numbers"
   ],
-  "thumbnail": "/submissions/number-dice/card.png",
-  "banner": "/submissions/number-dice/banner.png",
+  "thumbnail": "number-dice/card.png",
+  "banner": "number-dice/banner.png",
   "mainComponent": "MyGame.tsx",
   "windowComponent": "MyGameWindow.tsx",
   "setupComponent": "MyGameSetupCard.tsx",
