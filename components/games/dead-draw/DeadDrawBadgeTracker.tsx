@@ -75,14 +75,14 @@ const DeadDrawBadgeTracker: React.FC<DeadDrawBadgeTrackerProps> = ({
       >
         <img
           className="dead-draw-badge-tracker__badge-empty"
-          src="/dead-draw-assets/sheriffempty.png"
+          src="/submissions/dead-draw/sheriffempty.png"
           alt=""
           draggable={false}
         />
         {isFilled && (
           <img
             className={`dead-draw-badge-tracker__badge-full${isSlamming ? ' dead-draw-badge-tracker__badge-full--slamming' : ''}`}
-            src="/dead-draw-assets/sherriffformeter.png"
+            src="/submissions/dead-draw/sherriffformeter.png"
             alt="Sheriff eliminated"
             draggable={false}
           />

@@ -47,7 +47,7 @@ function RevengeFlipCard({ depth, position, currentMode }: { depth: number; posi
         <div className="dead-draw-card__flip-front">
           <img
             className="dead-draw-card__back-img"
-            src="/dead-draw-assets/cardback.png"
+            src="/submissions/dead-draw/cardback.png"
             alt="Card back"
             draggable={false}
           />
@@ -84,28 +84,28 @@ const LOOT_ICONS: Record<number, string> = {
 
 /** Image assets for loot cards — maps card value to asset path */
 const LOOT_IMAGES: Record<number, string> = {
-  2: '/dead-draw-assets/spur.png',
-  3: '/dead-draw-assets/oldboot.png',
-  4: '/dead-draw-assets/bulletpile.png',
-  5: '/dead-draw-assets/bottle.png',
-  6: '/dead-draw-assets/cowboyhat.png',
-  7: '/dead-draw-assets/knife.png',
-  8: '/dead-draw-assets/dynamite.png',
-  9: '/dead-draw-assets/coins.png',
-  10: '/dead-draw-assets/beltbuckle.png',
-  11: '/dead-draw-assets/pockwatch.png',
-  12: '/dead-draw-assets/saddlebag.png',
-  13: '/dead-draw-assets/goldcoins.png',
-  14: '/dead-draw-assets/goldbar.png',
-  15: '/dead-draw-assets/diamond.png',
+  2: '/submissions/dead-draw/spur.png',
+  3: '/submissions/dead-draw/oldboot.png',
+  4: '/submissions/dead-draw/bulletpile.png',
+  5: '/submissions/dead-draw/bottle.png',
+  6: '/submissions/dead-draw/cowboyhat.png',
+  7: '/submissions/dead-draw/knife.png',
+  8: '/submissions/dead-draw/dynamite.png',
+  9: '/submissions/dead-draw/coins.png',
+  10: '/submissions/dead-draw/beltbuckle.png',
+  11: '/submissions/dead-draw/pockwatch.png',
+  12: '/submissions/dead-draw/saddlebag.png',
+  13: '/submissions/dead-draw/goldcoins.png',
+  14: '/submissions/dead-draw/goldbar.png',
+  15: '/submissions/dead-draw/diamond.png',
 };
 
 /** Sheriff image: gun pointed at player in take mode, badge in shoot mode */
-const SHERIFF_IMAGE_TAKE = '/dead-draw-assets/sheriffontake.png';
-const SHERIFF_IMAGE_SHOOT = '/dead-draw-assets/sheriffonshoot.png';
+const SHERIFF_IMAGE_TAKE = '/submissions/dead-draw/sheriffontake.png';
+const SHERIFF_IMAGE_SHOOT = '/submissions/dead-draw/sheriffonshoot.png';
 
 /** Fallback for loot values without an image */
-const LOOT_IMAGE_FALLBACK = '/dead-draw-assets/bottle.png';
+const LOOT_IMAGE_FALLBACK = '/submissions/dead-draw/bottle.png';
 
 function CardFace({ value, isSheriff, mode, showFlash }: { value: number; isSheriff: boolean; mode?: 'take' | 'shoot'; showFlash?: boolean }) {
   if (isSheriff) {
@@ -437,7 +437,7 @@ const DeadDrawCard: React.FC<DeadDrawCardProps> = React.memo(
             >
               <img
                 className="dead-draw-card__back-img"
-                src="/dead-draw-assets/cardback.png"
+                src="/submissions/dead-draw/cardback.png"
                 alt=""
                 draggable={false}
               />
@@ -470,7 +470,7 @@ const DeadDrawCard: React.FC<DeadDrawCardProps> = React.memo(
               <div className="dead-draw-card__flip-front">
                 <img
                   className="dead-draw-card__back-img"
-                  src="/dead-draw-assets/cardback.png"
+                  src="/submissions/dead-draw/cardback.png"
                   alt="Card back"
                   draggable={false}
                 />
@@ -508,7 +508,7 @@ const DeadDrawCard: React.FC<DeadDrawCardProps> = React.memo(
             <div className="dead-draw-card__back">
               <img
                 className="dead-draw-card__back-img"
-                src="/dead-draw-assets/cardback.png"
+                src="/submissions/dead-draw/cardback.png"
                 alt="Card back"
                 draggable={false}
               />
@@ -536,7 +536,7 @@ const DeadDrawCard: React.FC<DeadDrawCardProps> = React.memo(
               <div className="dead-draw-card__back">
                 <img
                   className="dead-draw-card__back-img"
-                  src="/dead-draw-assets/cardback.png"
+                  src="/submissions/dead-draw/cardback.png"
                   alt=""
                   draggable={false}
                 />
@@ -598,7 +598,7 @@ const DeadDrawCard: React.FC<DeadDrawCardProps> = React.memo(
               <div className="dead-draw-card__back">
                 <img
                   className="dead-draw-card__back-img"
-                  src="/dead-draw-assets/cardback.png"
+                  src="/submissions/dead-draw/cardback.png"
                   alt="Card back"
                   draggable={false}
                 />

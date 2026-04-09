@@ -195,44 +195,44 @@ const DeadDrawWindow: React.FC<DeadDrawWindowProps> = ({
   }, [gameState.pendingOutcome, currentView, board, gameState.destroyedPositions]);
 
   // --- Sound Effects ---
-  const [_playShot] = useSound('/dead-draw-assets/sfx/sheriffgunshot.mp3', {
+  const [_playShot] = useSound('/submissions/dead-draw/sfx/sheriffgunshot.mp3', {
     volume: 0.5,
     interrupt: true,
   });
-  const [_playClick] = useSound('/dead-draw-assets/sfx/revolver-click.mp3', {
+  const [_playClick] = useSound('/submissions/dead-draw/sfx/revolver-click.mp3', {
     volume: 0.4,
     interrupt: true,
   });
-  const [_playGameStart] = useSound('/dead-draw-assets/sfx/revolver-spin-game-start.mp3', {
+  const [_playGameStart] = useSound('/submissions/dead-draw/sfx/revolver-spin-game-start.mp3', {
     volume: 0.5,
   });
-  const [_playSheriffHit] = useSound('/dead-draw-assets/sfx/shot.mp3', {
+  const [_playSheriffHit] = useSound('/submissions/dead-draw/sfx/shot.mp3', {
     volume: 1.0,
   });
-  const [_playEscape] = useSound('/dead-draw-assets/sfx/door-slam-escape.mp3', {
+  const [_playEscape] = useSound('/submissions/dead-draw/sfx/door-slam-escape.mp3', {
     volume: 0.5,
   });
-  const [_playGoldBar] = useSound('/dead-draw-assets/sfx/stack-complete.mp3', {
+  const [_playGoldBar] = useSound('/submissions/dead-draw/sfx/stack-complete.mp3', {
     volume: 0.5,
   });
-  const [_playGlassShatter] = useSound('/dead-draw-assets/sfx/shatter.mp3', {
-    volume: 0.5,
-    interrupt: true,
-  });
-  const [_playFlip, { sound: flipSound }] = useSound('/dead-draw-assets/sfx/flip.mp3', {
+  const [_playGlassShatter] = useSound('/submissions/dead-draw/sfx/shatter.mp3', {
     volume: 0.5,
     interrupt: true,
   });
-  const [_playStackComplete, { sound: stackCompleteSound }] = useSound('/dead-draw-assets/sfx/stack-complete.mp3', {
+  const [_playFlip, { sound: flipSound }] = useSound('/submissions/dead-draw/sfx/flip.mp3', {
+    volume: 0.5,
+    interrupt: true,
+  });
+  const [_playStackComplete, { sound: stackCompleteSound }] = useSound('/submissions/dead-draw/sfx/stack-complete.mp3', {
     volume: 0.5,
   });
-  const [_playCoin, { sound: coinSound }] = useSound('/dead-draw-assets/sfx/add-to-pot-coin.mp3', {
+  const [_playCoin, { sound: coinSound }] = useSound('/submissions/dead-draw/sfx/add-to-pot-coin.mp3', {
     volume: 0.5,
   });
-  const [_playRicochet, { sound: ricochetSound }] = useSound('/dead-draw-assets/sfx/ricochetonbadge.mp3', {
+  const [_playRicochet, { sound: ricochetSound }] = useSound('/submissions/dead-draw/sfx/ricochetonbadge.mp3', {
     volume: 0.6,
   });
-  const [_playBgm, { stop: stopBgm, sound: bgmSound }] = useSound('/dead-draw-assets/sfx/bgm.mp3', {
+  const [_playBgm, { stop: stopBgm, sound: bgmSound }] = useSound('/submissions/dead-draw/sfx/bgm.mp3', {
     volume: 0.3,
     loop: true,
   });
@@ -278,19 +278,17 @@ const DeadDrawWindow: React.FC<DeadDrawWindowProps> = ({
   }, [sfxMuted, _playRicochet, ricochetSound]);
   const playBgm = useCallback(() => { if (!musicMuted) _playBgm(); }, [musicMuted, _playBgm]);
 
-  // BGM: start once on first gameplay, loop forever. Never restart on play again.
-  const bgmStarted = useRef(false);
+  // BGM: loop while Dead Draw is open (setup through game over); stop when muted or on navigation away.
   useEffect(() => {
     if (musicMuted) {
       stopBgm();
-      bgmStarted.current = false;
-      return;
+      return undefined;
     }
-    if (currentView >= 1 && !bgmStarted.current) {
-      _playBgm();
-      bgmStarted.current = true;
-    }
-  }, [currentView, musicMuted, _playBgm, stopBgm]);
+    _playBgm();
+    return () => {
+      stopBgm();
+    };
+  }, [musicMuted, _playBgm, stopBgm]);
 
   // BGM volume fade — fades to silence as fewer cards remain on the table
   const bgmVolRef = useRef(0.3);
@@ -323,7 +321,7 @@ const DeadDrawWindow: React.FC<DeadDrawWindowProps> = ({
   }, [currentView, bgmSound, musicMuted]);
 
   // --- Heartbeat Sound ---
-  const [_playHeartbeat, { sound: heartbeatSound }] = useSound('/dead-draw-assets/sfx/heartbeat.mp3', {
+  const [_playHeartbeat, { sound: heartbeatSound }] = useSound('/submissions/dead-draw/sfx/heartbeat.mp3', {
     volume: 0.03,
     interrupt: true,
     sprite: { beat: [30, 900] }, // trim 30ms from start, play 900ms (skip clipping at edges)
@@ -582,7 +580,7 @@ const DeadDrawWindow: React.FC<DeadDrawWindowProps> = ({
       >
         <div className={`dead-draw-logo__img-wrap${isLogoSwinging ? ' dead-draw-logo__img-wrap--swinging' : ''}`}>
           <img
-            src="/dead-draw-assets/ddaclogo.png"
+            src="/submissions/dead-draw/ddaclogo.png"
             alt="Dead Draw"
             className="dead-draw-logo__img"
             draggable={false}
@@ -603,7 +601,7 @@ const DeadDrawWindow: React.FC<DeadDrawWindowProps> = ({
           <DeadDrawGrid
             board={null}
             depth={gameState.selectedDepth}
-            onClickPosition={() => {}}
+            onClickPosition={() => { }}
             disabled={true}
             revealSpeed={revealSpeed}
           />
@@ -622,63 +620,63 @@ const DeadDrawWindow: React.FC<DeadDrawWindowProps> = ({
                 fullClearMultiplier={bpsToDisplay(getFullClearMultiplierBps(board.depth))}
               />
               <DeadDrawGrid
-              board={board}
-              depth={board.depth}
-              onShotSound={handleShotSound}
-              onGlassShatter={handleGlassShatter}
-              revealSpeed={revealSpeed}
-              multiplierTier={gameState.pendingOutcome === 'rampage' ? 0 : getMultiplierTier(gameState.pendingOutcome ? gameState.preBustMultiplier : gameState.currentMultiplier)}
-              currentMultiplier={gameState.pendingOutcome ? gameState.preBustMultiplier : gameState.currentMultiplier}
-              revengePositions={revengePositions}
-              onClickPosition={(index) => {
-                if (
-                  gameState.isRevealing &&
-                  gameState.revealingPosition === index &&
-                  gameState.lockedMode === 'take'
-                ) {
-                  // Take mode: flip or dismiss based on cardPhase
-                  if (gameState.pendingOutcome) {
-                    // Busted — block all interaction
-                  } else if (gameState.cardPhase === 'ready') {
-                    flipStartedAt.current = Date.now();
-                    onFlipCard();
-                  } else if (gameState.cardPhase === 'flipped' && canDismiss()) {
-                    const pos = board!.positions[index];
-                    const isLastCard = pos.revealProgress >= board!.depth;
-                    if (isLastCard && board!.depth >= 3) {
-                      playStackComplete(gameState.shotsTaken);
-                    } else {
-                      playCoin(gameState.shotsTaken);
+                board={board}
+                depth={board.depth}
+                onShotSound={handleShotSound}
+                onGlassShatter={handleGlassShatter}
+                revealSpeed={revealSpeed}
+                multiplierTier={gameState.pendingOutcome === 'rampage' ? 0 : getMultiplierTier(gameState.pendingOutcome ? gameState.preBustMultiplier : gameState.currentMultiplier)}
+                currentMultiplier={gameState.pendingOutcome ? gameState.preBustMultiplier : gameState.currentMultiplier}
+                revengePositions={revengePositions}
+                onClickPosition={(index) => {
+                  if (
+                    gameState.isRevealing &&
+                    gameState.revealingPosition === index &&
+                    gameState.lockedMode === 'take'
+                  ) {
+                    // Take mode: flip or dismiss based on cardPhase
+                    if (gameState.pendingOutcome) {
+                      // Busted — block all interaction
+                    } else if (gameState.cardPhase === 'ready') {
+                      flipStartedAt.current = Date.now();
+                      onFlipCard();
+                    } else if (gameState.cardPhase === 'flipped' && canDismiss()) {
+                      const pos = board!.positions[index];
+                      const isLastCard = pos.revealProgress >= board!.depth;
+                      if (isLastCard && board!.depth >= 3) {
+                        playStackComplete(gameState.shotsTaken);
+                      } else {
+                        playCoin(gameState.shotsTaken);
+                      }
+                      onDismissCard();
                     }
-                    onDismissCard();
+                  } else if (
+                    gameState.isRevealing &&
+                    gameState.revealingPosition === index &&
+                    gameState.canAdvanceReveal &&
+                    gameState.lockedMode === 'shoot'
+                  ) {
+                    // Shoot mode: existing click-to-advance
+                    onAdvanceReveal();
+                  } else if (!gameState.isRevealing) {
+                    onShootPosition(index);
                   }
-                } else if (
-                  gameState.isRevealing &&
-                  gameState.revealingPosition === index &&
-                  gameState.canAdvanceReveal &&
-                  gameState.lockedMode === 'shoot'
-                ) {
-                  // Shoot mode: existing click-to-advance
-                  onAdvanceReveal();
-                } else if (!gameState.isRevealing) {
-                  onShootPosition(index);
-                }
-              }}
-              disabled={false}
-              currentMode={gameState.currentMode}
-              destroyedPositions={gameState.destroyedPositions}
-              cardPhase={gameState.cardPhase}
-              lockedMode={gameState.lockedMode}
-              revealingPosition={gameState.revealingPosition}
-            />
-          </div>
+                }}
+                disabled={false}
+                currentMode={gameState.currentMode}
+                destroyedPositions={gameState.destroyedPositions}
+                cardPhase={gameState.cardPhase}
+                lockedMode={gameState.lockedMode}
+                revealingPosition={gameState.revealingPosition}
+              />
+            </div>
 
-          {/* Badge Tracker — right side, mirrors Wanted Meter */}
-          <DeadDrawBadgeTracker
-            sheriffCount={board.sheriffCount}
-            eliminatedSheriffs={gameState.eliminatedSheriffs}
-            isRampage={gameState.pendingOutcome === 'rampage'}
-          />
+            {/* Badge Tracker — right side, mirrors Wanted Meter */}
+            <DeadDrawBadgeTracker
+              sheriffCount={board.sheriffCount}
+              eliminatedSheriffs={gameState.eliminatedSheriffs}
+              isRampage={gameState.pendingOutcome === 'rampage'}
+            />
           </div>
 
           <DeadDrawBottomBar

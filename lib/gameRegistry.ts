@@ -8,8 +8,8 @@ import LootTumble from '@/components/games/loot-tumble/LootTumble'
 import DeadDraw from '@/components/games/dead-draw/DeadDraw'
 
 const gameRegistry: Record<string, RegisteredGameComponent> = {
-  'example-game': ExampleGame,
   'pai-gow': PaiGow,
+  'example-game': ExampleGame,
   'street-looker': StreetLooker,
   'chicken-crossing': ChickenCrossing,
   'loot-tumble': LootTumble,

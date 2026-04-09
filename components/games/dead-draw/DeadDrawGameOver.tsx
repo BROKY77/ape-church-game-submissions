@@ -132,7 +132,7 @@ const DeadDrawGameOver: React.FC<DeadDrawGameOverProps> = ({
                     <img
                       key={i}
                       className="dead-draw-gameover__badge"
-                      src="/dead-draw-assets/sherriffformeter.png"
+                      src="/submissions/dead-draw/sherriffformeter.png"
                       alt=""
                       draggable={false}
                       style={{

@@ -261,7 +261,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: url('/dead-draw-assets/cardback.png') center / cover no-repeat;
+  background: url('/submissions/dead-draw/cardback.png') center / cover no-repeat;
   border-radius: 0.5rem;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3)) brightness(0.7);
 }

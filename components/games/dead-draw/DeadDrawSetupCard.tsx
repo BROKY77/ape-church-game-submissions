@@ -84,7 +84,7 @@ const DeadDrawSetupCard: React.FC<DeadDrawSetupCardProps> = ({
   };
 
   return (
-    <Card className="lg:basis-1/3 p-6 flex flex-col">
+    <Card className="lg:basis-1/3 flex flex-col p-6">
       {/* ====== SETUP VIEW ====== */}
       {currentView === 0 && (
         <>

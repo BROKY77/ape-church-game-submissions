@@ -28,6 +28,7 @@ import {
 } from './engine/types';
 
 import './dead-draw.styles.css';
+import { deadDrawGame } from './deadDrawConfig';
 
 // --- Animation timing ---
 // shatter (500ms) + pause to see card (300ms) = 800ms between layers
@@ -589,10 +590,14 @@ function gameReducer(state: GameState, action: GameAction): GameState {
 // --- Component ---
 
 interface DeadDrawComponentProps {
-  game: Game;
+  /** When omitted (e.g. submissions page renders `<Game />`), local config is used. */
+  game?: Game;
 }
 
-const DeadDrawComponent: React.FC<DeadDrawComponentProps> = ({ game }) => {
+const DeadDrawComponent: React.FC<DeadDrawComponentProps> = ({
+  game: gameProp,
+}) => {
+  const game = gameProp ?? deadDrawGame;
   const router = useRouter();
   const searchParams = useSearchParams();
   const replayIdString = searchParams.get('id');
@@ -893,8 +898,7 @@ const DeadDrawComponent: React.FC<DeadDrawComponentProps> = ({ game }) => {
 
   return (
     <div>
-      <div className="flex flex-col lg:flex-row gap-2 sm:gap-8 lg:gap-10">
-        <div className="lg:basis-2/3" style={{ height: 'clamp(280px, 45vh, 700px)' }}>
+      <div className="flex flex-col lg:flex-row gap-4 sm:gap-8 lg:gap-10">
         <GameWindow
           game={game}
           currentGameId={currentGameId}
@@ -932,7 +936,6 @@ const DeadDrawComponent: React.FC<DeadDrawComponentProps> = ({ game }) => {
             sfxMuted={sfxMuted}
           />
         </GameWindow>
-        </div>
 
         <DeadDrawSetupCard
           game={game}

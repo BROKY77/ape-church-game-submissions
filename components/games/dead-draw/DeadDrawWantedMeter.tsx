@@ -82,7 +82,7 @@ const DeadDrawWantedMeter: React.FC<DeadDrawWantedMeterProps> = ({
       {/* Meter image on top */}
       <img
         className="dead-draw-wanted-meter__img"
-        src="/dead-draw-assets/finalframe.png"
+        src="/submissions/dead-draw/finalframe.png"
         alt="Wanted meter"
         draggable={false}
       />

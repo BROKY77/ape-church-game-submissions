@@ -93,7 +93,7 @@ const DeadDrawBottomBar: React.FC<DeadDrawBottomBarProps> = ({
           onClick={() => onSwitchMode('take')}
           disabled={!canToggleMode || currentMode === 'take'}
         >
-          <img className="dead-draw-bottom-bar__mode-icon--img" src="/dead-draw-assets/glovefortake.png" alt="Take" draggable={false} />
+          <img className="dead-draw-bottom-bar__mode-icon--img" src="/submissions/dead-draw/glovefortake.png" alt="Take" draggable={false} />
         </button>
       </div>
 
@@ -124,7 +124,7 @@ const DeadDrawBottomBar: React.FC<DeadDrawBottomBarProps> = ({
           onClick={() => onSwitchMode('shoot')}
           disabled={!canToggleMode || currentMode === 'shoot'}
         >
-          <img className="dead-draw-bottom-bar__mode-icon--img" src="/dead-draw-assets/shootmode.png" alt="Shoot" draggable={false} />
+          <img className="dead-draw-bottom-bar__mode-icon--img" src="/submissions/dead-draw/shootmode.png" alt="Shoot" draggable={false} />
         </button>
       </div>
     </div>
