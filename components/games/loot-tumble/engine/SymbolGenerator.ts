@@ -60,4 +60,3 @@ export function createRandomCell(
 export function generateSymbols(count: number, mode: BonusMode = 'BASE'): string[] {
   return Array.from({ length: count }, () => generateWeightedSymbol(mode).id);
 }
-

@@ -14,4 +14,3 @@ export const SYMBOLS: SymbolDef[] = [
 ];
 
 export const SYMBOL_MAP = Object.fromEntries(SYMBOLS.map(s => [s.id, s]));
-

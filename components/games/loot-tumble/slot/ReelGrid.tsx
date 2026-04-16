@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Howl } from 'howler';
 import { Grid, Cluster, SlotState, FallenCellInfo, GridCell } from '@/components/games/loot-tumble/types';
 import { SymbolTile } from './SymbolTile';
@@ -17,7 +17,6 @@ interface Props {
   bonusActive?: boolean;
   bonusEffectMode?: 'none' | 'transition' | 'full';
   onSymbolClick?: (symbolId: string) => void;
-  sfxMuted?: boolean;
 }
 
 const BASE_SYMBOL_IDS = SYMBOLS.filter(symbol => symbol.kind !== 'multiplier').map(symbol => symbol.id);
@@ -122,7 +121,6 @@ export function ReelGrid({
   bonusActive = false,
   bonusEffectMode = 'full',
   onSymbolClick,
-  sfxMuted = false,
 }: Props) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -147,26 +145,23 @@ export function ReelGrid({
             next[col] = true;
             return next;
           });
-          if (!sfxMuted) {
-            new Howl({ src: ['/submissions/loot-tumble/slots settle.mp3'] }).play();
-          }
+          new Howl({ src: ['/submissions/loot-tumble/slots settle.mp3'] }).play();
 
           if (col === cols - 1 && spinSoundRef.current) {
             spinSoundRef.current.stop();
-            spinSoundRef.current.unload();
             spinSoundRef.current = null;
           }
         }, col * staggerMs);
       }
     }
-  }, [state, cols, sfxMuted]);
+  }, [state, cols]);
 
   useEffect(() => {
     if (state === 'SPINNING') {
       landingTriggered.current = false;
       setStoppedColumns([]);
 
-      if (!sfxMuted && !spinSoundRef.current) {
+      if (!spinSoundRef.current) {
         spinSoundRef.current = new Howl({
           src: ['/submissions/loot-tumble/slots start.mp3'],
           loop: true,
@@ -178,11 +173,9 @@ export function ReelGrid({
     return () => {
       if (spinSoundRef.current) {
         spinSoundRef.current.stop();
-        spinSoundRef.current.unload();
-        spinSoundRef.current = null;
       }
     };
-  }, [state, sfxMuted]);
+  }, [state]);
 
   const newCellSet = useMemo(() => new Set(cascadeNewCellKeys), [cascadeNewCellKeys]);
 
@@ -320,4 +313,3 @@ export function ReelGrid({
     </>
   );
 }
-
