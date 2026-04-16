@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Cluster, SlotState } from '@/components/games/loot-tumble/types';
 
 /* ------------------------------------------------------------------ */
@@ -121,4 +121,3 @@ export function ClusterParticles({ clusters, state, rows, cols }: Props) {
     </div>
   );
 }
-

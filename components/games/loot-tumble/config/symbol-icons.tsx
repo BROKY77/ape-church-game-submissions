@@ -14,4 +14,3 @@ export const SYMBOL_IMAGES: Record<string, string> = {
   scatter: '/submissions/loot-tumble/Scatter Symbol.png',
   multiplier: '/submissions/loot-tumble/Multiplier Symbol Bonus.png',
 };
-

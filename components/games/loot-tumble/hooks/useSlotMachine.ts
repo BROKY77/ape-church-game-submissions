@@ -434,4 +434,3 @@ function applyCascadeToGrid(
 
   return newGrid;
 }
-

@@ -342,4 +342,3 @@ const SlotsEngineSetupCard: React.FC<SlotsEngineSetupCardProps> = ({
 };
 
 export default SlotsEngineSetupCard;
-

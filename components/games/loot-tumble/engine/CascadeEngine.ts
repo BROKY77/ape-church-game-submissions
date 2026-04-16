@@ -124,4 +124,3 @@ export function runFullCascade(
 
   return { finalGrid: currentGrid, cascades, totalWin };
 }
-

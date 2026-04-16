@@ -1,6 +1,6 @@
 # Loot Tumble
 
-Loot Tumble is a treasure-themed cluster-pays slot built on the Ape Church game template flow and adapted for the submissions repository layout.
+Loot Tumble is a treasure-themed cluster-pays slot adapted from the Ape Church game template for the current submissions flow.
 
 ## Overview
 
@@ -12,30 +12,11 @@ Loot Tumble is a treasure-themed cluster-pays slot built on the Ape Church game 
 
 ## Core Gameplay
 
-- Match `5+` touching regular symbols to score wins
-- Winning symbols collapse and cascade new symbols into the grid
-- `3` touching scatter symbols trigger the bonus round
-- Bonus round awards free spins and allows scatter retriggers
-- Bonus-only multiplier symbols add together and apply to the final symbol win of that spin
-
-## Features
-
-- Cluster-based payouts with cascading chain reactions
-- Bonus stage transition with dedicated bonus board visuals
-- Bonus retrigger popups and premium bonus symbol effects
-- Rewatch of the finished session using recorded spin outcomes
-- Separate `Music` and `SFX` mute controls from the submission shell
-- Hidden angry-bird easter egg on rapid parrot taps
-
-## Controls
-
-- `Place Your Bet`
-- `Spin`
-- `Auto`
-- `Turbo`
-- `Rewatch`
-- `Music` and `SFX` mute buttons
-- In-game `Info` button
+- Match `5+` touching regular symbols anywhere on the grid
+- Winning clusters tumble away and can chain into additional cascades
+- `3` touching scatter symbols trigger a free-spin bonus round
+- Bonus spins can retrigger and can add multiplier symbols to the resolved win
+- Finished sessions can be replayed from recorded spin outcomes
 
 ## Submission Layout
 
@@ -45,11 +26,7 @@ Loot Tumble is a treasure-themed cluster-pays slot built on the Ape Church game 
 
 ## Review Notes
 
-- Main entry component for the submissions app is `LootTumble.tsx`
-- Game config is in `lootTumbleConfig.ts`
-- Assets use MP3/WebP/PNG only; no WAV files are included
-
-## Submitter Contact
-
-- Author: `Nightowlee`
-- Telegram: `@nightowlee`
+- Main entry component: `LootTumble.tsx`
+- Submission config: `lootTumbleConfig.ts`
+- Assets use MP3, PNG, and WebP only
+- Loading and rules screens are handled inside `SlotsEngineWindow.tsx`
