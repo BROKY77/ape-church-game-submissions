@@ -120,4 +120,3 @@ export const GameInfoModal: React.FC<GameInfoModalProps> = ({ isOpen, onClose })
         </div>
     );
 };
-

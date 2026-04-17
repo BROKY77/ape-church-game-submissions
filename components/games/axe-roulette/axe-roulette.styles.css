@@ -1,0 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Silkscreen&display=swap');
+
+.pixel-font {
+  font-family: 'Silkscreen', monospace;
+  letter-spacing: 0.05em;
+}
+
+.pixel-border {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}

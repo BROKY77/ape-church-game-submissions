@@ -77,4 +77,3 @@ export interface GameState {
   spinMultiplierTotal: number;
   lastSpinFailed: boolean;
 }
-

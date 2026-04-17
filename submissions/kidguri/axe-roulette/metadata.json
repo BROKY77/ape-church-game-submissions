@@ -1,0 +1,35 @@
+{
+  "team": "kidguri",
+  "gameName": "axe-roulette",
+  "displayTitle": "RILLAXE",
+  "description": "Axe Roulette is a fast-paced arcade game where you throw axes at a spinning roulette wheel. Place your bet, spin the wheel, and aim for the highest multiplier.",
+  "authors": [
+    {
+      "name": "KidGuri",
+      "telegram": "@web3gatsby"
+    }
+  ],
+  "revenueShare": [
+    {
+      "name": "RILLAZ",
+      "telegram": "@web3gatsby",
+      "address": "0x0E21951c7cbAbAaB30F6c0f511ccaA5Bc938Afe4",
+      "share": 100
+    }
+  ],
+  "status": "pending",
+  "category": "arcade",
+  "tags": [
+    "arcade",
+    "axe",
+    "roulette"
+  ],
+  "thumbnail": "/axe-roulette/card.png",
+  "banner": "/axe-roulette/banner.png",
+  "mainComponent": "AxeRoulette.tsx",
+  "windowComponent": "AxeRouletteWindow.tsx",
+  "setupComponent": "AxeRouletteSetupCard.tsx",
+  "configFile": "axeRouletteConfig.ts",
+  "version": "1.0.0",
+  "submittedAt": "2026-03-30"
+}

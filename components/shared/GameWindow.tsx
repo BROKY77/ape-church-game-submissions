@@ -70,7 +70,7 @@ const GameWindow: React.FC<GameWindowProps> = ({
     const [showResults, setShowResults] = useState(false);
 
     useEffect(() => {
-        if (disableBuiltInSong) return;
+        if (disableBuiltInSong || !game) return;
 
         const sound = new Howl({
             src: [game.song || fallbackSong],
@@ -89,7 +89,7 @@ const GameWindow: React.FC<GameWindowProps> = ({
             sound.unload();
             audioRef.current = null;
         };
-    }, [game.song, disableBuiltInSong]);
+    }, [game?.song, disableBuiltInSong]);
 
     useEffect(() => {
         if (disableBuiltInSong) return;

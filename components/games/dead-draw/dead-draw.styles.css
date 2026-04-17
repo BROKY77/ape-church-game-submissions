@@ -1,0 +1,1634 @@
+/* ============================================================
+   Dead Draw — Game Styles
+   Western theme: deep browns, gold accents, parchment textures
+   ============================================================ */
+
+:root {
+  --dd-bg-dark: #1a0f0a;
+  --dd-bg-mid: #2c1810;
+  --dd-parchment: #d4a574;
+  --dd-parchment-dark: #8b6914;
+  --dd-gold: #daa520;
+  --dd-gold-bright: #ffd700;
+  --dd-danger: #8b0000;
+  --dd-danger-bright: #dc143c;
+  --dd-safe: #2e7d32;
+  --dd-safe-bright: #4caf50;
+  --dd-text-primary: #f5e6d3;
+  --dd-text-muted: #a09080;
+
+  /* Animation durations */
+  --dd-flash-duration: 150ms;
+  --dd-smoke-duration: 400ms;
+  --dd-sheriff-reveal-duration: 600ms;
+  --dd-shake-duration: 300ms;
+  --dd-escape-duration: 500ms;
+  --dd-crosshair-duration: 200ms;
+  --dd-meter-duration: 200ms;
+}
+
+/* --- Window --- */
+
+.dead-draw-window {
+  color: var(--dd-text-primary);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  overflow: visible;
+  transition: box-shadow 3s ease-in-out;
+}
+
+/* --- Logo — hangs from top of game box --- */
+
+.dead-draw-logo {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  pointer-events: none;
+  perspective: 500px;
+}
+
+@media (max-width: 640px) {
+  .dead-draw-logo {
+    display: none;
+  }
+
+  .dead-draw-wanted-meter {
+    width: clamp(55px, 9vw, 100px);
+  }
+
+  .dead-draw-wanted-meter__multiplier {
+    font-size: 0.4rem;
+  }
+
+
+  .dead-draw-badge-tracker {
+    right: 8%;
+    width: clamp(34px, 5.5vw, 52px);
+  }
+
+  .dead-draw-game-area {
+    padding-top: 2px !important;
+    gap: 0.1rem;
+  }
+
+  .dead-draw-game-area__main {
+    flex: 0 1 auto;
+  }
+
+}
+
+/* In shoot mode during gameplay, make it clickable */
+.dead-draw-logo--shootable {
+  pointer-events: auto;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%23DC143C' stroke-width='1.5'/%3E%3Cline x1='16' y1='4' x2='16' y2='12' stroke='%23DC143C' stroke-width='1.5'/%3E%3Cline x1='16' y1='20' x2='16' y2='28' stroke='%23DC143C' stroke-width='1.5'/%3E%3Cline x1='4' y1='16' x2='12' y2='16' stroke='%23DC143C' stroke-width='1.5'/%3E%3Cline x1='20' y1='16' x2='28' y2='16' stroke='%23DC143C' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%23DC143C'/%3E%3C/svg%3E") 16 16, crosshair;
+}
+
+.dead-draw-logo__img-wrap {
+  position: relative;
+  transform-origin: top center;
+  transform-style: preserve-3d;
+}
+
+.dead-draw-logo__img-wrap--swinging {
+  animation: dd-logo-swing 900ms ease-out;
+}
+
+.dead-draw-logo__img {
+  width: clamp(140px, 28vw, 250px);
+  height: auto;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6));
+}
+
+/* Bullet holes on the sign */
+.dead-draw-logo__bullet-hole {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(10, 5, 0, 0.9) 25%, rgba(40, 20, 5, 0.6) 50%, transparent 100%);
+  box-shadow: 0 0 3px 1px rgba(30, 15, 0, 0.4), inset 0 0 2px rgba(0, 0, 0, 0.8);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+@keyframes dd-logo-swing {
+  0% { transform: rotateX(0deg); }
+  12% { transform: rotateX(-30deg); }
+  35% { transform: rotateX(18deg); }
+  55% { transform: rotateX(-10deg); }
+  75% { transform: rotateX(5deg); }
+  100% { transform: rotateX(0deg); }
+}
+
+.dead-draw-setup-preview {
+  opacity: 0.85;
+}
+
+.dead-draw-title {
+  color: var(--dd-gold);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.dead-draw-subtitle {
+  color: var(--dd-text-muted);
+}
+
+/* --- Grid --- */
+
+.dead-draw-grid {
+  user-select: none;
+  overflow: visible;
+  transition: box-shadow 200ms ease;
+}
+
+.dead-draw-grid--take-mode {
+  /* subtle gold ambient glow */
+}
+
+.dead-draw-grid--shoot-mode {
+}
+
+/* --- Card (transparent container — layers carry the visuals) --- */
+
+.dead-draw-card {
+  position: relative;
+  aspect-ratio: 1;
+  border: none !important;
+  border-radius: 0.5rem;
+  background: transparent !important;
+  cursor: default;
+  transition: filter 150ms ease;
+  overflow: visible;
+  padding: 0;
+  outline: none !important;
+  box-shadow: none !important;
+  font-family: inherit;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.dead-draw-card:focus,
+.dead-draw-card:focus-visible,
+.dead-draw-card:active {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.dead-draw-card,
+.dead-draw-card *,
+.dead-draw-card *::before,
+.dead-draw-card *::after {
+  outline: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+}
+
+.dead-draw-card--clickable {
+  cursor: pointer;
+}
+
+.dead-draw-card--clickable:hover {
+  filter: brightness(1.1);
+}
+
+.dead-draw-card--disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Shoot mode: red crosshair cursor */
+.dead-draw-card--shoot-mode.dead-draw-card--clickable {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%23DC143C' stroke-width='1.5'/%3E%3Cline x1='16' y1='4' x2='16' y2='12' stroke='%23DC143C' stroke-width='1.5'/%3E%3Cline x1='16' y1='20' x2='16' y2='28' stroke='%23DC143C' stroke-width='1.5'/%3E%3Cline x1='4' y1='16' x2='12' y2='16' stroke='%23DC143C' stroke-width='1.5'/%3E%3Cline x1='20' y1='16' x2='28' y2='16' stroke='%23DC143C' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%23DC143C'/%3E%3C/svg%3E") 16 16, crosshair;
+}
+
+
+/* Destroyed position (sheriff eliminated via shoot mode) */
+.dead-draw-card--destroyed {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 100ms ease 900ms; /* delay 900ms so shot-away animation plays first */
+}
+
+.dead-draw-card--revealed {
+  cursor: default;
+}
+
+.dead-draw-card--gone {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dead-draw-card--sheriff.dead-draw-card--revealed {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* --- Card Layers — actual stacked elements at FIXED offsets, NOTHING MOVES --- */
+
+.dead-draw-card__layer {
+  position: absolute;
+  inset: 0;
+  border: none;
+  border-radius: 0.5rem;
+  background: none;
+  overflow: hidden;
+}
+
+.dead-draw-card__layer-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Layer showing an image asset — shadow follows image alpha, not bounding box */
+.dead-draw-card__layer--has-img {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+/* Pregame stack: pseudo-elements peek out behind the ? card */
+.dead-draw-card--stack-2::before,
+.dead-draw-card--stack-3::before,
+.dead-draw-card--stack-3::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('/submissions/dead-draw/cardback.png') center / cover no-repeat;
+  border-radius: 0.5rem;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3)) brightness(0.7);
+}
+
+/* Depth 2: one card behind */
+.dead-draw-card--stack-2::before {
+  transform: translate(6px, 6px);
+  z-index: -1;
+}
+
+/* Depth 3: two cards behind */
+.dead-draw-card--stack-3::before {
+  transform: translate(6px, 6px);
+  z-index: -1;
+}
+
+.dead-draw-card--stack-3::after {
+  transform: translate(12px, 12px);
+  z-index: -2;
+}
+
+/* Face shattering: hide layer bg, allow shards to fly out */
+.dead-draw-card__layer--shattering {
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+/* Back shattering: hide bg, allow shards to fly out */
+.dead-draw-card__layer--back-shattering {
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+/* Sheriff layer */
+.dead-draw-card__layer--sheriff {
+}
+
+/* Face revealed under card back shell */
+.dead-draw-card__under-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Card back */
+
+.dead-draw-card__back {
+  width: 100%;
+  height: 100%;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.dead-draw-card__back-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.dead-draw-card__back-mark {
+  font-size: clamp(1rem, 3vw, 1.5rem);
+  color: var(--dd-bg-dark);
+  opacity: 0.4;
+  font-weight: bold;
+}
+
+.dead-draw-card__crosshair {
+  position: absolute;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  z-index: 2;
+  animation: dd-crosshair-appear var(--dd-crosshair-duration) ease-out;
+}
+
+/* --- Take Mode: 3D Card Flip + Dismiss --- */
+
+.dead-draw-card__flip-container {
+  position: absolute;
+  inset: 0;
+  perspective: 800px;
+}
+
+.dead-draw-card__flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform var(--dd-flip-speed, 300ms) ease-in-out;
+}
+
+.dead-draw-card__flip-inner--flipped {
+  transform: rotateY(180deg);
+}
+
+.dead-draw-card__flip-inner--dismissing {
+  transition: none;
+  animation: dd-card-dismiss 300ms ease-in forwards;
+}
+
+.dead-draw-card__flip-front,
+.dead-draw-card__flip-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+/* Allow muzzle flash to burst out of flip containers */
+.dead-draw-card__flip-back:has(.dead-draw-card__muzzle-flash),
+.dead-draw-card__flip-inner:has(.dead-draw-card__muzzle-flash),
+.dead-draw-card__flip-container:has(.dead-draw-card__muzzle-flash) {
+  overflow: visible !important;
+}
+.dead-draw-card__flip-inner--dismiss-face:has(.dead-draw-card__muzzle-flash) {
+  overflow: visible !important;
+}
+
+/* Revenge flip: muzzle flash fires after the 300ms flip completes */
+.dead-draw-card__flip-container--revenge .dead-draw-card__muzzle-flash {
+  animation-delay: 300ms;
+}
+.dead-draw-card__flip-container--revenge {
+  overflow: visible !important;
+}
+.dead-draw-card__flip-container--revenge .dead-draw-card__flip-back {
+  overflow: visible !important;
+}
+.dead-draw-card__flip-container--revenge .dead-draw-card__flip-inner {
+  overflow: visible !important;
+}
+
+.dead-draw-card__flip-front {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dead-draw-card__flip-back {
+  transform: rotateY(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes dd-card-dismiss {
+  0% {
+    transform: rotateY(180deg) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: rotateY(180deg) translateY(-60px);
+    opacity: 0;
+  }
+}
+
+/* Dismiss animation that shows the face directly (no 3D flip) */
+.dead-draw-card__flip-inner--dismiss-face {
+  animation: dd-card-dismiss-face 300ms ease-in forwards;
+}
+
+@keyframes dd-card-dismiss-face {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-60px);
+    opacity: 0;
+  }
+}
+
+/* Card face */
+
+.dead-draw-card__face {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  width: 100%;
+  height: 100%;
+  padding: 0.25rem;
+  border: 0 none transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.dead-draw-card__face--loot {
+  background: linear-gradient(135deg, #2a2015, #1a1510);
+}
+
+.dead-draw-card__face--sheriff {
+  position: relative;
+}
+
+/* Muzzle flash — burst from gun barrel center on take-mode sheriff reveal */
+/* Allow muzzle flash to overflow the card bounds */
+.dead-draw-card__face--sheriff {
+  overflow: visible !important;
+}
+
+.dead-draw-card__layer:has(.dead-draw-card__muzzle-flash),
+.dead-draw-card__layer-inner:has(.dead-draw-card__muzzle-flash) {
+  overflow: visible !important;
+}
+
+.dead-draw-card__muzzle-flash {
+  position: absolute;
+  top: calc(50% + 3px);
+  left: 50%;
+  width: 280%;
+  height: 280%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 10;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 220, 0.95) 0%,
+    rgba(255, 200, 50, 0.8) 15%,
+    rgba(255, 140, 0, 0.5) 35%,
+    rgba(255, 80, 0, 0.2) 55%,
+    transparent 75%
+  );
+  animation: dd-muzzle-flash 150ms ease-out 600ms forwards;
+  opacity: 0;
+}
+
+@keyframes dd-muzzle-flash {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.3);
+  }
+  30% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.3);
+  }
+}
+
+
+.dead-draw-card__loot-icon {
+  font-size: clamp(1.2rem, 3.5vw, 2rem);
+}
+
+.dead-draw-card__loot-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* When a card face has an image, strip padding/bg — image IS the card */
+.dead-draw-card__face--has-img {
+  padding: 0;
+  background: none !important;
+}
+
+.dead-draw-card__sheriff-badge {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  animation: dd-badge-spin var(--dd-sheriff-reveal-duration) ease-out;
+}
+
+.dead-draw-card__face--dead {
+  background: linear-gradient(135deg, #1a0505, #0a0000) !important;
+  animation: dd-sheriff-die 500ms ease-out;
+}
+
+.dead-draw-card__face--dead .dead-draw-card__sheriff-badge {
+  animation: dd-skull-appear 400ms ease-out;
+}
+
+@keyframes dd-sheriff-die {
+  0% { filter: brightness(2) saturate(2); }
+  30% { filter: brightness(1.5) saturate(0.5); }
+  100% { filter: brightness(1) saturate(1); }
+}
+
+@keyframes dd-skull-appear {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.dead-draw-card__label {
+  font-size: clamp(0.45rem, 1.2vw, 0.65rem);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+  text-align: center;
+  line-height: 1.1;
+}
+
+/* Cleared position */
+.dead-draw-card__face--cleared {
+  background: linear-gradient(135deg, #1a2a15, #0f1a0c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.dead-draw-card__cleared-icon {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+/* --- Wanted Meter (image-based with fill bar) --- */
+
+.dead-draw-game-area__main {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  width: 100%;
+}
+
+.dead-draw-wanted-meter {
+  position: absolute;
+  right: calc(100% + clamp(0.5rem, 2vw, 1.5rem));
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(70px, 12vw, 120px);
+  z-index: 5;
+}
+
+.dead-draw-wanted-meter__img {
+  width: 100%;
+  height: auto;
+  display: block;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  pointer-events: none;
+}
+
+/* Fill bar track — sits behind the meter image, between the posts */
+.dead-draw-wanted-meter__fill-track {
+  position: absolute;
+  /* Align with the gap between the wooden posts */
+  top: 6%;
+  bottom: 22%;
+  left: 28%;
+  right: 25%;
+  z-index: 1;
+  overflow: hidden;
+  /* Taper: wider at top, narrower at bottom, matching post angle */
+  clip-path: polygon(2% 0%, 98% 0%, 88% 100%, 12% 100%);
+}
+
+/* The actual fill bar — rises from bottom */
+.dead-draw-wanted-meter__fill-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  transition: height 400ms ease-out;
+  background: linear-gradient(
+    to top,
+    #6B4F1D,    /* dark brass at bottom */
+    #8b6914,    /* brass */
+    #DAA520,    /* goldenrod */
+    #FFD700,    /* gold */
+    #FFF0AA     /* bright glow at top */
+  );
+  /* Feathered top edge only — solid from bottom up */
+  mask-image: linear-gradient(to top, black 0%, black 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, black 0%, black 80%, transparent 100%);
+}
+
+/* Multiplier text overlay — positioned below WANTED text on the sign */
+.dead-draw-wanted-meter__overlay {
+  position: absolute;
+  bottom: 8%;
+  left: 0;
+  right: 5%;
+  z-index: 3;
+  text-align: center;
+  transform: rotate(-4deg);
+}
+
+.dead-draw-wanted-meter__multiplier {
+  font-size: clamp(0.65rem, 1.6vw, 0.9rem);
+  font-weight: 900;
+  transition: color 300ms ease, text-shadow 300ms ease;
+}
+
+/* --- Bust Blackout Screen --- */
+
+.dead-draw-bust-blackout {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Hard cut IN (no transition on mount), but fade to 85% is slow and smooth */
+  transition: opacity 1.5s ease-out;
+}
+
+.dead-draw-bust-blackout__content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  z-index: 1;
+}
+
+.dead-draw-bust-blackout__title {
+  position: absolute;
+  top: 38%;
+}
+
+.dead-draw-bust-blackout__title {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: clamp(1.8rem, 6vw, 3.5rem);
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #6b2020;
+  text-shadow: 0 2px 12px rgba(80, 10, 10, 0.5);
+}
+
+.dead-draw-bust-blackout__actions {
+  position: absolute;
+  top: 52%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dead-draw-bust-blackout__play-again {
+  padding: 0.5rem 1.5rem;
+  border: 2px solid var(--dd-gold);
+  border-radius: 0.4rem;
+  background: rgba(218, 165, 32, 0.15);
+  color: var(--dd-gold);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: clamp(0.7rem, 1.8vw, 1rem);
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.dead-draw-bust-blackout__play-again:hover {
+  background: rgba(218, 165, 32, 0.3);
+  box-shadow: 0 0 12px rgba(218, 165, 32, 0.4);
+}
+
+.dead-draw-bust-blackout__change-bet {
+  padding: 0.3rem 1rem;
+  border: 1px solid rgba(160, 144, 128, 0.4);
+  border-radius: 0.3rem;
+  background: transparent;
+  color: var(--dd-text-muted);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: clamp(0.5rem, 1.2vw, 0.7rem);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.dead-draw-bust-blackout__change-bet:hover {
+  border-color: var(--dd-text-muted);
+}
+
+.dead-draw-bust-blackout__info {
+  position: absolute;
+  top: 68%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.dead-draw-bust-blackout__had {
+  font-size: clamp(0.7rem, 2vw, 1rem);
+  font-weight: bold;
+  color: var(--dd-gold);
+}
+
+.dead-draw-bust-blackout__full-clear {
+  font-size: clamp(0.5rem, 1.2vw, 0.7rem);
+  color: var(--dd-text-muted);
+  opacity: 0.7;
+}
+
+.dead-draw-bust-blackout__threshold {
+  font-size: clamp(0.5rem, 1.2vw, 0.7rem);
+  color: var(--dd-text-muted);
+  opacity: 0.6;
+}
+
+
+
+/* Card hover shake — progressive intensity via --dd-shake-px on the card */
+@keyframes dd-card-shake {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(var(--dd-shake-px, 0.5px), calc(var(--dd-shake-px, 0.3px) * -0.6)); }
+  50% { transform: translate(calc(var(--dd-shake-px, 0.3px) * -0.6), var(--dd-shake-px, 0.5px)); }
+  75% { transform: translate(var(--dd-shake-px, 0.3px), calc(var(--dd-shake-px, 0.3px) * 0.6)); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Tier 1: subtle glow on hover */
+.dead-draw-card--hover-tier-1.dead-draw-card--clickable:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 0 8px rgba(218, 165, 32, 0.3);
+  animation: dd-card-shake 0.12s infinite;
+}
+
+/* Tier 2: brighter glow + shake on hover */
+.dead-draw-card--hover-tier-2.dead-draw-card--clickable:hover {
+  filter: brightness(1.2);
+  box-shadow: 0 0 14px rgba(218, 165, 32, 0.5);
+  animation: dd-card-shake 0.1s infinite;
+}
+
+/* Tier 3: spotlight (unhovered cards dim) + shake on hover */
+.dead-draw-grid--high-stakes .dead-draw-card--clickable:not(:hover) {
+  filter: brightness(0.85);
+  transition: filter 200ms ease;
+}
+
+.dead-draw-card--hover-tier-3.dead-draw-card--clickable:hover {
+  filter: brightness(1.25);
+  box-shadow: 0 0 20px rgba(218, 165, 32, 0.6);
+  animation: dd-card-shake 0.08s infinite;
+}
+
+
+/* --- Game Over --- */
+
+.dead-draw-gameover {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 1rem;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.85);
+  animation: dd-gameover-fade-in 0.6s ease-out;
+}
+
+@keyframes dd-gameover-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.dead-draw-gameover__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dead-draw-gameover__title {
+  font-size: clamp(1.5rem, 5vw, 3rem);
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+}
+
+.dead-draw-gameover--escaped .dead-draw-gameover__title {
+  color: var(--dd-safe-bright);
+}
+
+.dead-draw-gameover--busted .dead-draw-gameover__title {
+  color: var(--dd-danger-bright);
+  animation: dd-shake var(--dd-shake-duration) ease-out;
+}
+
+.dead-draw-gameover--full-clear .dead-draw-gameover__title {
+  color: var(--dd-gold-bright);
+}
+
+.dead-draw-gameover__subtitle {
+  font-size: clamp(0.75rem, 2vw, 1rem);
+  color: var(--dd-text-muted);
+}
+
+.dead-draw-gameover__payout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.dead-draw-gameover__payout-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--dd-text-muted);
+}
+
+.dead-draw-gameover__payout-amount {
+  font-size: clamp(1.2rem, 4vw, 2rem);
+  font-weight: bold;
+  color: var(--dd-gold-bright);
+}
+
+.dead-draw-gameover__payout-multiplier {
+  font-size: 0.9rem;
+  color: var(--dd-gold);
+}
+
+.dead-draw-gameover__loss {
+  margin-top: 0.5rem;
+}
+
+.dead-draw-gameover__loss-label {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: bold;
+  color: var(--dd-danger);
+}
+
+/* Near-miss / retention text on game over */
+.dead-draw-gameover__had-amount {
+  font-size: clamp(0.8rem, 2.5vw, 1.2rem);
+  font-weight: bold;
+  color: var(--dd-gold);
+  margin-bottom: 0.25rem;
+}
+
+.dead-draw-gameover__full-clear-hint {
+  font-size: clamp(0.55rem, 1.3vw, 0.75rem);
+  color: var(--dd-text-muted);
+  opacity: 0.8;
+  margin-top: 0.5rem;
+}
+
+.dead-draw-gameover__near-miss {
+  font-size: clamp(0.55rem, 1.3vw, 0.75rem);
+  color: var(--dd-text-muted);
+  margin-top: 0.25rem;
+}
+
+.dead-draw-gameover__depth-tease {
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
+.dead-draw-gameover__depth-tease p {
+  font-size: clamp(0.55rem, 1.2vw, 0.7rem);
+  color: var(--dd-gold);
+}
+
+.dead-draw-gameover__depth-tease-mult {
+  animation: dd-glow 2s ease-in-out infinite;
+  font-weight: bold;
+}
+
+.dead-draw-gameover__shoot-stat {
+  font-size: clamp(0.5rem, 1.1vw, 0.65rem);
+  color: var(--dd-text-muted);
+  margin-top: 0.5rem;
+  opacity: 0.7;
+}
+
+/* --- Reveal Speed Toggle --- */
+
+.dead-draw-speed-toggle {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.dead-draw-speed-toggle__btn {
+  padding: 0.2rem 0.6rem;
+  font-size: clamp(0.5rem, 1.2vw, 0.65rem);
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: 1px solid var(--dd-parchment-dark);
+  border-radius: 0.25rem;
+  background: var(--dd-bg-mid);
+  color: var(--dd-text-muted);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.dead-draw-speed-toggle__btn:hover {
+  border-color: var(--dd-gold);
+  color: var(--dd-text-primary);
+}
+
+.dead-draw-speed-toggle__btn--active {
+  border-color: var(--dd-gold);
+  background: rgba(218, 165, 32, 0.15);
+  color: var(--dd-gold);
+}
+
+/* --- Bottom Bar HUD --- */
+
+.dead-draw-bottom-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  padding: 0.4rem 0;
+  gap: clamp(0.4rem, 1.5vw, 0.75rem);
+  flex-shrink: 0;
+}
+
+.dead-draw-bottom-bar__mode-col {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.2rem;
+  flex: 0 0 auto;
+}
+
+.dead-draw-bottom-bar__step-label {
+  font-size: clamp(0.85rem, 2vw, 1.1rem);
+  font-weight: 700;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+  text-align: center;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 1), 0 0 20px rgba(0, 0, 0, 0.8), 0 4px 16px rgba(0, 0, 0, 0.6);
+  margin-bottom: -0.5rem;
+}
+
+.dead-draw-bottom-bar__step-label--take {
+  color: var(--dd-gold);
+}
+
+.dead-draw-bottom-bar__step-label--shoot {
+  color: var(--dd-danger-bright);
+}
+
+.dead-draw-bottom-bar__mode-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.4rem 0.6rem;
+  width: 100%;
+  border: 2px solid var(--dd-parchment-dark);
+  border-radius: 0.5rem;
+  background: var(--dd-bg-mid);
+  color: var(--dd-text-muted);
+  cursor: pointer;
+  transition: all 200ms ease;
+  font-family: inherit;
+  opacity: 0.7;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+}
+
+.dead-draw-bottom-bar__mode-btn:disabled {
+  cursor: default;
+}
+
+.dead-draw-bottom-bar__mode-btn--active {
+  opacity: 1;
+  transform: translateY(-2px);
+  filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.8));
+}
+
+.dead-draw-bottom-bar__mode-btn--take {
+  border: none;
+  background: transparent;
+}
+
+.dead-draw-bottom-bar__mode-btn--take.dead-draw-bottom-bar__mode-btn--active {
+  border: none;
+  background: transparent;
+  color: var(--dd-gold);
+  box-shadow: none;
+  filter: drop-shadow(0 0 8px rgba(218, 165, 32, 0.5));
+}
+
+.dead-draw-bottom-bar__mode-btn--shoot {
+  border: none;
+  background: transparent;
+}
+
+.dead-draw-bottom-bar__mode-btn--shoot.dead-draw-bottom-bar__mode-btn--active {
+  border: none;
+  background: transparent;
+  color: var(--dd-danger-bright);
+  box-shadow: none;
+  filter: drop-shadow(0 0 8px rgba(220, 20, 60, 0.5));
+}
+
+.dead-draw-bottom-bar__mode-icon {
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  line-height: 1;
+}
+
+.dead-draw-bottom-bar__mode-icon--img {
+  width: clamp(3rem, 10vw, 9rem);
+  height: auto;
+  pointer-events: none;
+}
+
+.dead-draw-bottom-bar__mode-label {
+  font-size: clamp(0.45rem, 1vw, 0.6rem);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: bold;
+}
+
+.dead-draw-bottom-bar__center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: visible;
+}
+
+.dead-draw-bottom-bar__escape {
+  width: 100%;
+  padding: 0.4rem 0.75rem;
+  height: 2.2rem;
+  border: 2px solid var(--dd-safe);
+  border-radius: 0.4rem;
+  background: rgba(46, 125, 50, 0.15);
+  color: var(--dd-safe-bright);
+  font-family: inherit;
+  font-size: clamp(0.55rem, 1.3vw, 0.75rem);
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dead-draw-bottom-bar__escape:hover:not(:disabled) {
+  background: rgba(46, 125, 50, 0.3);
+  box-shadow: 0 0 10px rgba(46, 125, 50, 0.3);
+}
+
+.dead-draw-bottom-bar__escape:disabled {
+  border-color: var(--dd-parchment-dark);
+  background: var(--dd-bg-mid);
+  color: var(--dd-text-muted);
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* Cash out pulse after safe take */
+.dead-draw-bottom-bar__escape--pulse {
+  animation: dd-cashout-pulse 400ms ease-in-out;
+  box-shadow: 0 0 16px rgba(218, 165, 32, 0.5);
+}
+
+@keyframes dd-cashout-pulse {
+  0% { box-shadow: 0 0 0 rgba(218, 165, 32, 0); }
+  50% { box-shadow: 0 0 20px rgba(218, 165, 32, 0.7); }
+  100% { box-shadow: 0 0 0 rgba(218, 165, 32, 0); }
+}
+
+/* Scaling payout font — deeper into round = bigger, more urgent */
+.dead-draw-bottom-bar__escape--tier-1 { font-size: clamp(0.6rem, 1.5vw, 0.85rem); }
+.dead-draw-bottom-bar__escape--tier-2 { font-size: clamp(0.65rem, 1.6vw, 0.9rem); }
+.dead-draw-bottom-bar__escape--tier-3 { font-size: clamp(0.7rem, 1.8vw, 1rem); }
+.dead-draw-bottom-bar__escape--tier-4 {
+  font-size: clamp(0.8rem, 2vw, 1.1rem);
+  text-shadow: 0 0 12px rgba(218, 165, 32, 0.4);
+}
+
+.dead-draw-bottom-bar__info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dead-draw-bottom-bar__multiplier {
+  font-size: clamp(0.6rem, 1.4vw, 0.8rem);
+  font-weight: bold;
+  color: var(--dd-gold);
+}
+
+.dead-draw-bottom-bar__draw-btn {
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--dd-danger);
+  border-radius: 0.25rem;
+  background: transparent;
+  color: var(--dd-danger);
+  font-family: inherit;
+  font-size: clamp(0.45rem, 1vw, 0.6rem);
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.dead-draw-bottom-bar__draw-btn:hover:not(:disabled) {
+  background: rgba(139, 0, 0, 0.15);
+}
+
+.dead-draw-bottom-bar__draw-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+
+/* --- Revolver Visual --- */
+
+.dead-draw-revolver {
+  position: absolute;
+  bottom: 3.5rem;
+  left: 50%;
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  transform-origin: bottom center;
+  transition: opacity 300ms ease, transform 300ms ease;
+  z-index: 5;
+  pointer-events: none;
+  filter: drop-shadow(0 0 6px rgba(220, 20, 60, 0.4));
+}
+
+.dead-draw-revolver--hidden {
+  opacity: 0;
+  transform: translateX(-50%) translateY(100%) !important;
+}
+
+/* --- Game Over: shot_loot --- */
+.dead-draw-gameover--shot-loot .dead-draw-gameover__title {
+  color: var(--dd-danger-bright);
+  animation: dd-shake var(--dd-shake-duration) ease-out;
+}
+
+/* --- Game Over: rampage --- */
+.dead-draw-gameover--rampage .dead-draw-gameover__title {
+  color: var(--dd-gold-bright);
+  animation: dd-glow 0.8s ease-in-out infinite;
+  font-size: clamp(2rem, 6vw, 4rem);
+}
+
+/* --- Shatter --- */
+
+/* Shatter overlay: 6 fragments of the card flying apart */
+.dead-draw-card__shatter-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.dead-draw-card__shard {
+  position: absolute;
+  overflow: hidden;
+  animation-duration: 500ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: forwards;
+}
+
+/* Shard content includes border + background so each fragment looks like a piece of the card */
+.dead-draw-card__shard-content {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 0.5rem;
+  background: none;
+  overflow: hidden;
+}
+
+/* Each shard covers a region of the card. The inner content is positioned
+   so the full card renders inside, but only the shard's clip-path is visible. */
+
+.dead-draw-card__shard--tl {
+  top: 0; left: 0; width: 55%; height: 40%;
+  clip-path: polygon(0 0, 100% 0, 80% 100%, 0 85%);
+  animation-name: dd-shard-tl;
+}
+.dead-draw-card__shard--tl .dead-draw-card__shard-content {
+  top: 0; left: 0; width: 182%; height: 250%;
+}
+
+.dead-draw-card__shard--tr {
+  top: 0; right: 0; width: 55%; height: 40%;
+  clip-path: polygon(20% 0, 100% 0, 100% 85%, 0 100%);
+  animation-name: dd-shard-tr;
+}
+.dead-draw-card__shard--tr .dead-draw-card__shard-content {
+  top: 0; right: 0; width: 182%; height: 250%;
+}
+
+.dead-draw-card__shard--ml {
+  top: 30%; left: 0; width: 55%; height: 40%;
+  clip-path: polygon(0 0, 100% 10%, 85% 90%, 0 100%);
+  animation-name: dd-shard-ml;
+}
+.dead-draw-card__shard--ml .dead-draw-card__shard-content {
+  top: -75%; left: 0; width: 182%; height: 250%;
+}
+
+.dead-draw-card__shard--mr {
+  top: 30%; right: 0; width: 55%; height: 40%;
+  clip-path: polygon(15% 10%, 100% 0, 100% 100%, 0 90%);
+  animation-name: dd-shard-mr;
+}
+.dead-draw-card__shard--mr .dead-draw-card__shard-content {
+  top: -75%; right: 0; width: 182%; height: 250%;
+}
+
+.dead-draw-card__shard--bl {
+  bottom: 0; left: 0; width: 55%; height: 40%;
+  clip-path: polygon(0 15%, 80% 0, 100% 100%, 0 100%);
+  animation-name: dd-shard-bl;
+}
+.dead-draw-card__shard--bl .dead-draw-card__shard-content {
+  bottom: 0; left: 0; width: 182%; height: 250%;
+}
+
+.dead-draw-card__shard--br {
+  bottom: 0; right: 0; width: 55%; height: 40%;
+  clip-path: polygon(0 0, 100% 15%, 100% 100%, 20% 100%);
+  animation-name: dd-shard-br;
+}
+.dead-draw-card__shard--br .dead-draw-card__shard-content {
+  bottom: 0; right: 0; width: 182%; height: 250%;
+}
+
+/* --- Animations --- */
+
+@keyframes dd-badge-spin {
+  0% {
+    transform: rotate(0deg) scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: rotate(180deg) scale(1.3);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+@keyframes dd-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-4px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes dd-pulse-danger {
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(220, 20, 60, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(220, 20, 60, 0.8);
+  }
+}
+
+@keyframes dd-crosshair-appear {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes dd-glow {
+  0%,
+  100% {
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+  }
+  50% {
+    text-shadow: 0 0 24px rgba(255, 215, 0, 0.9), 0 0 48px rgba(255, 215, 0, 0.4);
+  }
+}
+
+/* --- Shatter shard animations --- */
+/* Each shard flies outward in its direction, rotates, and fades.
+   The shards contain the actual card face so you see the card breaking. */
+
+@keyframes dd-shard-tl {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  30% { transform: translate(-15%, -10%) rotate(-5deg); opacity: 1; }
+  100% { transform: translate(-150%, -120%) rotate(-30deg); opacity: 0; }
+}
+
+@keyframes dd-shard-tr {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  30% { transform: translate(15%, -10%) rotate(4deg); opacity: 1; }
+  100% { transform: translate(150%, -120%) rotate(25deg); opacity: 0; }
+}
+
+@keyframes dd-shard-ml {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  30% { transform: translate(-20%, 5%) rotate(-3deg); opacity: 1; }
+  100% { transform: translate(-170%, 20%) rotate(-20deg); opacity: 0; }
+}
+
+@keyframes dd-shard-mr {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  30% { transform: translate(20%, -5%) rotate(3deg); opacity: 1; }
+  100% { transform: translate(170%, -15%) rotate(22deg); opacity: 0; }
+}
+
+@keyframes dd-shard-bl {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  30% { transform: translate(-12%, 12%) rotate(-4deg); opacity: 1; }
+  100% { transform: translate(-140%, 130%) rotate(-28deg); opacity: 0; }
+}
+
+@keyframes dd-shard-br {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  30% { transform: translate(12%, 12%) rotate(5deg); opacity: 1; }
+  100% { transform: translate(140%, 130%) rotate(32deg); opacity: 0; }
+}
+
+
+/* ============================================================
+   Sheriff Badge Kill Tracker
+   ============================================================ */
+
+.dead-draw-badge-tracker {
+  position: absolute;
+  right: 10%;
+  top: 50%;
+  transform: translate(50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 5;
+  width: clamp(52px, 8.5vw, 74px);
+}
+
+.dead-draw-badge-tracker__slot {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  margin-top: -5%;
+}
+
+.dead-draw-badge-tracker__slot:first-child {
+  margin-top: 0;
+}
+
+.dead-draw-badge-tracker--dense {
+  top: 55%;
+}
+
+.dead-draw-badge-tracker--dense .dead-draw-badge-tracker__slot {
+  margin-top: -30%;
+}
+
+.dead-draw-badge-tracker__badge-empty,
+.dead-draw-badge-tracker__badge-full {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.dead-draw-badge-tracker__badge-empty {
+  filter: brightness(0.5) saturate(0.3);
+  opacity: 0.6;
+}
+
+.dead-draw-badge-tracker__badge-full {
+  z-index: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+}
+
+/* Bird's eye slam: badge drops from high above onto the table.
+   Big scale + blur → hard impact with shadow burst → double bounce → settle. */
+.dead-draw-badge-tracker__badge-full--slamming {
+  animation: dd-badge-slam 550ms cubic-bezier(0.15, 0, 0.2, 1) forwards;
+}
+
+@keyframes dd-badge-slam {
+  /* Far above — huge, blurred, invisible */
+  0% {
+    transform: scale(3) rotate(-8deg);
+    opacity: 0;
+    filter: blur(6px);
+  }
+  /* Falling — coming into view */
+  12% {
+    opacity: 0.6;
+    transform: scale(2.2) rotate(-4deg);
+    filter: blur(3px);
+  }
+  /* IMPACT — slams down hard, compresses, shadow bursts out */
+  30% {
+    transform: scale(0.82) rotate(3deg);
+    opacity: 1;
+    filter: blur(0) drop-shadow(3px 4px 12px rgba(0, 0, 0, 0.8)) brightness(1.3);
+  }
+  /* First bounce — lifts back up */
+  48% {
+    transform: scale(1.15) rotate(-2deg);
+    filter: blur(0) drop-shadow(1px 2px 6px rgba(0, 0, 0, 0.5)) brightness(1.1);
+  }
+  /* Second hit */
+  62% {
+    transform: scale(0.94) rotate(1deg);
+    filter: blur(0) drop-shadow(2px 3px 8px rgba(0, 0, 0, 0.6));
+  }
+  /* Small lift */
+  78% {
+    transform: scale(1.04) rotate(-0.5deg);
+    filter: blur(0) drop-shadow(1px 2px 4px rgba(0, 0, 0, 0.4));
+  }
+  /* Settle flat */
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+    filter: blur(0) drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
+  }
+}
+
+
+/* ============================================================
+   Rampage Chase Lights (Game Over Screen)
+   ============================================================ */
+
+.dead-draw-gameover__badges {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(6px, 1.5vw, 14px);
+  margin-bottom: 0.5rem;
+}
+
+.dead-draw-gameover__badge {
+  width: clamp(28px, 5vw, 44px);
+  height: clamp(28px, 5vw, 44px);
+  object-fit: contain;
+  filter: brightness(0.7);
+  animation: dd-chase-light var(--dd-chase-duration, 1s) ease-in-out infinite;
+  animation-delay: var(--dd-chase-delay, 0ms);
+}
+
+@keyframes dd-chase-light {
+  0%   { filter: brightness(0.7); transform: scale(1); }
+  15%  { filter: brightness(1.6) drop-shadow(0 0 10px rgba(255, 215, 0, 0.9)); transform: scale(1.15); }
+  30%  { filter: brightness(0.7); transform: scale(1); }
+  100% { filter: brightness(0.7); transform: scale(1); }
+}
+
+/* ============================================================
+   Tumbleweed Idle
+   ============================================================ */
+
+.dead-draw-tumbleweed {
+  position: absolute;
+  bottom: 4px;
+  left: -40px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #8b6914 30%, #5a3e0a 70%, transparent 100%);
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 3;
+  animation: dd-tumbleweed-roll 3s linear forwards;
+}
+
+@keyframes dd-tumbleweed-roll {
+  0%   { left: -40px; transform: rotate(0deg); }
+  100% { left: calc(100% + 40px); transform: rotate(720deg); }
+}
+
+/* --- Mobile overrides (must be after base styles for cascade) --- */
+@media (max-width: 640px) {
+  .dead-draw-bust-blackout__content {
+    position: relative;
+    inset: auto;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .dead-draw-bust-blackout__title {
+    position: relative;
+    top: auto;
+  }
+
+  .dead-draw-bust-blackout__actions {
+    position: relative;
+    top: auto;
+  }
+
+  .dead-draw-bust-blackout__info {
+    position: relative;
+    top: auto;
+  }
+
+  .dead-draw-card--stack-2::before {
+    transform: translate(3px, 3px);
+  }
+
+  .dead-draw-card--stack-3::before {
+    transform: translate(3px, 3px);
+  }
+
+  .dead-draw-card--stack-3::after {
+    transform: translate(6px, 6px);
+  }
+
+  .dead-draw-bottom-bar__mode-icon--img {
+    width: clamp(4.5rem, 16vw, 7rem);
+  }
+
+  .dead-draw-bottom-bar {
+    align-items: center;
+  }
+
+  .dead-draw-bottom-bar__mode-col {
+    transform: translateY(-1rem);
+  }
+
+  .dead-draw-wanted-meter__overlay {
+    bottom: 6%;
+  }
+}

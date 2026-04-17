@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Howl } from 'howler';
 
 /* ------------------------------------------------------------------ */
@@ -14,7 +14,6 @@ interface Props {
   betAmount: number;
   onDismiss: () => void;
   turboEnabled?: boolean;
-  sfxMuted?: boolean;
 }
 
 type WinTier = 'BIG' | 'MEGA' | 'LEGENDARY';
@@ -143,7 +142,7 @@ function formatWinAmount(amount: number): string {
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
 
-export function BigWinOverlay({ show, totalWin, betAmount, onDismiss, turboEnabled = false, sfxMuted = false }: Props) {
+export function BigWinOverlay({ show, totalWin, betAmount, onDismiss, turboEnabled = false }: Props) {
   /* --- auto-dismiss timer ------------------------------------------ */
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -157,11 +156,11 @@ export function BigWinOverlay({ show, totalWin, betAmount, onDismiss, turboEnabl
   }, [show, onDismiss, turboEnabled]);
 
   useEffect(() => {
-    if (show && totalWin > 0 && !sfxMuted) {
+    if (show && totalWin > 0) {
       // Play win sound when big win screen appears
       new Howl({ src: ['/submissions/loot-tumble/win.mp3'] }).play();
     }
-  }, [show, totalWin, betAmount, sfxMuted]);
+  }, [show, totalWin, betAmount]);
 
   /* --- dismiss handler (click/tap) --------------------------------- */
   const handleDismiss = useCallback(() => {
@@ -322,4 +321,3 @@ export function BigWinOverlay({ show, totalWin, betAmount, onDismiss, turboEnabl
     </AnimatePresence>
   );
 }
-

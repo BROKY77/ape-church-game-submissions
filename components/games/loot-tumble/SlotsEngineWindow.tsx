@@ -8,12 +8,12 @@ import { WinDisplay } from "@/components/games/loot-tumble/slot/WinDisplay";
 import { ClusterParticles } from "@/components/games/loot-tumble/slot/ClusterParticles";
 import { BigWinOverlay } from "@/components/games/loot-tumble/slot/BigWinOverlay";
 import { GameInfoModal } from "./GameInfoModal";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useScreenShake } from "@/components/games/loot-tumble/hooks/useScreenShake";
 import { Howl } from "howler";
 
 type SceneTransitionDirection = "ENTER" | "EXIT";
-type SceneTransitionPhase = "IDLE" | "IMPACT" | "DROP" | "BLACKOUT" | "ENTER" | "SETTLE";
+type SceneTransitionPhase = "IDLE" | "IMPACT" | "CRACK" | "DROP" | "BLACKOUT" | "ENTER" | "SETTLE";
 
 export interface SlotsEventPopup {
     id: number;
@@ -72,6 +72,195 @@ function DustBurst({ burstId }: { burstId: number }) {
     );
 }
 
+// --- Falling debris particles during IMPACT/CRACK phase ---
+const DEBRIS_PIECES = Array.from({ length: 24 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    size: 3 + Math.random() * 8,
+    delay: Math.random() * 0.4,
+    duration: 1.2 + Math.random() * 1.0,
+    rotation: Math.random() * 360,
+    rotateSpeed: 120 + Math.random() * 240,
+    opacity: 0.4 + Math.random() * 0.5,
+    color: ['#8B6914', '#5C4A1E', '#A0722A', '#3D2B0F', '#6B4F1D'][Math.floor(Math.random() * 5)],
+    sway: (Math.random() - 0.5) * 40,
+}));
+
+function FallingDebris({ active, phase }: { active: boolean; phase: SceneTransitionPhase }) {
+    if (!active) return null;
+    const showDust = phase === "IMPACT" || phase === "CRACK" || phase === "DROP";
+    if (!showDust) return null;
+
+    return (
+        <div className="absolute inset-0 z-[18] pointer-events-none overflow-hidden">
+            {DEBRIS_PIECES.map((piece) => (
+                <motion.div
+                    key={`debris-${piece.id}`}
+                    className="absolute rounded-sm"
+                    style={{
+                        left: `${piece.x}%`,
+                        top: -10,
+                        width: piece.size,
+                        height: piece.size * (0.6 + Math.random() * 0.8),
+                        background: piece.color,
+                        boxShadow: `0 0 ${piece.size}px rgba(0,0,0,0.4)`,
+                    }}
+                    initial={{ y: -20, x: 0, rotate: piece.rotation, opacity: 0 }}
+                    animate={{
+                        y: [0, 300, 700],
+                        x: [0, piece.sway, piece.sway * 1.5],
+                        rotate: [piece.rotation, piece.rotation + piece.rotateSpeed],
+                        opacity: [0, piece.opacity, piece.opacity, 0],
+                    }}
+                    transition={{
+                        duration: piece.duration,
+                        delay: piece.delay,
+                        ease: [0.22, 0.68, 0.36, 1],
+                    }}
+                />
+            ))}
+            {/* Dust haze across the top */}
+            <motion.div
+                className="absolute inset-x-0 top-0 h-[30%]"
+                style={{
+                    background: "linear-gradient(to bottom, rgba(139,105,20,0.25) 0%, rgba(92,74,30,0.12) 40%, transparent 100%)",
+                }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: phase === "CRACK" || phase === "DROP" ? 1 : 0.4 }}
+                transition={{ duration: 0.6 }}
+            />
+        </div>
+    );
+}
+
+// --- SVG crack overlay that appears on the board ---
+function CrackOverlay({ active, phase }: { active: boolean; phase: SceneTransitionPhase }) {
+    if (!active || (phase !== "CRACK" && phase !== "DROP")) return null;
+
+    const crackProgress = phase === "DROP" ? 1 : 0.7;
+
+    return (
+        <div className="absolute inset-0 z-[15] pointer-events-none">
+            <svg viewBox="0 0 400 500" className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
+                {/* Main central crack */}
+                <motion.path
+                    d="M200,0 L195,60 L205,120 L192,180 L210,240 L188,310 L207,380 L195,440 L200,500"
+                    fill="none"
+                    stroke="rgba(255,200,80,0.9)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: crackProgress, opacity: 1 }}
+                    transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                    style={{ filter: "drop-shadow(0 0 8px rgba(255,180,40,0.8)) drop-shadow(0 0 20px rgba(255,140,20,0.4))" }}
+                />
+                {/* Branch cracks */}
+                <motion.path
+                    d="M195,60 L160,90 L140,85"
+                    fill="none" stroke="rgba(255,180,60,0.7)" strokeWidth="2"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: crackProgress, opacity: 0.8 }}
+                    transition={{ duration: 0.4, delay: 0.15, ease: [0.4, 0, 0.2, 1] }}
+                    style={{ filter: "drop-shadow(0 0 6px rgba(255,160,30,0.6))" }}
+                />
+                <motion.path
+                    d="M205,120 L240,150 L270,145"
+                    fill="none" stroke="rgba(255,180,60,0.7)" strokeWidth="2"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: crackProgress, opacity: 0.8 }}
+                    transition={{ duration: 0.4, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                    style={{ filter: "drop-shadow(0 0 6px rgba(255,160,30,0.6))" }}
+                />
+                <motion.path
+                    d="M192,180 L155,210 L130,200"
+                    fill="none" stroke="rgba(255,180,60,0.6)" strokeWidth="1.5"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: crackProgress, opacity: 0.7 }}
+                    transition={{ duration: 0.35, delay: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                    style={{ filter: "drop-shadow(0 0 5px rgba(255,160,30,0.5))" }}
+                />
+                <motion.path
+                    d="M210,240 L250,270 L280,262"
+                    fill="none" stroke="rgba(255,180,60,0.6)" strokeWidth="1.5"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: crackProgress, opacity: 0.7 }}
+                    transition={{ duration: 0.35, delay: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                    style={{ filter: "drop-shadow(0 0 5px rgba(255,160,30,0.5))" }}
+                />
+                <motion.path
+                    d="M188,310 L150,340 L125,332"
+                    fill="none" stroke="rgba(255,180,60,0.5)" strokeWidth="1.5"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: crackProgress, opacity: 0.6 }}
+                    transition={{ duration: 0.3, delay: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                    style={{ filter: "drop-shadow(0 0 4px rgba(255,160,30,0.4))" }}
+                />
+            </svg>
+            {/* Light bleeding through the crack */}
+            <motion.div
+                className="absolute inset-0"
+                style={{
+                    background: "linear-gradient(90deg, transparent 46%, rgba(255,200,80,0.15) 49%, rgba(255,220,100,0.25) 50%, rgba(255,200,80,0.15) 51%, transparent 54%)",
+                }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: phase === "DROP" ? 1 : 0.5 }}
+                transition={{ duration: 0.3 }}
+            />
+        </div>
+    );
+}
+
+// --- Ambient floating particles during bonus mode ---
+const AMBIENT_PARTICLES = Array.from({ length: 18 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    size: 2 + Math.random() * 4,
+    duration: 4 + Math.random() * 6,
+    delay: Math.random() * 3,
+    drift: (Math.random() - 0.5) * 30,
+    type: Math.random() > 0.6 ? 'ember' : 'dust' as const,
+}));
+
+function BonusAmbientParticles({ active }: { active: boolean }) {
+    if (!active) return null;
+
+    return (
+        <div className="absolute inset-0 z-[12] pointer-events-none overflow-hidden">
+            {AMBIENT_PARTICLES.map((p) => (
+                <motion.div
+                    key={`ambient-${p.id}`}
+                    className="absolute rounded-full"
+                    style={{
+                        left: `${p.x}%`,
+                        top: `${p.y}%`,
+                        width: p.size,
+                        height: p.size,
+                        background: p.type === 'ember'
+                            ? 'radial-gradient(circle, rgba(255,180,60,0.9) 0%, rgba(255,120,20,0.4) 60%, transparent 100%)'
+                            : 'radial-gradient(circle, rgba(200,190,170,0.5) 0%, rgba(160,140,110,0.2) 60%, transparent 100%)',
+                        boxShadow: p.type === 'ember'
+                            ? `0 0 ${p.size * 2}px rgba(255,160,40,0.4)`
+                            : 'none',
+                    }}
+                    animate={{
+                        y: [0, -(20 + Math.random() * 40), -(50 + Math.random() * 60)],
+                        x: [0, p.drift * 0.5, p.drift],
+                        opacity: [0, p.type === 'ember' ? 0.8 : 0.45, 0],
+                        scale: [0.5, 1, 0.3],
+                    }}
+                    transition={{
+                        duration: p.duration,
+                        delay: p.delay,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                    }}
+                />
+            ))}
+        </div>
+    );
+}
+
 interface SlotsEngineWindowProps {
     gameState: GameState;
     betAmount: number;
@@ -92,7 +281,6 @@ interface SlotsEngineWindowProps {
     onCloseInfo?: () => void;
     eventPopup?: SlotsEventPopup | null;
     onDismissEventPopup?: () => void;
-    sfxMuted?: boolean;
 }
 
 const SlotsEngineWindow: React.FC<SlotsEngineWindowProps> = ({
@@ -115,7 +303,6 @@ const SlotsEngineWindow: React.FC<SlotsEngineWindowProps> = ({
     onCloseInfo,
     eventPopup = null,
     onDismissEventPopup,
-    sfxMuted = false,
 }) => {
     const {
         grid,
@@ -139,25 +326,19 @@ const SlotsEngineWindow: React.FC<SlotsEngineWindowProps> = ({
     const birdTapTimestampsRef = React.useRef<number[]>([]);
 
     const { shakeControls, triggerShake } = useScreenShake();
-    const playSfx = useCallback((src: string) => {
-        if (sfxMuted) {
-            return;
-        }
-
-        new Howl({ src: [src] }).play();
-    }, [sfxMuted]);
     const showGame = isGameActive && introState === "READY";
     const showBonusTheme = visualMode === "BONUS";
     const incomingVisualMode: BonusMode = bonusTransitionDirection === "ENTER" ? "BONUS" : "BASE";
     const playAreaBackground = showBonusTheme ? "/submissions/loot-tumble/bonus background.webp" : "/submissions/loot-tumble/gamebg.webp";
     const sceneSpeedMultiplier = turboEnabled ? 1 : 1.6;
     const sceneTiming = {
-        dropDelay: Math.round(420 * sceneSpeedMultiplier),
-        blackoutDelay: Math.round(820 * sceneSpeedMultiplier),
-        swapDelay: Math.round(930 * sceneSpeedMultiplier),
-        enterDelay: Math.round(1010 * sceneSpeedMultiplier),
-        settleDelay: Math.round(1710 * sceneSpeedMultiplier),
-        completeDelay: Math.round(2140 * sceneSpeedMultiplier),
+        crackDelay: Math.round(380 * sceneSpeedMultiplier),
+        dropDelay: Math.round(720 * sceneSpeedMultiplier),
+        blackoutDelay: Math.round(1100 * sceneSpeedMultiplier),
+        swapDelay: Math.round(1220 * sceneSpeedMultiplier),
+        enterDelay: Math.round(1340 * sceneSpeedMultiplier),
+        settleDelay: Math.round(2100 * sceneSpeedMultiplier),
+        completeDelay: Math.round(2540 * sceneSpeedMultiplier),
     };
 
     useEffect(() => {
@@ -211,17 +392,18 @@ const SlotsEngineWindow: React.FC<SlotsEngineWindowProps> = ({
         const nextMode: BonusMode = bonusTransitionDirection === "ENTER" ? "BONUS" : "BASE";
 
         setSceneTransitionPhase("IMPACT");
-        playSfx("/submissions/loot-tumble/shock.mp3");
+        new Howl({ src: ["/submissions/loot-tumble/shock.mp3"] }).play();
         if (bonusTransitionDirection === "ENTER") {
             bonusLevelSoundRef.current?.stop();
             bonusLevelSoundRef.current?.unload();
-            bonusLevelSoundRef.current = null;
-
-            if (!sfxMuted) {
-                bonusLevelSoundRef.current = new Howl({ src: ["/submissions/loot-tumble/bonus level.mp3"] });
-                bonusLevelSoundRef.current.play();
-            }
+            bonusLevelSoundRef.current = new Howl({ src: ["/submissions/loot-tumble/bonus level.mp3"] });
+            bonusLevelSoundRef.current.play();
         }
+
+        const crackTimer = setTimeout(() => {
+            setSceneTransitionPhase("CRACK");
+            new Howl({ src: ["/submissions/loot-tumble/shock.mp3"], volume: 0.7 }).play();
+        }, sceneTiming.crackDelay);
 
         const dropTimer = setTimeout(() => {
             setSceneTransitionPhase("DROP");
@@ -252,6 +434,7 @@ const SlotsEngineWindow: React.FC<SlotsEngineWindowProps> = ({
         }, sceneTiming.completeDelay);
 
         return () => {
+            clearTimeout(crackTimer);
             clearTimeout(dropTimer);
             clearTimeout(blackoutTimer);
             clearTimeout(swapTimer);
@@ -266,27 +449,13 @@ const SlotsEngineWindow: React.FC<SlotsEngineWindowProps> = ({
         onVisualModeSwap,
         sceneTiming.blackoutDelay,
         sceneTiming.completeDelay,
+        sceneTiming.crackDelay,
         sceneTiming.dropDelay,
         sceneTiming.enterDelay,
         sceneTiming.settleDelay,
         sceneTiming.swapDelay,
         showGame,
-        sfxMuted,
-        playSfx,
     ]);
-
-    useEffect(() => {
-        if (!sfxMuted) {
-            return;
-        }
-
-        bonusLevelSoundRef.current?.stop();
-        bonusLevelSoundRef.current?.unload();
-        bonusLevelSoundRef.current = null;
-        angryBirdSoundRef.current?.stop();
-        angryBirdSoundRef.current?.unload();
-        angryBirdSoundRef.current = null;
-    }, [sfxMuted]);
 
     useEffect(() => {
         return () => {
@@ -342,19 +511,19 @@ const SlotsEngineWindow: React.FC<SlotsEngineWindowProps> = ({
         if (state === "CASCADING" && prev !== "CASCADING") {
             const totalClusterCells = activeClusters.reduce((sum, cluster) => sum + cluster.size, 0);
             if (totalClusterCells > 0) {
-                playSfx("/submissions/loot-tumble/points.mp3");
+                new Howl({ src: ["/submissions/loot-tumble/points.mp3"] }).play();
                 triggerShake(totalClusterCells, cascadeDepth);
             }
         }
         prevStateRef.current = state;
-    }, [state, activeClusters, triggerShake, cascadeDepth, playSfx]);
+    }, [state, activeClusters, triggerShake, cascadeDepth]);
 
     useEffect(() => {
         if (turboEnabled && autoSpinEnabled) {
-            playSfx("/submissions/loot-tumble/parrot.mp3");
-            playSfx("/submissions/loot-tumble/shock.mp3");
+            new Howl({ src: ["/submissions/loot-tumble/parrot.mp3"] }).play();
+            new Howl({ src: ["/submissions/loot-tumble/shock.mp3"] }).play();
         }
-    }, [turboEnabled, autoSpinEnabled, playSfx]);
+    }, [turboEnabled, autoSpinEnabled]);
 
     useEffect(() => {
         if (state === "WIN_DISPLAY" && totalWin >= betAmount * 10) {
@@ -370,11 +539,8 @@ const SlotsEngineWindow: React.FC<SlotsEngineWindowProps> = ({
         setShowAngryBird(true);
         angryBirdSoundRef.current?.stop();
         angryBirdSoundRef.current?.unload();
-        angryBirdSoundRef.current = null;
-        if (!sfxMuted) {
-            angryBirdSoundRef.current = new Howl({ src: ["/submissions/loot-tumble/yell.mp3"] });
-            angryBirdSoundRef.current.play();
-        }
+        angryBirdSoundRef.current = new Howl({ src: ["/submissions/loot-tumble/yell.mp3"] });
+        angryBirdSoundRef.current.play();
 
         if (angryBirdTimerRef.current) {
             clearTimeout(angryBirdTimerRef.current);
@@ -384,7 +550,7 @@ const SlotsEngineWindow: React.FC<SlotsEngineWindowProps> = ({
             setShowAngryBird(false);
             angryBirdTimerRef.current = null;
         }, 1500);
-    }, [sfxMuted]);
+    }, []);
 
     const handleSymbolClick = useCallback((symbolId: string) => {
         if (!showGame || bonusTransitionActive || symbolId !== "bird") {
@@ -456,7 +622,6 @@ const SlotsEngineWindow: React.FC<SlotsEngineWindowProps> = ({
                     bonusActive={boardMode === "BONUS"}
                     bonusEffectMode={bonusEffectMode}
                     onSymbolClick={handleSymbolClick}
-                    sfxMuted={sfxMuted}
                 />
 
                 {activeClusters.length > 0 && (state === "RESOLVING" || state === "CASCADING") && (
@@ -501,53 +666,106 @@ const SlotsEngineWindow: React.FC<SlotsEngineWindowProps> = ({
                 y: [0, 12, -10, 8, -4, 0],
                 transition: { duration: 0.48 * sceneSpeedMultiplier, ease: "easeOut" as const },
             }
+            : sceneTransitionPhase === "CRACK"
+            ? {
+                x: [0, -24, 22, -18, 14, -8, 4, 0],
+                y: [0, 16, -14, 12, -8, 4, 0],
+                transition: { duration: 0.56 * sceneSpeedMultiplier, ease: "easeOut" as const },
+            }
             : {
                 x: 0,
                 y: 0,
                 transition: { duration: 0.24 * sceneSpeedMultiplier, ease: "easeOut" as const },
             };
 
-    const outgoingBoardMotion =
+    // Split board departure - left half
+    const outgoingBoardLeftMotion =
         sceneTransitionPhase === "IMPACT"
             ? {
+                clipPath: "inset(0 0 0 0)",
+                x: 0, y: 0, rotate: 0,
                 scale: [1, 1.015, 0.99, 1.01, 1],
-                rotate: [0, -0.4, 0.5, -0.25, 0],
-                y: 0,
                 opacity: 1,
                 transition: { duration: 0.42 * sceneSpeedMultiplier, ease: "easeOut" as const },
             }
+            : sceneTransitionPhase === "CRACK"
+            ? {
+                clipPath: "inset(0 50% 0 0)",
+                x: -4, y: 0, rotate: -0.3,
+                scale: 1,
+                opacity: 1,
+                transition: { duration: 0.32 * sceneSpeedMultiplier, ease: [0.22, 1, 0.36, 1] as const },
+            }
             : sceneTransitionPhase === "DROP"
                 ? {
-                    y: [0, 70, 620],
-                    rotate: [0, -2.5, 4.5],
-                    scale: [1, 0.985, 0.94],
-                    opacity: [1, 1, 0],
-                    transition: { duration: 0.52 * sceneSpeedMultiplier, ease: [0.22, 1, 0.36, 1] as const },
+                    clipPath: "inset(0 50% 0 0)",
+                    x: [-4, -180, -400],
+                    y: [0, 80, 500],
+                    rotate: [-0.3, -8, -18],
+                    scale: [1, 0.95, 0.85],
+                    opacity: [1, 0.8, 0],
+                    transition: { duration: 0.62 * sceneSpeedMultiplier, ease: [0.22, 1, 0.36, 1] as const },
                 }
                 : sceneTransitionPhase === "BLACKOUT"
                     ? {
-                        y: 620,
-                        rotate: 4.5,
-                        scale: 0.94,
-                        opacity: 0,
+                        clipPath: "inset(0 50% 0 0)",
+                        x: -400, y: 500, rotate: -18, scale: 0.85, opacity: 0,
                         transition: { duration: 0.12 * sceneSpeedMultiplier, ease: "linear" as const },
                     }
                 : {
-                    y: 0,
-                    rotate: 0,
-                    scale: 1,
-                    opacity: 1,
+                    clipPath: "inset(0 0 0 0)",
+                    x: 0, y: 0, rotate: 0, scale: 1, opacity: 1,
+                    transition: { duration: 0.24 * sceneSpeedMultiplier, ease: "easeOut" as const },
+                };
+
+    // Split board departure - right half
+    const outgoingBoardRightMotion =
+        sceneTransitionPhase === "IMPACT"
+            ? {
+                clipPath: "inset(0 0 0 0)",
+                x: 0, y: 0, rotate: 0,
+                scale: [1, 1.015, 0.99, 1.01, 1],
+                opacity: 1,
+                transition: { duration: 0.42 * sceneSpeedMultiplier, ease: "easeOut" as const },
+            }
+            : sceneTransitionPhase === "CRACK"
+            ? {
+                clipPath: "inset(0 0 0 50%)",
+                x: 4, y: 0, rotate: 0.3,
+                scale: 1,
+                opacity: 1,
+                transition: { duration: 0.32 * sceneSpeedMultiplier, ease: [0.22, 1, 0.36, 1] as const },
+            }
+            : sceneTransitionPhase === "DROP"
+                ? {
+                    clipPath: "inset(0 0 0 50%)",
+                    x: [4, 180, 400],
+                    y: [0, 100, 550],
+                    rotate: [0.3, 10, 22],
+                    scale: [1, 0.95, 0.85],
+                    opacity: [1, 0.8, 0],
+                    transition: { duration: 0.62 * sceneSpeedMultiplier, ease: [0.22, 1, 0.36, 1] as const },
+                }
+                : sceneTransitionPhase === "BLACKOUT"
+                    ? {
+                        clipPath: "inset(0 0 0 50%)",
+                        x: 400, y: 550, rotate: 22, scale: 0.85, opacity: 0,
+                        transition: { duration: 0.12 * sceneSpeedMultiplier, ease: "linear" as const },
+                    }
+                : {
+                    clipPath: "inset(0 0 0 0)",
+                    x: 0, y: 0, rotate: 0, scale: 1, opacity: 1,
                     transition: { duration: 0.24 * sceneSpeedMultiplier, ease: "easeOut" as const },
                 };
 
     const incomingBoardMotion =
         sceneTransitionPhase === "ENTER"
             ? {
-                y: [-620, 36, 0],
-                rotate: [-4.5, 1.2, 0],
-                scale: [0.94, 1.015, 1],
-                opacity: [0, 1, 1],
-                transition: { duration: 0.72 * sceneSpeedMultiplier, ease: [0.16, 1, 0.3, 1] as const },
+                y: [-700, 24, -8, 0],
+                rotate: [-5, 1.5, -0.4, 0],
+                scale: [0.88, 1.025, 0.995, 1],
+                opacity: [0, 1, 1, 1],
+                transition: { duration: 0.82 * sceneSpeedMultiplier, ease: [0.16, 1, 0.3, 1] as const },
             }
             : {
                 y: 0,
@@ -571,13 +789,15 @@ const SlotsEngineWindow: React.FC<SlotsEngineWindowProps> = ({
     const transitionMessage =
         sceneTransitionPhase === "IMPACT"
             ? "Shaking Loose..."
-            : sceneTransitionPhase === "DROP"
-                ? "Dropping The Old Board..."
-                : sceneTransitionPhase === "BLACKOUT"
-                    ? incomingVisualMode === "BONUS" ? "Unlocking The Hidden Room..." : "Packing Up The Treasure..."
-                    : incomingVisualMode === "BONUS"
-                        ? "Free Spins Incoming"
-                        : "Returning To The Main Room";
+            : sceneTransitionPhase === "CRACK"
+                ? "The Walls Are Cracking..."
+                : sceneTransitionPhase === "DROP"
+                    ? "Breaking Apart..."
+                    : sceneTransitionPhase === "BLACKOUT"
+                        ? incomingVisualMode === "BONUS" ? "Unlocking The Hidden Room..." : "Packing Up The Treasure..."
+                        : incomingVisualMode === "BONUS"
+                            ? "Free Spins Incoming"
+                            : "Returning To The Main Room";
     const showFullEventPopup = eventPopup?.mode === "full";
     const showCompactEventPopup = eventPopup?.mode === "compact";
 
@@ -587,66 +807,15 @@ const SlotsEngineWindow: React.FC<SlotsEngineWindowProps> = ({
             animate={screenTransitionMotion}
             style={{ backgroundImage: `url("${playAreaBackground}")` }}
         >
-            <style jsx global>{`
-                @keyframes bonusSymbolCharge {
-                    0%,
-                    100% {
-                        transform: scale(1);
-                        opacity: 0.58;
-                    }
-
-                    22% {
-                        transform: scale(1.02);
-                        opacity: 0.9;
-                    }
-
-                    48% {
-                        transform: scale(1.045);
-                        opacity: 0.76;
-                    }
-
-                    74% {
-                        transform: scale(1.018);
-                        opacity: 0.98;
-                    }
-                }
-
-                @keyframes bonusSymbolArc {
-                    0%,
-                    100% {
-                        transform: scale(1.01);
-                        opacity: 0.16;
-                    }
-
-                    12% {
-                        transform: scale(1.035);
-                        opacity: 0.74;
-                    }
-
-                    28% {
-                        transform: scale(1.02);
-                        opacity: 0.22;
-                    }
-
-                    44% {
-                        transform: scale(1.045);
-                        opacity: 0.82;
-                    }
-
-                    62% {
-                        transform: scale(1.018);
-                        opacity: 0.26;
-                    }
-
-                    78% {
-                        transform: scale(1.05);
-                        opacity: 0.68;
-                    }
-                }
-            `}</style>
             {showBonusTheme && (
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.18),transparent_45%),radial-gradient(circle_at_bottom,rgba(251,191,36,0.18),transparent_40%)] pointer-events-none" />
             )}
+
+            {/* Ambient floating dust/embers during bonus round */}
+            <BonusAmbientParticles active={showBonusTheme && showGame && !bonusTransitionActive} />
+
+            {/* Falling debris during IMPACT/CRACK/DROP */}
+            <FallingDebris active={bonusTransitionActive && bonusTransitionDirection === "ENTER"} phase={sceneTransitionPhase} />
 
             <AnimatePresence>
                 {bonusTransitionActive && (
@@ -655,20 +824,24 @@ const SlotsEngineWindow: React.FC<SlotsEngineWindowProps> = ({
                         animate={{
                             opacity:
                                 sceneTransitionPhase === "IMPACT"
-                                    ? 0.3
-                                    : sceneTransitionPhase === "DROP"
-                                        ? 0.7
-                                        : sceneTransitionPhase === "BLACKOUT"
-                                            ? 0.94
-                                            : sceneTransitionPhase === "ENTER"
-                                                ? 0.42
-                                                : 0.16,
+                                    ? 0.15
+                                    : sceneTransitionPhase === "CRACK"
+                                        ? 0.25
+                                        : sceneTransitionPhase === "DROP"
+                                            ? 0.45
+                                            : sceneTransitionPhase === "BLACKOUT"
+                                                ? 0.92
+                                                : sceneTransitionPhase === "ENTER"
+                                                    ? 0.38
+                                                    : 0.14,
                             background:
                                 sceneTransitionPhase === "ENTER" || sceneTransitionPhase === "SETTLE"
                                     ? incomingVisualMode === "BONUS"
                                         ? "radial-gradient(circle at center, rgba(34,211,238,0.24), rgba(4,11,24,0.84))"
                                         : "radial-gradient(circle at center, rgba(245,158,11,0.18), rgba(12,8,5,0.82))"
-                                    : "radial-gradient(circle at center, rgba(8,8,12,0.74), rgba(0,0,0,0.92))",
+                                    : sceneTransitionPhase === "CRACK" || sceneTransitionPhase === "DROP"
+                                        ? "radial-gradient(circle at center, rgba(255,180,40,0.08), rgba(0,0,0,0.88))"
+                                        : "radial-gradient(circle at center, rgba(8,8,12,0.74), rgba(0,0,0,0.92))",
                         }}
                         exit={{ opacity: 0, transition: { duration: 0.25 } }}
                         className="absolute inset-0 z-20 pointer-events-none"
@@ -924,18 +1097,61 @@ const SlotsEngineWindow: React.FC<SlotsEngineWindowProps> = ({
             >
                 {bonusTransitionActive ? (
                     <div className="relative w-full h-full flex items-center justify-center">
-                        {(sceneTransitionPhase === "IMPACT" || sceneTransitionPhase === "DROP" || sceneTransitionPhase === "BLACKOUT") && (
-                            <motion.div
-                                animate={outgoingBoardMotion}
-                                className="absolute inset-0 flex items-center justify-center transform-gpu"
-                                style={{ transformOrigin: "50% 55%", willChange: "transform, opacity" }}
-                            >
-                                {renderBoardShell({
-                                    boardMode: visualMode,
-                                    boardPhase: sceneTransitionPhase,
-                                    showCompanion: false,
-                                })}
-                            </motion.div>
+                        {/* Outgoing board — split into left and right halves during CRACK/DROP */}
+                        {(sceneTransitionPhase === "IMPACT" || sceneTransitionPhase === "CRACK" || sceneTransitionPhase === "DROP" || sceneTransitionPhase === "BLACKOUT") && (
+                            <>
+                                {/* Left half */}
+                                <motion.div
+                                    animate={outgoingBoardLeftMotion}
+                                    className="absolute inset-0 flex items-center justify-center transform-gpu"
+                                    style={{ transformOrigin: "30% 55%", willChange: "transform, opacity, clip-path" }}
+                                >
+                                    <div className="relative w-full h-full">
+                                        {renderBoardShell({
+                                            boardMode: visualMode,
+                                            boardPhase: sceneTransitionPhase,
+                                            showCompanion: false,
+                                        })}
+                                        <CrackOverlay active={bonusTransitionDirection === "ENTER"} phase={sceneTransitionPhase} />
+                                    </div>
+                                </motion.div>
+                                {/* Right half */}
+                                <motion.div
+                                    animate={outgoingBoardRightMotion}
+                                    className="absolute inset-0 flex items-center justify-center transform-gpu"
+                                    style={{ transformOrigin: "70% 55%", willChange: "transform, opacity, clip-path" }}
+                                >
+                                    {renderBoardShell({
+                                        boardMode: visualMode,
+                                        boardPhase: sceneTransitionPhase,
+                                        showCompanion: false,
+                                    })}
+                                </motion.div>
+
+                                {/* Light seam bleeding through the crack */}
+                                {(sceneTransitionPhase === "CRACK" || sceneTransitionPhase === "DROP") && bonusTransitionDirection === "ENTER" && (
+                                    <motion.div
+                                        className="absolute inset-0 z-[16] flex items-center justify-center pointer-events-none"
+                                        initial={{ opacity: 0 }}
+                                        animate={{
+                                            opacity: sceneTransitionPhase === "CRACK" ? [0, 0.6, 0.8] : [0.8, 1, 0],
+                                        }}
+                                        transition={{
+                                            duration: sceneTransitionPhase === "CRACK" ? 0.4 * sceneSpeedMultiplier : 0.5 * sceneSpeedMultiplier,
+                                            ease: "easeOut",
+                                        }}
+                                    >
+                                        <div
+                                            className="h-[70%] w-[6px] rounded-full"
+                                            style={{
+                                                background: "linear-gradient(to bottom, transparent 0%, rgba(255,220,100,0.9) 20%, rgba(255,180,40,1) 50%, rgba(255,220,100,0.9) 80%, transparent 100%)",
+                                                boxShadow: "0 0 20px 8px rgba(255,180,40,0.5), 0 0 60px 20px rgba(255,140,20,0.25)",
+                                                filter: "blur(1px)",
+                                            }}
+                                        />
+                                    </motion.div>
+                                )}
+                            </>
                         )}
 
                         {(sceneTransitionPhase === "ENTER" || sceneTransitionPhase === "SETTLE") && (
@@ -989,7 +1205,7 @@ const SlotsEngineWindow: React.FC<SlotsEngineWindowProps> = ({
                     <motion.div
                         initial={{ opacity: 0, scale: 0.92, y: 14 }}
                         animate={{
-                            opacity: sceneTransitionPhase === "DROP" ? 0 : 1,
+                            opacity: (sceneTransitionPhase === "DROP" || sceneTransitionPhase === "CRACK") ? 0 : 1,
                             scale: sceneTransitionPhase === "ENTER" ? 1.04 : 1,
                             y: sceneTransitionPhase === "ENTER" ? -10 : 0,
                         }}
@@ -1054,7 +1270,6 @@ const SlotsEngineWindow: React.FC<SlotsEngineWindowProps> = ({
                 betAmount={betAmount}
                 onDismiss={dismissBigWin}
                 turboEnabled={turboEnabled}
-                sfxMuted={sfxMuted}
             />
 
             <GameInfoModal isOpen={!!showInfo} onClose={() => onCloseInfo?.()} />
@@ -1063,4 +1278,3 @@ const SlotsEngineWindow: React.FC<SlotsEngineWindowProps> = ({
 };
 
 export default SlotsEngineWindow;
-

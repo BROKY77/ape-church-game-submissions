@@ -20,6 +20,7 @@ interface SlotsEngineProps {
 const SlotsEngine: React.FC<SlotsEngineProps> = ({ game }) => {
     const [currentView, setCurrentView] = useState<0 | 1 | 2>(0);
     const [isLoading, setIsLoading] = useState(false);
+    const [introCompleted, setIntroCompleted] = useState(false);
     const [gameOver, setGameOver] = useState(false);
     const [numberOfSpins, setNumberOfSpins] = useState(10);
     const [currentSpinIndex, setCurrentSpinIndex] = useState(0);
@@ -32,8 +33,6 @@ const SlotsEngine: React.FC<SlotsEngineProps> = ({ game }) => {
     const [eventPopup, setEventPopup] = useState<SlotsEventPopup | null>(null);
     const [replayActive, setReplayActive] = useState(false);
     const [replayPendingNext, setReplayPendingNext] = useState(false);
-    const [musicMuted, setMusicMuted] = useState(false);
-    const [sfxMuted, setSfxMuted] = useState(false);
 
     const [currentGameId, setCurrentGameId] = useState<bigint>(
         BigInt(bytesToHex(new Uint8Array(randomBytes(32))))
@@ -43,6 +42,7 @@ const SlotsEngine: React.FC<SlotsEngineProps> = ({ game }) => {
     const replayCursorRef = useRef(0);
     const replayActiveRef = useRef(false);
     replayActiveRef.current = replayActive;
+    const pendingEventPopupRef = useRef<SlotsEventPopup | null>(null);
 
     const { turboEnabled, speedMultiplier, toggleTurbo } = useTurboMode();
     const handleRecordedSpin = useCallback((recordedSpin: RecordedSpin) => {
@@ -197,14 +197,24 @@ const SlotsEngine: React.FC<SlotsEngineProps> = ({ game }) => {
             }
 
             if (gameState.awardedFreeSpins > 0) {
-                setEventPopup({
+                const popupData: SlotsEventPopup = {
                     id: Date.now(),
                     variant: launchedSpinMode === "BASE" ? "bonus-entry" : "bonus-retrigger",
                     title: launchedSpinMode === "BASE" ? "Bonus Round Unlocked" : "Scatter Retrigger",
                     message: `You got ${gameState.awardedFreeSpins} free spins`,
                     iconSrc: "/submissions/loot-tumble/Scatter Symbol.png",
                     mode: turboEnabled ? "compact" : "full",
-                });
+                };
+
+                // For bonus-entry from BASE mode, a transition will play —
+                // defer the popup until the transition finishes.
+                // For retriggers (already in BONUS), no transition occurs,
+                // so show the popup immediately.
+                if (launchedSpinMode === "BASE") {
+                    pendingEventPopupRef.current = popupData;
+                } else {
+                    setEventPopup(popupData);
+                }
             }
 
             const noBaseSpinsLeft = nextBaseSpinIndex >= numberOfSpins;
@@ -375,6 +385,7 @@ const SlotsEngine: React.FC<SlotsEngineProps> = ({ game }) => {
         setShowInfo(false);
         recordedSpinsRef.current = [];
         replayCursorRef.current = 0;
+        pendingEventPopupRef.current = null;
         prevBonusModeForTransitionRef.current = false;
         prevBonusTransitionActiveRef.current = false;
         launchedSpinModeRef.current = "BASE";
@@ -415,6 +426,7 @@ const SlotsEngine: React.FC<SlotsEngineProps> = ({ game }) => {
         setShowInfo(false);
         recordedSpinsRef.current = [];
         replayCursorRef.current = 0;
+        pendingEventPopupRef.current = null;
         prevBonusModeForTransitionRef.current = false;
         prevBonusTransitionActiveRef.current = false;
         launchedSpinModeRef.current = "BASE";
@@ -441,6 +453,12 @@ const SlotsEngine: React.FC<SlotsEngineProps> = ({ game }) => {
     const handleBonusTransitionComplete = useCallback(() => {
         setBonusTransitionActive(false);
         setBonusTransitionDirection(null);
+
+        // Show the deferred bonus-entry popup now that the transition is done
+        if (pendingEventPopupRef.current) {
+            setEventPopup(pendingEventPopupRef.current);
+            pendingEventPopupRef.current = null;
+        }
     }, []);
 
     const handleDismissEventPopup = useCallback(() => {
@@ -475,6 +493,7 @@ const SlotsEngine: React.FC<SlotsEngineProps> = ({ game }) => {
         setReplayPendingNext(false);
         setShowInfo(false);
         replayCursorRef.current = 0;
+        pendingEventPopupRef.current = null;
         prevBonusModeForTransitionRef.current = false;
         prevBonusTransitionActiveRef.current = false;
         launchedSpinModeRef.current = "BASE";
@@ -489,6 +508,7 @@ const SlotsEngine: React.FC<SlotsEngineProps> = ({ game }) => {
 
     const payout = accumulatedWin;
     const shouldShowPNL = accumulatedWin > totalSessionBet;
+
     return (
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-8 lg:gap-10">
             <GameWindow
@@ -506,8 +526,7 @@ const SlotsEngine: React.FC<SlotsEngineProps> = ({ game }) => {
                 isUserOriginalPlayer={true}
                 showPNL={shouldShowPNL}
                 isGamePaused={false}
-                onMusicMutedChange={setMusicMuted}
-                onSfxMutedChange={setSfxMuted}
+                disableBuiltInSong={!introCompleted}
             >
                 <SlotsEngineWindow
                     gameState={gameState}
@@ -523,13 +542,12 @@ const SlotsEngine: React.FC<SlotsEngineProps> = ({ game }) => {
                     bonusSpinsRemaining={gameState.bonusSpinsRemaining}
                     onVisualModeSwap={handleVisualModeSwap}
                     onBonusTransitionComplete={handleBonusTransitionComplete}
-                    onIntroComplete={() => undefined}
+                    onIntroComplete={() => setIntroCompleted(true)}
                     showInfo={showInfo}
                     onOpenInfo={() => setShowInfo(true)}
                     onCloseInfo={() => setShowInfo(false)}
                     eventPopup={eventPopup}
                     onDismissEventPopup={handleDismissEventPopup}
-                    sfxMuted={sfxMuted}
                 />
             </GameWindow>
 
@@ -566,4 +584,3 @@ const SlotsEngine: React.FC<SlotsEngineProps> = ({ game }) => {
 };
 
 export default SlotsEngine;
-
