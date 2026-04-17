@@ -36,5 +36,6 @@
   "windowComponent": "FoxyShooterWindow.tsx",
   "setupComponent": "FoxyShooterSetupCard.tsx",
   "configFile": "foxyShooterConfig.ts",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "submittedAt": "2025-03-25"
 }
