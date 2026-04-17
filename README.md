@@ -132,6 +132,44 @@ When you open the PR, automated checks will run immediately. All checks must pas
 
 ---
 
+## For reviewers
+
+These steps are for **maintainers** who need to check out a submission PR locally, fix or verify something, and push updates as an integration branch on `origin` (for CI or handoff), without merging the contributor’s fork directly.
+
+1. **Fetch the PR into a local branch.** Replace `<PR_NUMBER>` with the GitHub pull request number. Replace `review/<short-name>` with a local branch label you will recognize (often the game slug in kebab-case).
+
+   ```bash
+   git fetch origin pull/<PR_NUMBER>/head:review/<short-name>
+   git checkout review/<short-name>
+   ```
+
+   Example for PR `5` and a local branch `review/asen-vox-pai-gow`:
+
+   ```bash
+   git fetch origin pull/5/head:review/asen-vox-pai-gow
+   git checkout review/asen-vox-pai-gow
+   ```
+
+2. **Make your changes**, then commit and **push the same local branch to a feature branch on `origin`** (adjust the remote branch name to match your team’s naming, e.g. `feat/add-<game-slug>`):
+
+   ```bash
+   git add path/to/changed-file
+   git commit -m "fix: short description of the change"
+   git push origin review/<short-name>:refs/heads/feat/add-<game-slug>
+   ```
+
+   Example mirroring a local `review/dead-draw` branch to `feat/add-dead-draw`:
+
+   ```bash
+   git add submissions/example-team/dead-draw/metadata.json
+   git commit -m "fix: correct metadata.json closing bracket"
+   git push origin review/dead-draw:refs/heads/feat/add-dead-draw
+   ```
+
+The `git push origin local:refs/heads/remote` form creates (or updates) the named branch on `origin` from your current local branch tip without renaming your local checkout.
+
+---
+
 ## Do Not Include
 
 The following will cause your PR checks to fail:
