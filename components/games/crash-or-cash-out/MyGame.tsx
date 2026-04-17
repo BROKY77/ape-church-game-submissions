@@ -8,12 +8,15 @@ import MyGameWindow from "./MyGameWindow";
 import MyGameSetupCard from "./MyGameSetupCard";
 import { bytesToHex, Hex } from "viem";
 import { toast } from "sonner";
+import { myGame } from "./myGameConfig";
 
 interface MyGameComponentProps {
-    game: Game;
+    /** Omitted on `/submissions/...` preview routes; config supplies defaults. */
+    game?: Game;
 }
 
 const MyGameComponent: React.FC<MyGameComponentProps> = ({ game }) => {
+    const gameData = game ?? myGame;
     const router = useRouter();
     const searchParams = useSearchParams();
     const replayIdString = searchParams.get("id");
@@ -263,7 +266,7 @@ const MyGameComponent: React.FC<MyGameComponentProps> = ({ game }) => {
         <div>
             <div className="flex flex-col lg:flex-row gap-4 sm:gap-8 lg:gap-10">
                 <GameWindow
-                    game={game}
+                    game={gameData}
                     currentGameId={currentGameId}
                     isLoading={isLoading}
                     isGameFinished={gameOver}
@@ -280,7 +283,7 @@ const MyGameComponent: React.FC<MyGameComponentProps> = ({ game }) => {
                     resultModalDelayMs={1000}
                 >
                     <MyGameWindow
-                        game={game}
+                        game={gameData}
                         currentMultiplier={currentMultiplier}
                         isClimbing={isClimbing}
                         hasCrashed={hasCrashed}
@@ -290,7 +293,7 @@ const MyGameComponent: React.FC<MyGameComponentProps> = ({ game }) => {
                 </GameWindow>
 
                 <MyGameSetupCard
-                    game={game}
+                    game={gameData}
                     onPlay={async () => await playGame()}
                     onCashOut={handleCashOut}
                     onRewatch={handleRewatch}
