@@ -47,4 +47,3 @@ export function useSessionStats(): UseSessionStatsReturn {
 
   return { stats, recordSpin, resetStats };
 }
-

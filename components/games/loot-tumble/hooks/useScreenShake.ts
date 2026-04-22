@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import { useAnimationControls } from 'motion/react';
+import { useAnimationControls } from 'framer-motion';
 
 /**
  * Escalating screen shake tied to cascade depth.
@@ -71,4 +71,3 @@ export function useScreenShake() {
 
   return { shakeControls, triggerShake };
 }
-

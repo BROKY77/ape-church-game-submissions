@@ -1,0 +1,41 @@
+{
+  "team": "foxyfam-balloons",
+  "gameName": "foxy-shooter",
+  "displayTitle": "Foxy Shooter",
+  "description": "Can you help Foxy protect the goal? Predict where they will try and kick the ball, then roll the dice and try to defend the goal!",
+  "authors": [
+    {
+      "name": "Foxy Fam",
+      "telegram": "CODENAME883"
+    }
+  ],
+  "revenueShare": [
+    {
+      "name": "FoxyFam",
+      "telegram": "mmwalk",
+      "address": "0xE4f81D542e95D3c582c0f3c28286DdC48DA779b0",
+      "share": 25
+    }, {
+      "name": "Balloons",
+      "telegram": "paperhamms",
+      "address": "0x68B1ccD2fc53925eFD90284Fa7Fee662c564cd19",
+      "share": 75
+    }
+  ],
+  "status": "pending",
+  "category": "arcade",
+  "tags": [
+    "arcade",
+    "soccer",
+    "dice",
+    "shooter"
+  ],
+  "thumbnail": "/foxy-shooter/card.png",
+  "banner": "/foxy-shooter/banner.png",
+  "mainComponent": "FoxyShooter.tsx",
+  "windowComponent": "FoxyShooterWindow.tsx",
+  "setupComponent": "FoxyShooterSetupCard.tsx",
+  "configFile": "foxyShooterConfig.ts",
+  "version": "1.0.0",
+  "submittedAt": "2025-03-25"
+}

@@ -1,6 +1,6 @@
 export const GAME_CONFIG = {
-  gridRows: 7,
-  gridCols: 6,
+  gridRows: 6,
+  gridCols: 5,
   minClusterSize: 5,
   startingBalance: 1000,
   defaultBet: 1,
@@ -38,4 +38,3 @@ export const GAME_CONFIG = {
     multiplierWeights: [36, 26, 18, 10, 6, 3, 1],
   },
 };
-

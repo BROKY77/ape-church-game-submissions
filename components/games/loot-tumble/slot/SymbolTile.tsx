@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { SymbolId } from '@/components/games/loot-tumble/types';
 import { SYMBOL_MAP } from '@/components/games/loot-tumble/config/symbols';
 import { SYMBOL_IMAGES } from '@/components/games/loot-tumble/config/symbol-icons';
@@ -193,4 +193,3 @@ export function SymbolTile({
     </motion.div>
   );
 }
-

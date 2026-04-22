@@ -67,4 +67,3 @@ export function flatCells(grid: Grid): GridCell[] {
 export function gridSize(grid: Grid): { rows: number; cols: number } {
   return { rows: grid.length, cols: grid[0]?.length ?? 0 };
 }
-

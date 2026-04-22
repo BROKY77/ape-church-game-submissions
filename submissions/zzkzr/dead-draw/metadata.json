@@ -1,0 +1,36 @@
+{
+  "team": "zzkzr",
+  "gameName": "dead-draw",
+  "displayTitle": "Dead Draw",
+  "description": "Western-themed grid-reveal game. Take loot from a 4x4 grid or shoot the Sheriff, but watch out for the other. Choose your depth for higher risk and reward.",
+  "authors": [
+    {
+      "name": "zzkzr",
+      "telegram": "zzkzr1"
+    }
+  ],
+  "revenueShare": [
+    {
+      "name": "zzkzr",
+      "telegram": "zzkzr1",
+      "address": "0x9f7975eF3EA316D9961960eD9c985BDC2e4102B4",
+      "share": 100
+    }
+  ],
+  "status": "pending",
+  "category": "card",
+  "tags": [
+    "card",
+    "western",
+    "mines",
+    "grid-reveal"
+  ],
+  "thumbnail": "/dead-draw/card.png",
+  "banner": "/dead-draw/banner.png",
+  "mainComponent": "DeadDraw.tsx",
+  "windowComponent": "DeadDrawWindow.tsx",
+  "setupComponent": "DeadDrawSetupCard.tsx",
+  "configFile": "deadDrawConfig.ts",
+  "version": "1.0.0",
+  "submittedAt": "2026-04-04"
+}
