@@ -662,8 +662,8 @@ const MyGameWindow: React.FC<MyGameWindowProps> = ({
 
     const muteSfx = false;
     const sfxVolume = 0.5;
-    const [winSFX] = useSound("/my-game/sfx/win.wav", { volume: sfxVolume, soundEnabled: !muteSfx, interrupt: true });
-    const [loseSFX] = useSound("/my-game/sfx/lose.mp3", { volume: sfxVolume, soundEnabled: !muteSfx, interrupt: true });
+    const [winSFX] = useSound("/submissions/example-game/sfx/win.mp3", { volume: sfxVolume, soundEnabled: !muteSfx, interrupt: true });
+    const [loseSFX] = useSound("/submissions/example-game/sfx/lose.mp3", { volume: sfxVolume, soundEnabled: !muteSfx, interrupt: true });
 
     useEffect(() => {
         if (animationPhase === "result") {
