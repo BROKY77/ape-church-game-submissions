@@ -93,6 +93,12 @@ Do not copy any other files. After copying, confirm what
 was moved and check that the folder names match exactly.
 ```
 
+**`my-game` vs `app/` — what to rename, what not to touch**
+
+- In the **template repo**, the sample game folder is often named `components/my-game/` (and `public/my-game/`). That name is only a **placeholder**. When you submit here, your game must live under `components/games/<your-game-slug>/` and assets under `public/submissions/<your-game-slug>/`, matching `metadata.json`.
+- In **your game’s own files** (everything under `components/games/<your-game-slug>/`), update **static asset URLs** to `/submissions/<your-game-slug>/...`. Do not ship paths that still say `/my-game/` — those will 404 on the preview site.
+- **"Do not modify `app/` / `lib/`"** (when the template says that) refers to **platform wiring** the this app uses to load games. Those directories are **not part of your submission** (see [Do Not Include](#do-not-include) below). It does **not** mean you cannot edit your game components; it means maintainers integrate your game separately. Your `.tsx` files under `components/games/<slug>/` are yours to change freely, including imports and asset paths.
+
 After the agent runs, verify the structure matches the file tree above before moving on.
 
 ---
