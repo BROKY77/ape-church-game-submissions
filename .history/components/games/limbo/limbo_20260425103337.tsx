@@ -3,8 +3,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useSound from "use-sound";
 import GameWindow from "@/components/shared/GameWindow";
-import MyGameWindow from "./limboWindow";
-import MyGameSetupCard from "./limboSetupCard";
+import MyGameWindow from "./MyGameWindow";
+import MyGameSetupCard from "./MyGameSetupCard";
 import { bytesToHex } from "viem";
 import { randomBytes, Game } from "@/lib/games";
 import {
@@ -14,7 +14,7 @@ import {
     drawLimboMultiplierFromWord,
     getTargetForWinChance,
     getWinChanceForTarget,
-} from "./limboConfig";
+} from "@/components/my-game/myGameConfig";
 
 interface MyGameProps {
     game: Game;

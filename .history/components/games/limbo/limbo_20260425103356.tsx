@@ -14,7 +14,7 @@ import {
     drawLimboMultiplierFromWord,
     getTargetForWinChance,
     getWinChanceForTarget,
-} from "./limboConfig";
+} from "@/components/my-game/myGameConfig";
 
 interface MyGameProps {
     game: Game;
