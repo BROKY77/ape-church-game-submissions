@@ -1,0 +1,36 @@
+{
+  "team": "zzkzr",
+  "gameName": "gem-storm",
+  "displayTitle": "Gem Storm",
+  "description": "Every gem on the grid carries its own multiplier. Fill the four diamond markers to trigger Hold the Gems, lock every visible gem, and chase the full grid for the Grand Jackpot.",
+  "authors": [
+    {
+      "name": "zzkzr",
+      "telegram": "zzkzr1"
+    }
+  ],
+  "revenueShare": [
+    {
+      "name": "zzkzr",
+      "telegram": "zzkzr1",
+      "address": "0x9f7975eF3EA316D9961960eD9c985BDC2e4102B4",
+      "share": 100
+    }
+  ],
+  "status": "pending",
+  "category": "arcade",
+  "tags": [
+    "slots",
+    "gems",
+    "hold-and-spin",
+    "jackpot"
+  ],
+  "thumbnail": "/gem-storm/card.png",
+  "banner": "/gem-storm/banner.png",
+  "mainComponent": "Paydirt.tsx",
+  "windowComponent": "PaydirtWindow.tsx",
+  "setupComponent": "PaydirtSetupCard.tsx",
+  "configFile": "paydirtConfig.ts",
+  "version": "1.0.0",
+  "submittedAt": "2026-04-27"
+}

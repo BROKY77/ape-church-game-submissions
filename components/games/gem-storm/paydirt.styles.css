@@ -1,0 +1,3515 @@
+/*
+ * Gem Storm — ALL layout, color, typography, and animation primitives live here.
+ * Change any value in :root to reposition or retheme. No magic numbers in TSX.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
+
+:root {
+    /* === GRID LAYOUT === */
+    --pd-grid-cols: 5;
+    --pd-grid-rows: 5;
+    --pd-grid-width: min(92vw, 520px);
+    --pd-grid-aspect: 1 / 1;
+    --pd-grid-gap: 0px;
+    --pd-cell-radius: 12px;
+    --pd-cell-border: 2px;
+
+    /* === COMPONENT POSITIONS === */
+    --pd-header-h: 56px;
+    --pd-footer-h: 96px;
+    --pd-bet-bottom: 16px;
+    --pd-respin-top: 9%;
+    --pd-respin-right: 5%;
+    --pd-total-bottom: 14%;
+    --pd-hud-gap: 0px;
+
+    /* === COLORS — Gem Storm palette ===
+     * Dark elegant jewelry-display: deep onyx/charcoal backdrop, polished
+     * velvet card, restrained warm-gold accents. Bling lives in the gems
+     * themselves, not in the chrome around them. */
+    --pd-bg-1: #07050d;       /* near-black backdrop */
+    --pd-bg-2: #110a1c;       /* midnight purple */
+    --pd-bg-3: #1a0f2a;       /* velvet purple */
+    --pd-gold: #d4a574;       /* warm aged-gold (less saturated than cartoon yellow) */
+    --pd-gold-hi: #f0d9a8;    /* champagne highlight */
+    --pd-gold-lo: #8a6238;    /* deep antique gold shadow */
+    --pd-gold-deep: #5a3f1f;  /* darker still */
+    --pd-gold-glow: rgba(212, 165, 116, 0.35);
+    --pd-gold-glow-strong: rgba(240, 217, 168, 0.7);
+    --pd-chrome: #b8b8c8;     /* brushed silver accent */
+    --pd-chrome-dark: #5a5a6a;
+
+    --pd-text: #ece4d4;
+    --pd-text-mute: #8a7e6a;
+    --pd-danger: #dc2626;
+    --pd-warn: #f59e0b;
+    --pd-ok: #4ade80;
+
+    --pd-cell-bg: #0e0a1a;          /* dark velvet cell card */
+    --pd-cell-border-c: #2a2138;
+    --pd-cell-empty: #07050d;
+    --pd-cell-marker-ring: rgba(212, 165, 116, 0.18);
+    --pd-cell-marker-ring-lit: rgba(240, 217, 168, 1);
+
+    /* === TYPOGRAPHY ===
+     * Single family — Fredoka across the board. Friendly rounded forms read
+     * playful (slot-game energy) while staying tight at small sizes. 700 for
+     * big numbers/headers, 600 for HUD values, 400-500 for body text. */
+    --pd-font-display: 'Fredoka', system-ui, -apple-system, sans-serif;
+    --pd-font-body: 'Fredoka', system-ui, -apple-system, sans-serif;
+    --pd-font-value: 'Fredoka', system-ui, -apple-system, sans-serif;
+
+    /* === TIMING === */
+    --pd-reel-spin: 1200ms;
+    --pd-reel-gap: 120ms;
+    --pd-lock: 400ms;
+    --pd-tension-zoom: 600ms;
+    --pd-celebration-stagger: 50ms;
+
+    /* === SPIN CHOREOGRAPHY (turbo-overridable) ===
+       Must stay aligned with the SpinTimings table in Paydirt.tsx.
+       Entry + loop stay fixed across modes so the REEL'S VISIBLE SPEED
+       never changes — the strip scrolls past at the same rate in both
+       normal and turbo. What turbo shortens is the number of cells that
+       spin (only the final marker) and the decel/bounce tail. The eye
+       sees individual symbols flying by at the same tempo in either
+       mode, just for less wall-clock time in turbo. */
+    --pd-spin-entry: 250ms;
+    --pd-spin-loop: 660ms;
+    /* Decel duration is the per-cell landing animation. Kept close to    */
+    /* slow's 1000ms so the cell drop itself LOOKS the same visual speed  */
+    /* across modes. Fast/turbo feel faster because the gaps between      */
+    /* landings (nonMarkerGap, respinLandGap) + reelSpinBase are shorter, */
+    /* not because each individual cell's animation is sped up. Shorter   */
+    /* decel = each gem scrolls past its pool at a faster pixels/sec,     */
+    /* which looked motion-blur-smeared and stressed the compositor.      */
+    --pd-spin-decel: 800ms;
+    --pd-spin-blur-fade: 800ms;
+    /* Cascade-entry stagger between successive cells in column-major order.
+       The base-game spin flips every cell to isSpinning in one render; the
+       visible "wave" comes purely from per-cell animation-delay computed as
+       --pd-cell-wave-pos × --pd-cascade-wave-gap. CSS-driven cascade is not
+       susceptible to mobile setTimeout throttling (the prior JS fanout was —
+       right-side cells could be left un-flipped when their landCell fired,
+       so they jumped from blank → decel without ever showing the spin loop). */
+    --pd-cascade-wave-gap: 14ms;
+    /* Cascade-entry duration: the strip animates from translateY(0) (target
+       slot = previous gem visible) to translateY(-1800%) (the spin loop's
+       FROM keyframe) over this window. Travel distance is fixed (9vh =
+       strip needs to reach the loop's entry point), so this duration sets
+       the AVERAGE entry speed. Combined with a heavy ease-in timing
+       function on the spin animation (slow start → fast end), the gem
+       lingers at translateY(0) for the first chunk of the entry and only
+       picks up speed as it accelerates into the loop. Tuned so the cell
+       reads as "still → ramps up smoothly" rather than "still → whoosh". */
+    --pd-cascade-entry: 280ms;
+    /* Bounce duration is INTENTIONALLY constant across slow/fast/turbo. */
+    /* The click-into-place feel shouldn't get rushed when the player is */
+    /* in turbo mode — only the spin cadence speeds up, not the impact   */
+    /* moment. JS T.cellBounceMs is also pinned to the same value across */
+    /* all 3 timing tables so the strip stays mounted long enough for    */
+    /* the full bounce to render. */
+    --pd-land-subtle: 280ms;
+}
+
+/* Slow — restores the original cinematic choreography. Longer rev-up,
+   longer decel, more dwell on the landing squish. Applied on .pd-root
+   throughout the whole game (not scoped to phase) because "slow" means
+   the bonus plays cinematically too. */
+.pd-root.pd-slow {
+    --pd-spin-entry: 550ms;
+    --pd-spin-decel: 1000ms;
+    --pd-spin-blur-fade: 1000ms;
+    --pd-cascade-wave-gap: 24ms;
+    --pd-cascade-entry: 360ms;
+    /* --pd-land-subtle inherited from base — bounce constant. */
+}
+
+/* Turbo — only decel and land compress; entry/loop keep natural speed.
+   Scoped by PaydirtWindow to phase === "spinning" only so the bonus
+   always runs at the default (fast) duration. */
+.pd-root.pd-turbo {
+    --pd-spin-decel: 500ms;
+    --pd-spin-blur-fade: 500ms;
+    --pd-cascade-wave-gap: 5ms;
+    /* Compressed entry so the cascade fits within turbo's 200ms reel-base
+       window — at 22ms gap × 24 positions + 160ms entry the right-side
+       cells would still be entering when their landing fires. */
+    --pd-cascade-entry: 90ms;
+    /* --pd-land-subtle inherited from base — bounce constant. */
+}
+
+/* Mobile gets a faster spin loop across the board — the visible window
+   between cascade-entry handoff and per-cell decel is short (especially
+   on top-left cells, where cascade ends early but landing fires soon),
+   and the default 660ms loop barely advances 1 gem in that window. A
+   shorter loop scrolls more gems per visible ms AND reduces the velocity
+   gap between cascade-entry's end and the loop's start, smoothing the
+   handoff. Desktop keeps the cinematic 660ms loop because its JS-driven
+   wave already paces out cleanly. */
+.pd-narrow {
+    --pd-spin-loop: 360ms;
+}
+.pd-narrow.pd-slow {
+    --pd-spin-loop: 520ms;
+}
+/* Mobile turbo: top-left cells only get ~90-110ms of spin loop before
+   their landing fires (reelSpinBase=200ms is the binding constraint).
+   Tighter still — short cascade-entry, fast loop. */
+.pd-narrow.pd-turbo {
+    --pd-spin-loop: 240ms;
+    --pd-cascade-wave-gap: 4ms;
+    --pd-cascade-entry: 70ms;
+}
+
+/* ============================================================================ */
+/* LAYOUT CONTAINERS                                                            */
+/* ============================================================================ */
+
+.pd-root {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--pd-hud-gap);
+    width: 100%;
+    height: 100%;
+    padding: 12px;
+    color: var(--pd-text);
+    font-family: var(--pd-font-body);
+    overflow: visible;
+}
+
+/* When mounted inside the Ape Church <GameWindow/>, absolute-position over
+   the template's background image and prevent pointer-events from the empty
+   dust layer blocking settings buttons. */
+.pd-root--in-window {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    container-type: size;
+    /* Dark jewelry-display backdrop. Subtle velvet vignette at top, deep
+       charcoal everywhere else. Lets the gems carry all the brightness. */
+    background:
+        radial-gradient(ellipse at center top, rgba(26, 15, 42, 0.6), transparent 65%),
+        linear-gradient(180deg, #0a0612 0%, #07050d 50%, #050308 100%);
+    /* Top pad = just below the logo's 120px absolute band. flex-start
+       pins the grid right against that top reserve so it sits high and
+       doesn't re-center deeper when more bottom space is free. */
+    padding: 120px 12px 20px;
+    justify-content: flex-start;
+}
+
+/* Decorative scattered gems + coins behind the grid. The layer is pushed
+   behind the in-flow content (JackpotBar, grid, HUD) via z-index: -1 —
+   `.pd-root--in-window` already creates a stacking context (z-index: 10),
+   so -1 stays inside that context and can't leak below the backdrop. */
+.pd-treasure-bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+    filter: blur(0.5px) saturate(1.05);
+}
+.pd-treasure__item {
+    position: absolute;
+    display: block;
+}
+
+/* Falling background gems: each gem continuously tumbles from just
+   above the window to just below it, rotating as it goes. Per-item
+   `animationDuration` + negative `animationDelay` are set inline so
+   the scatter never syncs up. The rotation base is inlined via
+   `--pd-gem-rot` so every gem keeps its own initial tilt. */
+.pd-treasure__item--fall {
+    top: 0;
+    animation: pd-treasure-fall linear infinite;
+    will-change: transform, top;
+}
+@keyframes pd-treasure-fall {
+    0%   { top: -12%;  transform: translate(-50%, 0) rotate(var(--pd-gem-rot, 0deg)); }
+    100% { top: 112%;  transform: translate(-50%, 0) rotate(calc(var(--pd-gem-rot, 0deg) + var(--pd-gem-spin, 360deg))); }
+}
+.pd-treasure__item > svg,
+.pd-treasure__item > .pd-gem {
+    width: 100%;
+    height: 100%;
+}
+/* Decorative gems skip the shimmer — they'd chew CPU for no visual gain
+   at this opacity and size. */
+.pd-treasure__item .pd-gem__shimmer { display: none; }
+.pd-treasure__item .pd-gem__halo { display: none; }
+
+/* Inside the GameWindow, size the grid by the container's smaller dimension
+   so it stays square no matter how landscape the window is. Both width and
+   height use the same min() so nothing can stretch it horizontally. */
+.pd-root--in-window .pd-grid {
+    /* Layout cap: 74cqh leaves just enough vertical for the fixed 120px
+       logo band + bottom padding while letting the playing grid fill
+       the main stage. Fits cleanly on a 720×720 gamebox (74% of 720 =
+       533px) without clipping. `scale` on view 0/2 shrinks it visually
+       only — layout stays put, logo is absolute-positioned, nothing
+       else can shift. */
+    width: min(86cqh, 96cqw, 680px);
+    height: min(86cqh, 96cqw, 680px);
+    aspect-ratio: auto;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 3;
+}
+
+/* Views 0 + 2: slightly smaller visual grid to make clean room for the
+   jackpot row (view 0) / change-bet UI (view 2). Not a tiny shrink —
+   just enough to give the jackpots breathing room at the bottom. */
+/* Specificity is bumped by doubling up the root class so this rule
+   wins over `.pd-root.pd-streak-N .pd-grid { scale: N }` declared
+   later in the file. Without that bump, streak-0's `scale: 1` would
+   override the view-0/view-2 shrink the moment the page loaded
+   (since streak-0 is always applied in idle state), and the zoom-in
+   on Place-Bet would stop working. */
+.pd-root.pd-root--in-window.pd-view-0 .pd-grid,
+.pd-root.pd-root--in-window.pd-view-2.pd-has-win .pd-grid {
+    scale: 0.9;
+}
+
+/* Decorative frame overlay sits on top of the grid; pointer-events disabled
+   so spins still register on the cells beneath. Scaled slightly larger than
+   the grid so the frame's wood lip sits over the outer cell edges. */
+.pd-symbol--img {
+    width: 78%;
+    height: 78%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    position: relative;
+}
+.pd-symbol--img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+/* Per-cell wooden frame overlay. Slightly oversized so the wood lip sits
+   over the cell's edge. pointer-events off so clicks still land on the cell. */
+/* Single wooden frame wrapping the entire 4x4 grid. Stretched to fully cover
+   grid edges so no tile corners poke out. pointer-events off for clicks. */
+.pd-grid-frame {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 118%;
+    height: 118%;
+    max-width: none;
+    max-height: none;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 50;
+    object-fit: fill;
+    display: block;
+}
+
+/* Near-miss zoom + corner highlight removed entirely (across all
+   platforms). The dim/highlight on cells stays — that's gameplay
+   clarity (showing which marker is still in play). The dramatic
+   camera push + corner halo on the last-empty marker were the
+   "near miss" decorations the player wanted gone. */
+
+/* During 3/4 tension: dim the GEM/CONTENT inside non-marker cells (not
+   the cell card itself, otherwise the gold grid background bleeds through
+   the transparent cards and washes the whole grid brown). The card stays
+   opaque dark, only the gem inside fades. */
+.pd-root.pd-tension-3 .pd-cell--non-marker .pd-gem,
+.pd-root.pd-tension-3 .pd-cell--non-marker .pd-nugget,
+.pd-root.pd-tension-3 .pd-cell--non-marker .pd-symbol {
+    opacity: 0.25;
+    filter: saturate(0.6);
+}
+
+/* Filled markers stay mostly bright but receded slightly. */
+.pd-root.pd-tension-3 .pd-cell--marker:not(.pd-cell--last-empty) .pd-gem,
+.pd-root.pd-tension-3 .pd-cell--marker:not(.pd-cell--last-empty) .pd-nugget {
+    opacity: 0.9;
+}
+
+.pd-root.pd-phase-holdRespin .pd-cell--outer,
+.pd-root.pd-phase-holdRespin .pd-cell--non-marker {
+    /* keep non-locked cells visible */
+}
+
+.pd-grid {
+    position: relative; /* anchor for chest-rope / ghost-number overlays */
+    display: grid;
+    /* minmax(0, 1fr) — NOT `1fr` (== minmax(auto, 1fr)). `auto` as the */
+    /* minimum lets any flex child with wider intrinsic content (the    */
+    /* chest's 38px label "123.45" at ~180px) push the column past its  */
+    /* fair share. Since all columns are 1fr equal, one expanded column */
+    /* grows every column, and the whole grid visually resizes on chest */
+    /* landing. Pinning the minimum to 0 guarantees fair-share width no */
+    /* matter what the content prefers; overflow stays purely visual.   */
+    grid-template-columns: repeat(var(--pd-grid-cols), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--pd-grid-rows), minmax(0, 1fr));
+    gap: var(--pd-grid-gap);
+    width: var(--pd-grid-width);
+    aspect-ratio: var(--pd-grid-aspect);
+    padding: 0;
+    border-radius: 4px;
+    /* Cells draw their own internal + perimeter dividers via ::after. The
+       decorative gold frame is added via the wrapping ::before pseudo so
+       it sits OUTSIDE the cell area and doesn't fight any cell border. */
+    background:
+        radial-gradient(ellipse at center, #1a1340 0%, #0c0820 60%, #07051a 100%);
+    box-shadow:
+        0 12px 32px rgba(0, 0, 0, 0.7),
+        0 0 24px rgba(212, 165, 116, 0.18);
+    position: relative;
+    z-index: 10;
+    outline: 3px solid var(--pd-gold);
+    outline-offset: 2px;
+}
+
+
+/* Shake is applied to the entire scene — whole screen trembles when the
+   bonus grid is nearly full, not just the grid. Amplitudes live in the
+   @keyframes below (toned down from the old grid-only version). */
+.pd-root.pd-earthquake {
+    animation: pd-earthquake 0.18s linear infinite;
+}
+.pd-root.pd-rumble {
+    animation: pd-rumble 0.45s ease-in-out infinite;
+}
+
+/* Streak zoom — each consecutive marker hit pushes the grid up a notch.
+   `scale` is its own CSS property (independent of `transform`), so screen
+   shake + streak zoom compose cleanly. Breaks back to 1.0 when a marker
+   misses (markerStreakZoom → 0) and when the spin resolves. */
+.pd-grid {
+    transition: scale 420ms cubic-bezier(0.33, 1.6, 0.4, 1);
+    transform-origin: 50% 50%;
+}
+.pd-root.pd-streak-0 .pd-grid { scale: 1; }
+.pd-root.pd-streak-1 .pd-grid { scale: 1.025; }
+.pd-root.pd-streak-2 .pd-grid { scale: 1.055; }
+.pd-root.pd-streak-3 .pd-grid { scale: 1.09; }
+
+/* Turbo on mobile: kill marker streak zoom. The progressive grid scale */
+/* costs a layer recompute per marker on iOS, which compounds with the */
+/* tight turbo cadence. Mobile + turbo should feel snappy/flat, not    */
+/* dolly-in-cinematic.                                                  */
+@media (max-width: 1023px) {
+    .pd-turbo.pd-streak-1 .pd-grid,
+    .pd-turbo.pd-streak-2 .pd-grid,
+    .pd-turbo.pd-streak-3 .pd-grid { scale: 1; }
+}
+.pd-narrow.pd-turbo.pd-streak-1 .pd-grid,
+.pd-narrow.pd-turbo.pd-streak-2 .pd-grid,
+.pd-narrow.pd-turbo.pd-streak-3 .pd-grid { scale: 1; }
+
+/* Mobile streak-zoom smoothing — desktop bezier (0.33, 1.6, 0.4, 1) has a
+   springy overshoot that judders on mobile during the rapid streak chain.
+   Smooth ease-out, slightly shorter, no overshoot. Desktop unchanged. */
+@media (max-width: 1023px) {
+    .pd-grid {
+        transition: scale 320ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+}
+.pd-narrow .pd-grid {
+    transition: scale 320ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Mobile: kill the tension-3 darkening entirely. On a small viewport the
+   dimmed cells read as "the game broke" rather than "tension building"
+   because the whole grid is in the player's foveal vision — there's no
+   peripheral cue to draw attention to the marker that the dim is supposed
+   to spotlight. Desktop keeps the effect since the dim functions as actual
+   anticipation framing there. Overrides BOTH the per-cell .pd-cell--dim
+   opacity (applied via JS prop) and the inner .pd-symbol/.pd-gem dimming. */
+.pd-root.pd-narrow .pd-cell--dim {
+    opacity: 1;
+    filter: none;
+}
+.pd-root.pd-narrow.pd-tension-3 .pd-cell--non-marker .pd-gem,
+.pd-root.pd-narrow.pd-tension-3 .pd-cell--non-marker .pd-nugget,
+.pd-root.pd-narrow.pd-tension-3 .pd-cell--non-marker .pd-symbol {
+    opacity: 1;
+    filter: none;
+}
+.pd-root.pd-narrow.pd-tension-3 .pd-cell--marker:not(.pd-cell--last-empty) .pd-gem,
+.pd-root.pd-narrow.pd-tension-3 .pd-cell--marker:not(.pd-cell--last-empty) .pd-nugget {
+    opacity: 1;
+}
+
+/* Near-miss tension-3 zoom is removed entirely now (see above), so no */
+/* per-speed override is needed.                                       */
+
+/* Progressive bonus-miss zoom — each consecutive non-hit respin pushes
+   --pd-miss-zoom up 10% (capped at 6 steps → 1.60× / 60% zoom); any hit
+   snaps it back to 1. Applied to the whole .pd-root (not just .pd-grid)
+   so the camera push is full-screen — the HUD, jackpot bar, background,
+   everything scales together like a cinematic dolly-in. `scale` is a
+   separate CSS property from `transform`, so this composes cleanly with
+   the rumble/earthquake translate animations also on .pd-root. */
+.pd-root {
+    transition: scale 480ms cubic-bezier(0.33, 1.3, 0.4, 1);
+    transform-origin: center center;
+}
+.pd-root.pd-phase-holdTrigger,
+.pd-root.pd-phase-holdRespin,
+.pd-root.pd-phase-holdComplete {
+    scale: var(--pd-miss-zoom, 1);
+}
+
+/* ============================================================================ */
+/* CELL STATES                                                                  */
+/* ============================================================================ */
+
+.pd-cell {
+    position: relative;
+    z-index: 2; /* above grid frame ::before/::after */
+    aspect-ratio: 1 / 1;
+    overflow: visible;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(18px, 5vw, 36px);
+    user-select: none;
+    -webkit-user-select: none;
+    /* Tell the browser this subtree's layout is independent — changes
+       inside one cell never reflow neighbors. Big win when 21+ cells
+       update in rapid sequence during the cascade. Paint containment is
+       deliberately omitted so halos/glows can extend past the cell edge. */
+    contain: layout;
+}
+
+/* Gridline overlay — each cell draws right + bottom (always); cells on
+   the LEFT column add left, cells on the TOP row add top. This way every
+   line is drawn exactly once, and the outer perimeter is built from the
+   outer cells' edge borders (no grid-level frame needed = nothing to get
+   clipped by parent overflow). */
+.pd-cell::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 4;
+    border-right: 1px solid rgba(212, 165, 116, 0.55);
+    border-bottom: 1px solid rgba(212, 165, 116, 0.55);
+}
+.pd-cell:nth-child(5n+1)::after { border-left: 1px solid rgba(212, 165, 116, 0.55); }
+.pd-cell:nth-child(-n+5)::after { border-top: 1px solid rgba(212, 165, 116, 0.55); }
+
+/* Marker cells get their own saturated gold sub-frame so the diamond layout
+   reads at a glance even when they haven't lit. Inner glow + gradient tint
+   give the cells a "live, ready to receive" feel. */
+.pd-cell--marker .pd-cell__card {
+    background:
+        radial-gradient(ellipse at 50% 50%, rgba(255, 215, 100, 0.18) 0%, transparent 65%),
+        radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 55%),
+        linear-gradient(180deg, #1f1838 0%, #0a0618 100%);
+    box-shadow:
+        inset 0 0 0 2px rgba(255, 215, 100, 0.85),
+        inset 0 0 0 3px rgba(212, 165, 116, 0.35),
+        inset 0 0 22px rgba(255, 200, 80, 0.45),
+        inset 0 0 40px rgba(255, 200, 80, 0.18),
+        0 0 14px rgba(255, 200, 80, 0.25);
+}
+
+/* During the bonus round, markers lose their gold sub-frame — their job
+   is done (they triggered the bonus). During Hold, all 25 cells should
+   read as uniform slots so locked gems / chests / empties are visually
+   equal. Reset to the plain .pd-cell__card styling. */
+.pd-root.pd-phase-holdTrigger .pd-cell--marker .pd-cell__card,
+.pd-root.pd-phase-holdRespin .pd-cell--marker .pd-cell__card,
+.pd-root.pd-phase-holdComplete .pd-cell--marker .pd-cell__card {
+    background:
+        radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.04) 0%, transparent 55%),
+        linear-gradient(180deg, #14102a 0%, #07050d 100%);
+    box-shadow: none;
+}
+
+
+/* Inner tile card — fills cell entirely (no inset). Holds the tile
+   background and ALL glow/lit/locked box-shadow effects. Separation
+   between tiles comes from the grid's thin wood-colored gap. */
+.pd-cell__card {
+    position: absolute;
+    inset: 0;
+    /* Polished onyx tile — subtle inner gradient sells depth without
+       distracting from the gem above. Square corners (no radius) matches
+       the gold-grid divider look. */
+    background:
+        radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.04) 0%, transparent 55%),
+        linear-gradient(180deg, #14102a 0%, #07050d 100%);
+    transition: box-shadow 0.2s ease, opacity 0.3s ease, filter 0.3s ease;
+    z-index: 0;
+}
+
+/* Static content (nuggets, symbols) stacks above the absolutely-positioned
+   card so values stay visible. Reel viewport stays absolute; just bumped. */
+.pd-cell > .pd-nugget,
+.pd-cell > .pd-symbol {
+    position: relative;
+    z-index: 1;
+}
+.pd-cell > .pd-reel-viewport {
+    z-index: 1;
+}
+
+/* ============================================================================ */
+/* GEM (procedural SVG)                                                         */
+/* ============================================================================ */
+
+.pd-gem {
+    position: relative;
+    width: 88%;
+    height: 88%;
+    /* Belt-and-suspenders for the grid minmax(0, 1fr) fix: even if a   */
+    /* gem ends up in a different flex context later, min-width:0 stops */
+    /* wide children (chest label, jackpot pill) from pushing it out.   */
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    /* Promote each gem to its own GPU layer so the SVG only paints once on
+       mount and subsequent compositing is cheap. Critical for the cascading-
+       drop wave where 21 gems can mount inside ~250ms.
+       `contain: layout` only (NOT paint) — paint containment was clipping
+       jackpot halos/spark effects that intentionally extend past the gem
+       rect to bleed into the surrounding cell. */
+    will-change: transform;
+    contain: layout;
+}
+
+/* Image-based gem body: the ChatGPT-polished PNG tinted per tier via a
+   hue-rotate filter. Sepia first so the grayscale source has a warm base
+   chroma to rotate away from; saturate boosts the final color to casino-
+   vivid; drop-shadow gives the gem weight against the cell card. Each
+   .pd-gem--TIER selector (below) overrides the --hue custom property. */
+.pd-gem__image {
+    position: absolute;
+    inset: 6%;
+    width: 88%;
+    height: 88%;
+    object-fit: contain;
+    z-index: 1;
+    user-select: none;
+    -webkit-user-drag: none;
+    filter:
+        sepia(1)
+        saturate(var(--pd-gem-saturate, 2.4))
+        hue-rotate(var(--pd-gem-hue, 0deg))
+        brightness(var(--pd-gem-brightness, 1))
+        drop-shadow(0 3px 5px rgba(0, 0, 0, 0.55));
+}
+
+/* Per-tier hue targets. Sepia bakes in an orange base (~35° in HSL), so
+   the hue-rotate below is relative to that — e.g. to get green, rotate
+   ~80° past orange; blue is ~180°; purple is ~240°; red is ~320°. */
+.pd-gem--low  { --pd-gem-hue: 160deg; --pd-gem-saturate: 2.2; }  /* cyan/teal */
+.pd-gem--mid  { --pd-gem-hue:  90deg; --pd-gem-saturate: 2.5; }  /* vivid green */
+.pd-gem--high { --pd-gem-hue: 210deg; --pd-gem-saturate: 2.8; }  /* deep blue-purple */
+
+/* Per-shape size hierarchy: shape == tier signal at a glance. Diamond is
+   the smallest (low-value gold), hexagon medium, octagon larger, star
+   (jackpot) the most prominent. Replaces an older "compensate the diamond
+   silhouette so all base shapes match optically" rule — the new design
+   uses the silhouette difference as deliberate visual hierarchy so a
+   0.25-gem doesn't read bigger than a MINI jackpot. */
+.pd-gem--shape-diamond .pd-gem__image,
+.pd-gem--shape-diamond .pd-gem__shimmer {
+    transform: scale(0.88);
+}
+.pd-gem--shape-hexagon .pd-gem__image,
+.pd-gem--shape-hexagon .pd-gem__shimmer {
+    transform: scale(0.96);
+}
+/* octagon stays at natural 1.0 — baseline non-jackpot prominence */
+.pd-gem--shape-star .pd-gem__image,
+.pd-gem--shape-star .pd-gem__shimmer {
+    transform: scale(1.06);
+}
+
+/* Mobile keeps the original "all shapes optically uniform" look — the
+   per-tier size hierarchy is desktop-only. On narrow viewports the cells
+   are already small, so an additional shape-based size delta makes low-
+   tier diamonds disappear visually. Restore the old diamond compensation
+   and reset hexagon/star to natural scale. */
+@media (max-width: 1023px) {
+    .pd-gem--shape-diamond .pd-gem__image,
+    .pd-gem--shape-diamond .pd-gem__shimmer {
+        transform: scale(1.15);
+    }
+    .pd-gem--shape-hexagon .pd-gem__image,
+    .pd-gem--shape-hexagon .pd-gem__shimmer,
+    .pd-gem--shape-star .pd-gem__image,
+    .pd-gem--shape-star .pd-gem__shimmer {
+        transform: scale(1);
+    }
+}
+.pd-narrow .pd-gem--shape-diamond .pd-gem__image,
+.pd-narrow .pd-gem--shape-diamond .pd-gem__shimmer {
+    transform: scale(1.15);
+}
+.pd-narrow .pd-gem--shape-hexagon .pd-gem__image,
+.pd-narrow .pd-gem--shape-hexagon .pd-gem__shimmer,
+.pd-narrow .pd-gem--shape-star .pd-gem__image,
+.pd-narrow .pd-gem--shape-star .pd-gem__shimmer {
+    transform: scale(1);
+}
+
+/* Jackpot tiers sit on fixed vivid hues. Each one is instantly recognizable
+   by color so players can read the tier without parsing the label text. */
+.pd-gem--mini  { --pd-gem-hue: 320deg; --pd-gem-saturate: 3.2; --pd-gem-brightness: 1.08; } /* hot red */
+.pd-gem--minor { --pd-gem-hue: 255deg; --pd-gem-saturate: 3.0; --pd-gem-brightness: 1.08; } /* magenta-purple */
+.pd-gem--major { --pd-gem-hue: 340deg; --pd-gem-saturate: 3.3; --pd-gem-brightness: 1.12; } /* bright orange */
+.pd-gem--grand { --pd-gem-hue:  50deg; --pd-gem-saturate: 3.6; --pd-gem-brightness: 1.18; } /* electric yellow-green */
+
+/* Jackpot gems animate: the whole gem breathes (scale pulse), and the
+   label text seesaws + pulses on its own rhythm. We intentionally do NOT
+   rotate the image — the shimmer overlay uses the PNG's alpha as a mask,
+   and any rotation would desync the mask (shimmer showing on air, not
+   gem). Breathing + text animation gives "alive" energy without the
+   mask-mismatch glitch. */
+.pd-gem--mini,
+.pd-gem--minor,
+.pd-gem--major,
+.pd-gem--grand {
+    animation: pd-jackpot-breathe 1.8s ease-in-out infinite;
+}
+
+/* Label: pulses bigger/smaller while seesawing left/right so it reads as
+   bouncy/playful instead of a flat centered word. Two separate animation
+   tracks composed via the `transform` shorthand in the keyframes. */
+.pd-gem--mini .pd-gem__label,
+.pd-gem--minor .pd-gem__label,
+.pd-gem--major .pd-gem__label,
+.pd-gem--grand .pd-gem__label {
+    animation: pd-jackpot-label-bounce 1.4s ease-in-out infinite;
+    transform-origin: 50% 65%; /* pivot point toward the bottom of the
+                                 text so the seesaw looks like it's
+                                 rocking on a base, not spinning at the
+                                 dead center. */
+}
+
+/* Halo on jackpot gems is bigger and pulses harder than the high-tier one.
+   Inset pushed further out so the glow really bleeds past the cell edge. */
+.pd-gem--mini .pd-gem__halo,
+.pd-gem--minor .pd-gem__halo,
+.pd-gem--major .pd-gem__halo,
+.pd-gem--grand .pd-gem__halo {
+    inset: -35%;
+    opacity: 1;
+    filter: blur(6px);
+    animation: pd-jackpot-halo-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pd-jackpot-breathe {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.06); }
+}
+/* Label seesaw + pulse: scale up in the middle of each swing so the
+   text "punches forward" at the apex of each tilt. 4-point keyframe
+   gives two full rock-backs per cycle. */
+@keyframes pd-jackpot-label-bounce {
+    0%   { transform: rotate(-9deg) scale(1); }
+    25%  { transform: rotate(0deg)  scale(1.18); }
+    50%  { transform: rotate(9deg)  scale(1); }
+    75%  { transform: rotate(0deg)  scale(1.18); }
+    100% { transform: rotate(-9deg) scale(1); }
+}
+@keyframes pd-jackpot-halo-pulse {
+    0%, 100% { opacity: 0.55; transform: scale(0.92); filter: blur(5px); }
+    50%      { opacity: 1.0;  transform: scale(1.1);  filter: blur(8px); }
+}
+
+/* Text label on the gem's flat table — bold cream-white with a dark
+   stroke to stand out against any tier color. Sits above the image
+   layer, centered. Pop-in is scoped to .pd-cell--just-locked (NOT the
+   base label rule) because the static .pd-gem mounts during the spin
+   phase with visibility:hidden — firing the animation at mount means
+   it plays out before the user can ever see it. .pd-cell--just-locked
+   is added the instant the gem becomes visible and stays true for
+   ~500ms, which is the right window for the 480ms animation. */
+.pd-gem__label {
+    position: relative;
+    z-index: 3;
+    font-family: var(--pd-font-display, 'Fredoka', system-ui, sans-serif);
+    font-weight: 900;
+    color: #fff4cc;
+    letter-spacing: 0.02em;
+    text-shadow:
+        -1.5px -1.5px 0 rgba(0, 0, 0, 0.95),
+         1.5px -1.5px 0 rgba(0, 0, 0, 0.95),
+        -1.5px  1.5px 0 rgba(0, 0, 0, 0.95),
+         1.5px  1.5px 0 rgba(0, 0, 0, 0.95),
+        -1.5px  0    0 rgba(0, 0, 0, 0.95),
+         1.5px  0    0 rgba(0, 0, 0, 0.95),
+         0    -1.5px 0 rgba(0, 0, 0, 0.95),
+         0     1.5px 0 rgba(0, 0, 0, 0.95),
+         0 0 6px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    line-height: 1;
+    transform-origin: center;
+}
+/* Regular gem pop-in. The :not(.pd-cell--stopping) is critical: in the
+   bonus-round respin path (Paydirt.tsx:988-991) `justLocked: true` and
+   `isStopping: true` get set in the SAME setState, so the cell briefly
+   has both classes while the static .pd-gem is still visibility:hidden
+   (line 1450). Without :not, the rule matches during that hidden window
+   and the animation plays out invisibly — by the time isStopping clears
+   ~100ms later, the pop-in is already at scale(1). With :not, the rule
+   starts matching at the EXACT moment isStopping clears, which is when
+   the gem flips visible — animation fires fresh and visibly. */
+/* Excluded for bonus-round respins (.pd-phase-holdRespin on the root) —
+   those landings get a different visual treatment (the post-chest-zap
+   WAAPI pop-in handled by Paydirt.tsx). Only the initial trigger spin
+   landing (phase=holdTrigger) gets this CSS pop-in. */
+.pd-root:not(.pd-phase-holdRespin) .pd-cell--just-locked:not(.pd-cell--stopping):not(.pd-cell--decelerating):not(.pd-cell--spinning) .pd-gem__label {
+    animation: pd-gem-label-pop-in 480ms cubic-bezier(0.34, 1.4, 0.5, 1) both;
+}
+/* Jackpot tier pop-in: same pop. The base jackpot rule's infinite
+   bounce gets temporarily replaced for the 500ms just-locked window,
+   then resumes after. Brief discontinuity is acceptable — the pop-in
+   is the dramatic moment, the bounce is steady-state ambient motion. */
+.pd-root:not(.pd-phase-holdRespin) .pd-cell--just-locked:not(.pd-cell--stopping):not(.pd-cell--decelerating):not(.pd-cell--spinning) .pd-gem--mini .pd-gem__label,
+.pd-root:not(.pd-phase-holdRespin) .pd-cell--just-locked:not(.pd-cell--stopping):not(.pd-cell--decelerating):not(.pd-cell--spinning) .pd-gem--minor .pd-gem__label,
+.pd-root:not(.pd-phase-holdRespin) .pd-cell--just-locked:not(.pd-cell--stopping):not(.pd-cell--decelerating):not(.pd-cell--spinning) .pd-gem--major .pd-gem__label,
+.pd-root:not(.pd-phase-holdRespin) .pd-cell--just-locked:not(.pd-cell--stopping):not(.pd-cell--decelerating):not(.pd-cell--spinning) .pd-gem--grand .pd-gem__label {
+    animation: pd-gem-label-pop-in 480ms cubic-bezier(0.34, 1.4, 0.5, 1) both;
+}
+/* Jelly pop-in: shoots up past target, undershoots, smaller overshoot,
+   settles. Five keyframes give the bouncy "wet" feel without needing
+   a complex easing curve. */
+@keyframes pd-gem-label-pop-in {
+    0%   { transform: scale(0);     opacity: 0; }
+    45%  { transform: scale(1.4);   opacity: 1; }
+    65%  { transform: scale(0.85);  opacity: 1; }
+    82%  { transform: scale(1.08);  opacity: 1; }
+    100% { transform: scale(1);     opacity: 1; }
+}
+
+/* Soft outer halo behind the gem in the gem's own accent hue. Fades out
+   toward the cell edges and pulses gently. */
+.pd-gem__halo {
+    position: absolute;
+    inset: -18%;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.7;
+    animation: pd-gem-halo-pulse 2.6s ease-in-out infinite;
+    filter: blur(4px);
+}
+
+@keyframes pd-gem-halo-pulse {
+    0%, 100% { opacity: 0.45; transform: scale(0.95); }
+    50%      { opacity: 0.85; transform: scale(1.05); }
+}
+
+/* Diagonal shimmer stripe swept across the gem. Masked to the gem's own
+   PNG silhouette (via the --pd-gem-src CSS variable set on .pd-gem) so
+   the sweep only shows where the gem is opaque — otherwise the stripe
+   bleeds out past the faceted outline into the surrounding transparent
+   cell area. */
+.pd-gem__shimmer {
+    position: absolute;
+    inset: 6%;
+    width: 88%;
+    height: 88%;
+    z-index: 2;
+    pointer-events: none;
+    background-image: linear-gradient(110deg,
+        transparent 40%,
+        rgba(255, 255, 255, 0) 46%,
+        rgba(255, 255, 255, 0.55) 50%,
+        rgba(255, 255, 255, 0) 54%,
+        transparent 60%);
+    background-size: 220% 100%;
+    background-repeat: no-repeat;
+    animation: pd-gem-shine 3.2s ease-in-out infinite;
+    mix-blend-mode: screen;
+    /* Clip the shimmer to the gem's silhouette using the same PNG as
+       an alpha mask. `mask-mode: alpha` uses the PNG's alpha channel
+       (not its luminance) so transparent = hidden, opaque = visible. */
+    -webkit-mask-image: var(--pd-gem-src);
+    mask-image: var(--pd-gem-src);
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-mode: alpha;
+    mask-mode: alpha;
+}
+
+@keyframes pd-gem-shine {
+    0%   { background-position: 180% 0; opacity: 0; }
+    15%  { opacity: 1; }
+    85%  { opacity: 1; }
+    100% { background-position: -80% 0; opacity: 0; }
+}
+
+/* Tier-specific halo color adjustments and shimmer cadence variation so
+   high-tier gems feel more alive. */
+.pd-gem--grand .pd-gem__shimmer { animation-duration: 1.6s; }
+.pd-gem--major .pd-gem__shimmer { animation-duration: 2.0s; }
+.pd-gem--minor .pd-gem__shimmer,
+.pd-gem--mini  .pd-gem__shimmer { animation-duration: 2.5s; }
+
+.pd-gem--grand .pd-gem__halo { animation-duration: 1.4s; opacity: 1; }
+.pd-gem--major .pd-gem__halo { animation-duration: 1.9s; }
+
+/* High-tier halo is a smaller, softer throb — present but clearly a step
+   below the jackpot tiers so the payout hierarchy stays legible. */
+.pd-gem--high .pd-gem__halo {
+    inset: -10%;
+    opacity: 0.5;
+    filter: blur(3px);
+    animation-duration: 2.8s;
+}
+
+/* High-tier gem body pulse — gentle scale + brightness throb that reads as
+   "this one is alive". Paired with the halo above for the full effect. */
+.pd-gem--high {
+    animation: pd-gem-body-pulse 2.4s ease-in-out infinite;
+    transform-origin: 50% 50%;
+    will-change: transform, filter;
+}
+
+@keyframes pd-gem-body-pulse {
+    0%, 100% { transform: scale(1);    filter: brightness(1)    drop-shadow(0 0 0 transparent); }
+    50%      { transform: scale(1.05); filter: brightness(1.18) drop-shadow(0 0 6px rgba(255, 240, 200, 0.35)); }
+}
+
+/* Decorative background gems and spin-strip gems never pulse — the effect
+   only belongs to settled high-tier cells. */
+.pd-treasure__item .pd-gem--high,
+.pd-reel-viewport .pd-gem--high {
+    animation: none;
+    filter: none;
+    transform: none;
+}
+
+/* Coin background for nugget tiles: fills the cell interior, value/number
+   renders on top. */
+.pd-nugget {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.pd-nugget__coin {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    object-fit: contain;
+    pointer-events: none;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+.pd-nugget__value {
+    position: relative;
+    z-index: 1;
+    font-family: var(--pd-font-display);
+    font-weight: 800;
+    color: #2a1a0a;
+    text-shadow: 0 1px 0 rgba(255, 220, 120, 0.6);
+}
+
+.pd-cell--marker.pd-cell--lit .pd-cell__card {
+    box-shadow:
+        inset 0 0 0 2.5px var(--pd-cell-marker-ring-lit),
+        inset 0 0 0 4px rgba(255, 200, 80, 0.5),
+        inset 0 0 28px rgba(255, 220, 100, 0.6),
+        inset 0 0 50px rgba(255, 200, 80, 0.25),
+        0 0 24px var(--pd-gold-glow-strong),
+        0 0 40px var(--pd-gold-glow);
+}
+
+.pd-cell--marker.pd-cell--last-empty .pd-cell__card {
+    animation: pd-marker-beg 0.8s ease-in-out infinite alternate;
+}
+
+
+/* Inner viewport owns the mask + SVG motion blur — isolated so the cell's
+   background, border, and locked-nugget glow are NOT blurred or faded. */
+.pd-reel-viewport {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    /* Always mounted. `contain: paint` pins it to its own paint layer so
+       the compositor doesn't recreate the layer when the strip mounts
+       inside — previously the whole filter texture was re-rasterized at
+       the start of every spin. */
+    contain: paint;
+    mask-image: linear-gradient(to bottom,
+        transparent 0%,
+        rgba(0, 0, 0, 1) 20%,
+        rgba(0, 0, 0, 1) 80%,
+        transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom,
+        transparent 0%,
+        rgba(0, 0, 0, 1) 20%,
+        rgba(0, 0, 0, 1) 80%,
+        transparent 100%);
+}
+
+.pd-reel-viewport .pd-reel-strip {
+    /* Default: no animation. The --spin / --decel modifiers below set the
+       phase-specific animation. Common: vertical motion blur via SVG filter,
+       and `will-change` to keep the strip on its own composite layer so the
+       transform animation doesn't repaint surrounding cells. */
+    will-change: transform;
+}
+
+/* Vertical motion blur lives on the STRIP (the transforming element),
+   not the viewport. Filter applied to a parent whose child transforms
+   forces the filter output to re-rasterize every frame (parent's
+   "rendered content" changes as child moves). Applied to the strip
+   itself — which only has its transform animating — the filter
+   rasterizes ONCE when the strip is promoted to its own layer, and
+   every subsequent frame is a compositor-only transform + cached-
+   bitmap re-composite. Critical when many cells spin simultaneously,
+   each of which would otherwise run its own per-frame filter pass. */
+
+/* Spinning phase: cycle through pool items only. Strip layout is
+   [target, 5 teasers, ...pool×2], so positions -600% through -1400% show
+   pool items 6→14. Item 14 == item 6 (pool is doubled), so the wrap from
+   keyframe `to` back to `from` is visually seamless — no jump. */
+/* Spin-strip animation is TWO sequential tracks:
+   1. pd-strip-entry: 550ms with heavy ease-in. Strip starts at
+      translateY(0) (target slot = previous gem, visible and mostly still),
+      lingers briefly so the old symbol registers, then accelerates up to
+      translateY(-1800%) (the spin loop's `from` position) — giving the
+      impression that the reel physically revs up out of rest.
+      cell.symbol is preserved across the spin-restart in playGame, so
+      the target slot IS the previous gem.
+   2. pd-strip-spin-loop: begins at 550ms with the strip already at -1800%
+      (matches the entry's endpoint — zero-jump handoff). */
+.pd-reel-viewport .pd-reel-strip--spin {
+    /* Motion blur via SVG filter; see feGaussianBlur defs in PaydirtWindow. */
+    filter: url(#pd-vblur);
+    /* Desktop keeps the original simple spin loop. The visible cascade is
+       JS-driven on desktop (per-cell setTimeout wave in playGame flips
+       cells to isSpinning in column-major order). Mobile uses a different
+       approach — see .pd-narrow rule below — because the JS wave was racy
+       on iOS. */
+    animation: pd-strip-spin-loop var(--pd-spin-loop) linear infinite both;
+}
+
+/* Decelerating phase: same DOM, transform animates from the loop's resting
+   Y back through the teasers (items 2→1) to the target (item 0).
+   Starting at translateY(-600%) — the loop's `to` keyframe — means if the
+   loop happened to stop at iteration boundary there's literally zero jump.
+   Mid-iteration handoffs still show pool gems on both sides of the swap so
+   the user sees "the reel just slowed down," not a strip-swap. Blur fades
+   via discrete filter-url step-swaps — CSS can't interpolate between
+   url() references, so 3 levels of feGaussianBlur ramp down the perceived
+   motion. Only 3 filter re-rasterizations across the 1s decel, not one
+   per frame. */
+.pd-reel-viewport .pd-reel-strip--decel {
+    animation:
+        pd-strip-decelerate var(--pd-spin-decel) cubic-bezier(0.18, 0.55, 0.25, 1) forwards,
+        pd-strip-vblur-fade var(--pd-spin-blur-fade) linear forwards;
+}
+@keyframes pd-strip-vblur-fade {
+    0%   { filter: url(#pd-vblur);   }
+    45%  { filter: url(#pd-vblur-2); }
+    75%  { filter: url(#pd-vblur-1); }
+    100% { filter: none; }
+}
+
+/* ---------------------------------------------------------------- */
+/* MOBILE-ONLY: SVG filter → scaleY + shorter reel strip            */
+/* ---------------------------------------------------------------- */
+/* iOS Safari CPU-rasterizes `filter: url(#svg)` on transforming    */
+/* elements, which tanks FPS on iPhone. Swap for a pure compositor  */
+/* vertical stretch (`scale: 1 1.2`) — the `scale` CSS property is  */
+/* independent of `transform`, so the strip's translateY animation  */
+/* stays untouched and the stretch applies on top.                  */
+/*                                                                  */
+/* ReelStrip also halves SPIN_POOL (12→6 items) on narrow to drop   */
+/* DOM child count per strip from 27→15. At 25 simultaneous strips  */
+/* that's ~300 fewer nodes to composite every frame. These narrow   */
+/* keyframes scale the loop translate distances to match: pool of 6 */
+/* means the loop now cycles 6 items worth (-900% → -300%) instead  */
+/* of 12 (-1800% → -600%). Seamless wrap preserved because the pool */
+/* is still doubled (12 items total rendered, 6 unique).            */
+@keyframes pd-strip-scale-fade {
+    0%   { scale: 1 1.2; }
+    100% { scale: 1 1;   }
+}
+@keyframes pd-strip-entry-narrow {
+    0%   { transform: translateY(0);      }
+    100% { transform: translateY(-900%);  }
+}
+/* Narrow cascade-entry: same idea but for mobile's scale-stretch (no SVG
+   filter on mobile because iOS CPU-rasterizes filter:url which tanks FPS).
+   `scale: 1 1` during backwards-fill = unstretched still gem; ramps to
+   1 1.2 by the end of the entry so the spin loop's static scale takes
+   over seamlessly. */
+@keyframes pd-strip-cascade-entry-narrow {
+    0%   { transform: translateY(0);     scale: 1 1;   }
+    100% { transform: translateY(-900%); scale: 1 1.2; }
+}
+@keyframes pd-strip-spin-loop-narrow {
+    from { transform: translateY(-900%); }
+    to   { transform: translateY(-300%); }
+}
+@keyframes pd-strip-decelerate-narrow {
+    /* Flat landing — gem bounce handles the click feel, constant 280ms. */
+    0%   { transform: translateY(-300%); }
+    100% { transform: translateY(0);     }
+}
+@media (max-width: 1023px) {
+    .pd-reel-viewport .pd-reel-strip--spin {
+        filter: none !important;
+        scale: 1 1.2;
+        animation:
+            pd-strip-spin-loop-narrow var(--pd-spin-loop) linear infinite calc(var(--pd-cell-wave-pos, 0) * var(--pd-cascade-wave-gap, 12ms) + var(--pd-cascade-entry, 100ms)) backwards,
+            pd-strip-cascade-entry-narrow var(--pd-cascade-entry, 100ms) cubic-bezier(0.7, 0, 0.95, 0.45) calc(var(--pd-cell-wave-pos, 0) * var(--pd-cascade-wave-gap, 12ms)) backwards !important;
+    }
+    .pd-reel-viewport .pd-reel-strip--decel {
+        filter: none !important;
+        animation:
+            pd-strip-decelerate-narrow var(--pd-spin-decel) cubic-bezier(0.18, 0.55, 0.25, 1) forwards,
+            pd-strip-scale-fade var(--pd-spin-blur-fade) linear forwards !important;
+    }
+}
+.pd-narrow .pd-reel-viewport .pd-reel-strip--spin {
+    filter: none !important;
+    scale: 1 1.2;
+    animation:
+        pd-strip-spin-loop-narrow var(--pd-spin-loop) linear infinite calc(var(--pd-cell-wave-pos, 0) * var(--pd-cascade-wave-gap, 12ms) + var(--pd-cascade-entry, 100ms)) backwards,
+        pd-strip-cascade-entry-narrow var(--pd-cascade-entry, 100ms) cubic-bezier(0.7, 0, 0.95, 0.45) calc(var(--pd-cell-wave-pos, 0) * var(--pd-cascade-wave-gap, 12ms)) backwards !important;
+}
+.pd-narrow .pd-reel-viewport .pd-reel-strip--decel {
+    filter: none !important;
+    animation:
+        pd-strip-decelerate-narrow var(--pd-spin-decel) cubic-bezier(0.18, 0.55, 0.25, 1) forwards,
+        pd-strip-scale-fade var(--pd-spin-blur-fade) linear forwards !important;
+}
+
+.pd-reel-viewport .pd-reel-strip__item {
+    opacity: 0.95;
+}
+
+/* Spin-strip preview gems: scale slightly down so they read as "in motion"
+   without cropping the facets at the cell edge. */
+.pd-reel-viewport .pd-reel-strip__item .pd-gem {
+    width: 78%;
+    height: 78%;
+}
+/* Target slot is the LANDING position. After the swap-from-strip-to-
+   static-gem at end of isStopping, the gem must be the same size in
+   both contexts or the user perceives the size jump as "the gem just
+   snapped to its final size with no animation". Match the standalone
+   gem's 88% so the swap is visually invisible. */
+.pd-reel-viewport .pd-reel-strip__item--target .pd-gem {
+    width: 88%;
+    height: 88%;
+}
+/* Pre-rendered gem images (pool + teasers) sit at the same proportions
+   as live PaydirtGem instances, but render as one composite layer per
+   image instead of ~26 SVG primitives. */
+.pd-reel-strip__gem-img {
+    width: 78%;
+    height: 78%;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+/* Chest cell — stacks way above every other cell + gridlines so the
+   oversized chest silhouette protrudes cleanly. Default cells are
+   z-index: 2, their gridline ::after is z-index: 4 within each cell's
+   own stacking context. Cell-level z-index comparison means chest-cell
+   at 100 beats neighbor cells at 2 AT THE SIBLING LEVEL, but the chest
+   IMAGE also needs explicit z-index to clear its own cell's ::after. */
+.pd-cell--has-chest {
+    z-index: 100;
+    overflow: visible;
+}
+.pd-cell--has-chest::after {
+    z-index: 1; /* demote own gridline so it doesn't cut across the chest */
+}
+.pd-cell--has-chest .pd-gem {
+    z-index: 50;
+}
+.pd-cell--has-chest .pd-gem__image,
+.pd-cell--has-chest .pd-gem__label,
+.pd-cell--has-chest .pd-gem__halo {
+    z-index: 50;
+}
+
+/* Jackpot-tier cells need the same neighbor-clipping fix the chest gets:
+   the halo bleeds via inset:-35% past the cell edge, but adjacent cells
+   at the baseline z-index:2 paint over it (row-major DOM order means
+   earlier-rendered neighbors clip the halo on the left/top side, hence
+   the asymmetric crop). Bumping the cell's stacking lifts the bleed-out
+   above all non-chest cells. The :has(> .pd-gem--TIER) DIRECT-CHILD
+   selector targets only the static landed gem (a direct child of
+   .pd-cell via NuggetContent), so reel-strip jackpot teasers flying
+   past during a spin (nested inside .pd-reel-viewport > .pd-reel-strip
+   > .pd-reel-strip__item > .pd-gem) never match — no z-index flicker
+   while the reel scrolls. Note: not scoped to .pd-cell--locked so the
+   base-game PREVIEW case works too — when a non-trigger spin lands
+   jackpot tiers as visible previews, the cell isn't locked but the
+   gem still has its halo. */
+.pd-cell:has(> .pd-gem--mini),
+.pd-cell:has(> .pd-gem--minor),
+.pd-cell:has(> .pd-gem--major),
+.pd-cell:has(> .pd-gem--grand) {
+    z-index: 30;
+}
+.pd-cell:has(> .pd-gem--mini)::after,
+.pd-cell:has(> .pd-gem--minor)::after,
+.pd-cell:has(> .pd-gem--major)::after,
+.pd-cell:has(> .pd-gem--grand)::after {
+    /* Demote own gridline so the halo isn't sliced by it inside the cell. */
+    z-index: 1;
+}
+
+/* Chest gem keeps the same layout box as a normal gem (88% of cell) so
+   it doesn't push the CSS grid's row/column tracks. The visual grow-out
+   is done via `transform: scale()` on the image — transforms don't
+   affect layout flow, so the image renders larger without resizing the
+   cell. Combined with cell z-index: 20 above, the enlarged image paints
+   over adjacent cells cleanly. */
+.pd-gem--chest {
+    animation: pd-chest-breathe 1.3s ease-in-out infinite;
+}
+.pd-chest__image {
+    --pd-gem-saturate: 3.5;
+    --pd-gem-brightness: 1.2;
+    transform: scale(2.2);
+    transform-origin: center center;
+    animation: pd-chest-rainbow 3s linear infinite;
+}
+.pd-chest__halo {
+    inset: -40%;
+    opacity: 1;
+    filter: blur(10px);
+    background: radial-gradient(circle at center,
+        rgba(255, 215, 130, 0.9) 0%,
+        rgba(255, 215, 130, 0.4) 30%,
+        transparent 65%);
+    animation: pd-chest-halo 1.8s ease-in-out infinite;
+}
+.pd-chest__label {
+    z-index: 4;
+    font-size: 38px;
+    letter-spacing: 0.01em;
+    transform-origin: center center;
+    will-change: transform;
+    animation: pd-chest-label-stretch 1.4s ease-in-out infinite;
+    text-shadow:
+        -2px -2px 0 rgba(0, 0, 0, 0.95),
+         2px -2px 0 rgba(0, 0, 0, 0.95),
+        -2px  2px 0 rgba(0, 0, 0, 0.95),
+         2px  2px 0 rgba(0, 0, 0, 0.95),
+        -2px  0    0 rgba(0, 0, 0, 0.95),
+         2px  0    0 rgba(0, 0, 0, 0.95),
+         0   -2px  0 rgba(0, 0, 0, 0.95),
+         0    2px  0 rgba(0, 0, 0, 0.95),
+         0 0 14px rgba(255, 215, 130, 0.95),
+         0 0 28px rgba(255, 180, 60, 0.65);
+}
+
+@keyframes pd-chest-label-stretch {
+    /* Subtle squash-and-stretch breath — no translate, no rotate, just a
+       horizontal stretch followed by a vertical stretch so the number
+       feels alive without jumping around. React key on the span restarts
+       this on value change so each reveal still gets a fresh beat. */
+    0%, 100% { transform: scale(1,    1);    }
+    45%      { transform: scale(1.08, 0.94); }
+    75%      { transform: scale(0.96, 1.05); }
+}
+
+/* ×N badge — small gold pill in the top-right corner of the chest,
+   preserving the multiplier context once the reveal lands. */
+.pd-chest__mult {
+    position: absolute;
+    top: 4%;
+    right: 4%;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 11px;
+    background: linear-gradient(180deg, #ffd870 0%, #d97a10 100%);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.7),
+        inset 0 -1px 0 rgba(100, 50, 0, 0.5),
+        0 0 10px rgba(255, 200, 80, 0.85),
+        0 0 20px rgba(255, 150, 30, 0.55);
+    font-family: var(--pd-font-display, 'Fredoka', system-ui, sans-serif);
+    font-weight: 900;
+    font-size: 13px;
+    color: #3a1800;
+    letter-spacing: 0.02em;
+    transform-origin: center center;
+    animation: pd-chest-mult-pop 1.3s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+    pointer-events: none;
+}
+@keyframes pd-chest-mult-pop {
+    0%   { transform: scale(1)    rotate(8deg);  }
+    15%  { transform: scale(1.28) rotate(-6deg); }
+    35%  { transform: scale(1)    rotate(8deg);  }
+    55%  { transform: scale(1.12) rotate(-4deg); }
+    75%  { transform: scale(1)    rotate(8deg);  }
+    100% { transform: scale(1)    rotate(8deg);  }
+}
+
+/* Vacuum flavor: ropes pull each locked gem's number toward the chest.
+   Attached to the grid (not body) so they inherit the grid's stacking
+   context — z-index kept below .pd-cell (z-index: 2) so gems and chests
+   paint over the ropes instead of the ropes covering them. */
+.pd-chest-ghost-number {
+    position: absolute;
+    pointer-events: none;
+    z-index: 6;
+    font-family: var(--pd-font-display, 'Fredoka', system-ui, sans-serif);
+    font-weight: 900;
+    font-size: 18px;
+    line-height: 1;
+    color: #fff4cc;
+    letter-spacing: 0.02em;
+    text-shadow:
+        -1.5px -1.5px 0 rgba(0, 0, 0, 0.95),
+         1.5px -1.5px 0 rgba(0, 0, 0, 0.95),
+        -1.5px  1.5px 0 rgba(0, 0, 0, 0.95),
+         1.5px  1.5px 0 rgba(0, 0, 0, 0.95),
+         0 0 10px rgba(255, 215, 130, 0.95),
+         0 0 20px rgba(255, 180, 60, 0.7);
+    will-change: transform, opacity;
+}
+
+/* Lightning bolt — anchored at the chest, rotated to face the gem, scaleX
+   shrinks with the ghost as it flies in. Same anchor/rotation/retract as
+   before; visual is now a jagged bolt rendered on the ::before pseudo so
+   the parent box stays at 4px (positioning math in JS unchanged). The
+   pseudo extends ±9px vertically to give the zigzag room to breathe.
+   z-index: 5 paints over regular cells (2) but under the chest (100).
+   mix-blend-mode: screen keeps it readable over gems it crosses. Color
+   per gem tier via data-tier → currentColor. */
+.pd-chest-rope {
+    position: absolute;
+    pointer-events: none;
+    z-index: 5;
+    height: 4px;
+    transform-origin: 0 50%;
+    mix-blend-mode: screen;
+    will-change: transform, opacity;
+}
+.pd-chest-rope::before {
+    content: "";
+    position: absolute;
+    inset: -11px 0;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        currentColor 22%,
+        #ffffff 46%,
+        #ffffff 54%,
+        currentColor 78%,
+        transparent 100%
+    );
+    /* Two animations compose: clip-path strobes through 5 jagged
+       shapes (the bolt visibly writhes), and the filter flickers
+       (brightness + glow pulse). Per-bolt --pd-bolt-delay (set in
+       JS to a negative random offset) desyncs each rope from the
+       others so they don't all flicker in lockstep. */
+    animation:
+        pd-lightning-shapes 220ms step-end infinite var(--pd-bolt-delay, 0ms),
+        pd-lightning-flicker 100ms step-end infinite var(--pd-bolt-delay, 0ms);
+}
+/* Five distinct zigzag silhouettes. step-end makes each shape hold
+   for its slice then snap to the next — that snap is what reads as
+   electrical motion.
+
+   Each polygon is a constant-thickness ribbon: top edge and bottom
+   edge are derived from a shared zigzag centerline (top = c - 10%,
+   bottom = c + 10%). Top can never cross bottom → no self-intersection
+   → no kite/diamond fills. Each frame's centerline is independently
+   asymmetric so the bolt visibly writhes. */
+@keyframes pd-lightning-shapes {
+    0% {
+        clip-path: polygon(
+            0% 40%, 4% 25%, 8% 50%, 12% 20%, 16% 45%, 20% 25%, 24% 52%,
+            28% 18%, 32% 45%, 36% 20%, 40% 50%, 44% 25%, 48% 40%, 52% 15%,
+            56% 48%, 60% 22%, 64% 52%, 68% 20%, 72% 45%, 76% 15%, 80% 40%,
+            84% 22%, 88% 50%, 92% 18%, 96% 40%, 100% 40%,
+            100% 60%, 96% 60%, 92% 38%, 88% 70%, 84% 42%, 80% 60%, 76% 35%,
+            72% 65%, 68% 40%, 64% 72%, 60% 42%, 56% 68%, 52% 35%, 48% 60%,
+            44% 45%, 40% 70%, 36% 40%, 32% 65%, 28% 38%, 24% 72%, 20% 45%,
+            16% 65%, 12% 40%, 8% 70%, 4% 45%, 0% 60%
+        );
+    }
+    20% {
+        clip-path: polygon(
+            0% 40%, 4% 50%, 8% 20%, 12% 45%, 16% 15%, 20% 50%, 24% 25%,
+            28% 40%, 32% 18%, 36% 45%, 40% 28%, 44% 20%, 48% 45%, 52% 25%,
+            56% 50%, 60% 18%, 64% 40%, 68% 25%, 72% 20%, 76% 45%, 80% 28%,
+            84% 18%, 88% 40%, 92% 25%, 96% 50%, 100% 40%,
+            100% 60%, 96% 70%, 92% 40%, 88% 65%, 84% 38%, 80% 70%, 76% 45%,
+            72% 60%, 68% 38%, 64% 65%, 60% 48%, 56% 40%, 52% 65%, 48% 45%,
+            44% 70%, 40% 38%, 36% 60%, 32% 45%, 28% 40%, 24% 65%, 20% 48%,
+            16% 38%, 12% 60%, 8% 45%, 4% 70%, 0% 60%
+        );
+    }
+    40% {
+        clip-path: polygon(
+            0% 30%, 4% 50%, 8% 20%, 12% 45%, 16% 15%, 20% 40%, 24% 22%,
+            28% 52%, 32% 18%, 36% 45%, 40% 25%, 44% 50%, 48% 18%, 52% 40%,
+            56% 22%, 60% 48%, 64% 20%, 68% 50%, 72% 25%, 76% 15%, 80% 40%,
+            84% 22%, 88% 45%, 92% 20%, 96% 50%, 100% 40%,
+            100% 60%, 96% 70%, 92% 40%, 88% 65%, 84% 42%, 80% 60%, 76% 35%,
+            72% 70%, 68% 45%, 64% 40%, 60% 68%, 56% 42%, 52% 60%, 48% 38%,
+            44% 70%, 40% 45%, 36% 65%, 32% 38%, 28% 72%, 24% 42%, 20% 60%,
+            16% 35%, 12% 65%, 8% 40%, 4% 70%, 0% 50%
+        );
+    }
+    60% {
+        clip-path: polygon(
+            0% 45%, 4% 25%, 8% 50%, 12% 18%, 16% 40%, 20% 22%, 24% 50%,
+            28% 25%, 32% 18%, 36% 40%, 40% 28%, 44% 18%, 48% 50%, 52% 25%,
+            56% 15%, 60% 45%, 64% 22%, 68% 48%, 72% 18%, 76% 40%, 80% 28%,
+            84% 22%, 88% 50%, 92% 18%, 96% 40%, 100% 40%,
+            100% 60%, 96% 60%, 92% 38%, 88% 70%, 84% 42%, 80% 48%, 76% 60%,
+            72% 38%, 68% 68%, 64% 42%, 60% 65%, 56% 35%, 52% 45%, 48% 70%,
+            44% 38%, 40% 48%, 36% 60%, 32% 38%, 28% 45%, 24% 70%, 20% 42%,
+            16% 60%, 12% 38%, 8% 70%, 4% 45%, 0% 65%
+        );
+    }
+    80% {
+        clip-path: polygon(
+            0% 35%, 4% 50%, 8% 18%, 12% 45%, 16% 22%, 20% 40%, 24% 18%,
+            28% 50%, 32% 28%, 36% 20%, 40% 45%, 44% 22%, 48% 50%, 52% 18%,
+            56% 40%, 60% 25%, 64% 18%, 68% 48%, 72% 22%, 76% 50%, 80% 18%,
+            84% 25%, 88% 40%, 92% 20%, 96% 45%, 100% 40%,
+            100% 60%, 96% 65%, 92% 40%, 88% 60%, 84% 45%, 80% 38%, 76% 70%,
+            72% 42%, 68% 68%, 64% 38%, 60% 45%, 56% 60%, 52% 38%, 48% 70%,
+            44% 42%, 40% 65%, 36% 40%, 32% 48%, 28% 70%, 24% 38%, 20% 60%,
+            16% 42%, 12% 65%, 8% 38%, 4% 70%, 0% 55%
+        );
+    }
+    100% {
+        clip-path: polygon(
+            0% 40%, 4% 25%, 8% 50%, 12% 20%, 16% 45%, 20% 25%, 24% 52%,
+            28% 18%, 32% 45%, 36% 20%, 40% 50%, 44% 25%, 48% 40%, 52% 15%,
+            56% 48%, 60% 22%, 64% 52%, 68% 20%, 72% 45%, 76% 15%, 80% 40%,
+            84% 22%, 88% 50%, 92% 18%, 96% 40%, 100% 40%,
+            100% 60%, 96% 60%, 92% 38%, 88% 70%, 84% 42%, 80% 60%, 76% 35%,
+            72% 65%, 68% 40%, 64% 72%, 60% 42%, 56% 68%, 52% 35%, 48% 60%,
+            44% 45%, 40% 70%, 36% 40%, 32% 65%, 28% 38%, 24% 72%, 20% 45%,
+            16% 65%, 12% 40%, 8% 70%, 4% 45%, 0% 60%
+        );
+    }
+}
+/* Glow + brightness flicker. Filter-only — does NOT touch transform
+   or opacity, so it composes cleanly with the WAAPI transform/opacity
+   animation that drives the retract toward the chest. */
+@keyframes pd-lightning-flicker {
+    0%, 100% {
+        filter: drop-shadow(0 0 3px currentColor)
+                drop-shadow(0 0 8px currentColor)
+                brightness(1);
+    }
+    33% {
+        filter: drop-shadow(0 0 5px currentColor)
+                drop-shadow(0 0 14px currentColor)
+                brightness(1.5);
+    }
+    66% {
+        filter: drop-shadow(0 0 2px currentColor)
+                drop-shadow(0 0 6px currentColor)
+                brightness(0.7);
+    }
+}
+/* Per-tier rope color. Only `color` is set now — the gradient and the
+   drop-shadow both read it via currentColor. */
+.pd-chest-rope[data-tier="low"]   { color: #7ddcff; }
+.pd-chest-rope[data-tier="mid"]   { color: #6fe380; }
+.pd-chest-rope[data-tier="high"]  { color: #8aa6ff; }
+.pd-chest-rope[data-tier="mini"]  { color: #ff6a6a; }
+.pd-chest-rope[data-tier="minor"] { color: #d086ff; }
+.pd-chest-rope[data-tier="major"] { color: #ffb070; }
+.pd-chest-rope[data-tier="grand"] { color: #ffe878; }
+
+
+@keyframes pd-chest-breathe {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.08); }
+}
+
+@keyframes pd-chest-rainbow {
+    0%   { filter: sepia(1) saturate(var(--pd-gem-saturate)) hue-rotate(0deg)   brightness(var(--pd-gem-brightness)) drop-shadow(0 3px 5px rgba(0,0,0,0.55)); }
+    100% { filter: sepia(1) saturate(var(--pd-gem-saturate)) hue-rotate(360deg) brightness(var(--pd-gem-brightness)) drop-shadow(0 3px 5px rgba(0,0,0,0.55)); }
+}
+
+@keyframes pd-chest-halo {
+    0%, 100% { opacity: 0.5; transform: scale(0.88); }
+    50%      { opacity: 1;   transform: scale(1.15); }
+}
+
+/* Coin-flip overlay — 3D-rotating "coin" injected onto the chest cell
+   while the multiplier is being decided. Text content (the multiplier
+   number) is cycled via JS interval. The outer .pd-chest-flip handles
+   positioning + perspective; the inner __face does the rotation so
+   text stays readable throughout (counter-rotating transforms). */
+.pd-chest-flip {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 120;
+    perspective: 500px;
+}
+.pd-chest-flip__face {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90%;
+    height: 90%;
+    animation: pd-chest-flip-spin 0.9s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+    transform-origin: center center;
+    backface-visibility: visible;
+    filter: drop-shadow(0 0 18px rgba(120, 180, 255, 0.55));
+}
+.pd-chest-flip__gem {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+    filter:
+        sepia(1)
+        saturate(2.8)
+        hue-rotate(210deg)
+        brightness(1)
+        drop-shadow(0 3px 5px rgba(0, 0, 0, 0.55));
+}
+.pd-chest-flip__label {
+    position: relative;
+    z-index: 2;
+    font-family: var(--pd-font-display, 'Fredoka', system-ui, sans-serif);
+    font-weight: 900;
+    font-size: 24px;
+    color: #fffaf0;
+    text-shadow:
+        -1.5px -1.5px 0 rgba(20, 10, 40, 0.95),
+         1.5px -1.5px 0 rgba(20, 10, 40, 0.95),
+        -1.5px  1.5px 0 rgba(20, 10, 40, 0.95),
+         1.5px  1.5px 0 rgba(20, 10, 40, 0.95),
+        -1.5px  0    0 rgba(20, 10, 40, 0.95),
+         1.5px  0    0 rgba(20, 10, 40, 0.95),
+         0    -1.5px 0 rgba(20, 10, 40, 0.95),
+         0     1.5px 0 rgba(20, 10, 40, 0.95);
+}
+.pd-chest-flip--settled .pd-chest-flip__face {
+    animation: pd-chest-flip-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.pd-chest-flip--fade .pd-chest-flip__face {
+    animation: pd-chest-flip-fade 0.2s ease-in forwards;
+}
+
+@keyframes pd-chest-flip-spin {
+    /* 3D rotation on Y axis — coin whirls 3 full turns while growing in.
+       Each half-rotation naturally flips the text but we keep it facing
+       forward via the number updating independently in JS. */
+    0%   { transform: scale(0) rotateY(0deg); opacity: 0; }
+    15%  { transform: scale(1.3) rotateY(180deg); opacity: 1; }
+    50%  { transform: scale(1.5) rotateY(720deg); }
+    100% { transform: scale(1.4) rotateY(1080deg); }
+}
+@keyframes pd-chest-flip-pop {
+    /* On settle: big satisfying overshoot with a slight tilt hold. */
+    0%   { transform: scale(1.4) rotateY(1080deg); }
+    50%  { transform: scale(2) rotateY(1080deg); }
+    100% { transform: scale(1.7) rotateY(1080deg); }
+}
+@keyframes pd-chest-flip-fade {
+    0%   { opacity: 1; transform: scale(1.7) rotateY(1080deg); }
+    100% { opacity: 0; transform: scale(2.2) rotateY(1080deg); }
+}
+.pd-reel-viewport .pd-reel-strip__item .pd-gem__halo,
+.pd-reel-viewport .pd-reel-strip__item .pd-gem__shimmer {
+    display: none;
+}
+/* Spin-strip gems (teasers + pool) are flying past at 18/sec — kill every
+   animation on them. The vertical motion blur sells the spin; per-gem
+   shimmer/pulse just burns CPU for effects no one can see.
+   Target slot is EXCLUDED: it's the gem that lands and needs to play the
+   click-into-place bounce animation during isStopping. The previous rule
+   applied to all in-strip gems including the target, and its `transform:
+   none !important` was silently blocking the bounce animation's
+   transform interpolation (important-static beats animation in the CSS
+   cascade). */
+.pd-reel-viewport .pd-reel-strip__item:not(.pd-reel-strip__item--target) .pd-gem {
+    animation: none !important;
+    filter: none !important;
+    transform: none !important;
+}
+
+.pd-reel-viewport .pd-reel-strip__item--blank {
+    /* Blanks render as a tiny centered dot — creates visual rhythm without
+       looking like a placeholder character. */
+    opacity: 0.3;
+    font-size: 0.9em;
+    color: var(--pd-text-mute);
+    letter-spacing: 0;
+}
+
+
+
+.pd-reel-strip__item--target {
+    /* Override item text formatting — the inner NuggetContent/RegularSymbol
+       brings its own styling. */
+    font-size: inherit;
+}
+
+/* Click-into-place: subtle squash-and-settle at the exact strip-resting
+   position. NO translateY — the symbol is already visible from the decel
+   strip; a drop-in would cause the jump the user flagged. Just a small
+   vertical pinch to sell the 'detent' feel. */
+.pd-cell--stopping .pd-symbol,
+.pd-cell--stopping .pd-nugget,
+.pd-cell--stopping .pd-gem {
+    /* `both` applies the 0% keyframe immediately so the bounce starts
+       in its squashed initial state, not at default scale. */
+    animation: pd-cell-land-subtle var(--pd-land-subtle) cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    will-change: transform;
+}
+
+/* Static gem (NuggetContent or EmptyCell) is always mounted as a direct
+   child of .pd-cell so its <img> stays decoded across spins. Hide it
+   via visibility while the strip is the active rendering layer; when
+   the strip unmounts at settled, the static gem becomes visible
+   immediately with no mount/decode flicker. visibility (vs display)
+   keeps the layer cached so the reveal is paint-only. */
+.pd-cell--spinning > .pd-gem,
+.pd-cell--decelerating > .pd-gem,
+.pd-cell--stopping > .pd-gem,
+.pd-cell--spinning > .pd-symbol,
+.pd-cell--decelerating > .pd-symbol,
+.pd-cell--stopping > .pd-symbol {
+    visibility: hidden;
+}
+
+/* Bounce runs on the strip's target-slot gem during isStopping, not on
+   a freshly-mounted static gem. Avoids the opacity 0→1 pop AND the
+   mount-mid-bounce pattern where the gem appears at a stretched keyframe
+   state (scaleY 1.18) and reads as a flicker. The strip target was the
+   visible landing element during decel, so keeping the bounce there is
+   a continuous handoff.                                                  */
+.pd-cell--stopping .pd-reel-strip__item--target .pd-gem,
+.pd-cell--stopping .pd-reel-strip__item--target .pd-symbol,
+.pd-cell--stopping .pd-reel-strip__item--target .pd-nugget {
+    /* No !important on `transform` here — that was blocking the
+       animation's transform interpolation. The viewport blocker above
+       no longer matches the target slot, so this animation can apply
+       normally with only specificity (no !important needed). */
+    animation: pd-cell-land-subtle var(--pd-land-subtle) cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.pd-reel-strip {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    will-change: transform;
+    /* 21 items (7 glyphs × 3) stacked vertically, each occupying one cell-height. */
+}
+
+.pd-reel-strip__item {
+    flex: 0 0 auto;
+    width: 100%;
+    min-height: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(22px, 5.5vw, 42px);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
+
+.pd-cell--locked .pd-cell__card {
+    background:
+        radial-gradient(circle at 40% 35%,
+            rgba(255, 255, 255, 0.25) 0%,
+            transparent 40%),
+        var(--pd-cell-bg);
+    box-shadow:
+        0 0 18px var(--pd-gold-glow),
+        inset 0 0 12px var(--pd-gold-glow);
+}
+
+/* Pulse is a pre-rasterized pseudo whose opacity is animated on the
+   compositor. Previous impl animated box-shadow on up to 12 locked cells
+   in parallel, which forced a full paint every frame (worst when a respin
+   is simultaneously running SVG blur filters on the empty cells). */
+.pd-cell--locked .pd-cell__card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    box-shadow:
+        0 0 25px var(--pd-gold-glow-strong),
+        inset 0 0 15px rgba(255, 215, 0, 0.4);
+    opacity: 0;
+    animation: pd-gold-pulse 2s ease-in-out infinite;
+    will-change: opacity;
+}
+
+.pd-cell--just-locked .pd-cell__card {
+    animation: pd-gold-slam 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pd-cell--dim {
+    opacity: var(--pd-dim-outer, 0.4);
+    filter: saturate(0.6);
+}
+
+/* ============================================================================ */
+/* PLACEHOLDERS (CSS-drawn — swap via assets.ts when real art arrives)          */
+/* ============================================================================ */
+
+.pd-nugget {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2a1a0a;
+    font-family: var(--pd-font-value);
+    font-weight: 900;
+    font-size: 0.9em;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.pd-nugget--mini,
+.pd-nugget--minor,
+.pd-nugget--major,
+.pd-nugget--grand {
+    font-size: 0.6em;
+    letter-spacing: 0.05em;
+}
+
+.pd-nugget--plain {
+    font-size: 1.4em;
+}
+
+.pd-nugget--grand {
+    animation: pd-grand-shimmer 2s ease-in-out infinite;
+}
+
+.pd-symbol {
+    width: 72%;
+    height: 72%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(22px, 5.5vw, 42px);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
+
+.pd-symbol--empty-pan {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pd-symbol--empty-pan::before {
+    content: "◆";
+    font-family: var(--pd-font-display);
+    font-size: 36px;
+    line-height: 1;
+    color: rgba(212, 165, 116, 0.16);
+    text-shadow: 0 0 6px rgba(212, 165, 116, 0.12);
+    /* The U+25C6 BLACK DIAMOND glyph has its baseline below its visual
+       center — flex-centering puts the glyph BOX in the middle, but
+       the diamond sits low within that box. Translate up ~7% of the
+       font-size to land the visual centroid on the cell center across
+       any font/render. em-relative so it scales with font-size. */
+    transform: translateY(-0.07em);
+}
+
+
+/* ============================================================================ */
+/* HUD                                                                          */
+/* ============================================================================ */
+
+.pd-hud {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 520px;
+}
+
+/* Jackpot pairs — horizontal rows flanking the logo at the top of the
+   window. Aligned vertically with the logo so the top band reads as
+   [gem gem] [LOGO] [gem gem]. Only visible between rounds (idle /
+   gameOver). No panel chrome. */
+/* Wrapper anchors the whole jackpot block (gem row + disclaimer) to the
+   bottom of the game window. Previously .pd-jackpot-bar was directly
+   absolute-positioned; now it's a flow item inside this wrapper so we can
+   stack the shimmering "Fill whole board for 1200x!" disclaimer below it
+   without juggling more absolute coordinates. */
+.pd-jackpot-bar-wrap {
+    position: absolute;
+    left: 50%;
+    /* Hugs the bottom edge of the game window — disclaimer (last child)
+       sits right above this offset; the bar floats well above the disclaimer
+       via the large flex gap below. Net effect: gems pushed up toward the
+       grid, big breathing room between gems and disclaimer, disclaimer
+       close to the gamebox edge. */
+    bottom: 12px;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    z-index: 5;
+    pointer-events: none;
+}
+.pd-jackpot-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: clamp(14px, 2.5vw, 28px);
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    font-family: var(--pd-font-display);
+    font-size: 11px;
+    box-shadow: none;
+    pointer-events: none;
+}
+
+/* Shimmering disclaimer under the jackpot row.
+   Gradient text via background-clip: text — the gradient sweeps across the
+   text via animated background-position. Width:200% means the gradient
+   tile is twice as wide as the text, so half a sweep produces a clean
+   highlight pass without revealing the gradient's edges. */
+.pd-jackpot-disclaimer {
+    font-family: var(--pd-font-display);
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
+    /* Sits below the bar with the wrapper's flex gap providing breathing
+       room. No negative margin — the gems and disclaimer are visually
+       distinct now (per user spec). z-index kept just to win against the
+       falling-gems decoration if any drifts past. */
+    position: relative;
+    z-index: 20;
+    background: linear-gradient(
+        90deg,
+        var(--pd-gold-lo) 0%,
+        var(--pd-gold) 30%,
+        #fff7dd 50%,
+        var(--pd-gold) 70%,
+        var(--pd-gold-lo) 100%
+    );
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    animation: pd-jackpot-disclaimer-shimmer 2.6s linear infinite;
+    /* drop-shadow on the element (not text-shadow — text is transparent) so
+       the gold text reads against the dark game-window background. */
+    filter: drop-shadow(0 0 6px rgba(212, 165, 116, 0.45));
+}
+@keyframes pd-jackpot-disclaimer-shimmer {
+    from { background-position: 200% 0; }
+    to   { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .pd-jackpot-disclaimer { animation: none; }
+}
+
+/* Logo — sits at the top of the window, takes the wide space that the
+   jackpot bar used to occupy. Sized large by default; max-height caps
+   vertical so tall logos can't push the grid down. */
+.pd-logo {
+    /* Pinned absolutely to the top-center of the game window. Taken out
+       of the flex column entirely so NO grid/bottom-bar/layout change
+       can push it. Its position is now driven solely by top/left +
+       translateX, never by siblings. Default (view 1/2): compact size
+       so the grid has room. View 0 (setup) overrides below with a
+       larger logo — transitions smoothly between the two states when
+       Place Bet flips view 0 → 1. */
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(400px, 54%);
+    height: 112px;
+    max-height: 112px;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.65));
+    z-index: 11;
+    transition: width 420ms cubic-bezier(0.33, 1.3, 0.4, 1),
+        height 420ms cubic-bezier(0.33, 1.3, 0.4, 1);
+}
+
+.pd-root.pd-root--in-window.pd-view-0 .pd-logo {
+    width: min(480px, 66%);
+    height: 148px;
+    max-height: 148px;
+}
+
+/* Mobile: drop the logo entirely. On a narrow viewport the grid needs
+   every pixel of vertical space, and the logo becomes redundant with
+   the platform's own app chrome above the game window. Grid + jackpot
+   bar resized to fit the freed space and avoid the bottom overlap that
+   showed up with the 5×5 grid. */
+/* ================================================================ */
+/* MOBILE / NARROW LAYOUT                                           */
+/* ================================================================ */
+/* Activated by EITHER:
+   • @media (max-width: 1023px)          — narrow viewport
+   • `.pd-narrow` class on .pd-root      — ResizeObserver detected a
+                                            narrow game-window element
+   Both paths define the same rules; either is sufficient to activate
+   the narrow layout. Every state block below owns its own padding,
+   justify-content, and grid size — nothing is inherited between
+   states, so changing one state can't ripple into another. */
+
+
+/* ---------------------------------------------------------------- */
+/* SECTION 1 · NARROW BASE (chrome — applies to every narrow view)  */
+/* ---------------------------------------------------------------- */
+/* Root padding + centered flex, logo hidden by default, smaller    */
+/* grid, smaller jackpot gems, chest scale-down, bottom-bar tuned   */
+/* for RespinCounter + RunningTotal side-by-side.                   */
+
+@media (max-width: 1023px) {
+    .pd-root--in-window {
+        padding: 10px 6px 14px !important;
+        justify-content: center !important;
+    }
+    .pd-root .pd-logo { display: none; }
+    .pd-root--in-window .pd-grid {
+        width: min(90cqh, 98cqw, 720px) !important;
+        height: min(90cqh, 98cqw, 720px) !important;
+    }
+    .pd-jackpot-bar-wrap { bottom: 10px; gap: 8px; }
+    .pd-jackpot-bar {
+        gap: clamp(6px, 2vw, 14px);
+        font-size: 9px;
+    }
+    .pd-jackpot-tier__gem {
+        width: clamp(44px, 12vw, 56px);
+        height: clamp(44px, 12vw, 56px);
+    }
+    .pd-jackpot-disclaimer { font-size: 13px; }
+    .pd-jackpot-tier__gem .pd-gem__halo {
+        inset: -45%;
+        filter: blur(8px);
+    }
+    /* Chest stays at desktop visuals on narrow — earlier scale-down + */
+    /* animation-disable was a false-fix for a "grid resize" symptom    */
+    /* that turns out to be pure visual overflow (transform: scale on  */
+    /* the chest image doesn't reflow the grid; the grid columns/rows  */
+    /* stay put). User wants the chest large + animated on mobile too. */
+    .pd-chest__halo {
+        /* Reduce the halo blur on narrow — high-DPI iOS struggles with */
+        /* large blur radii applied to radial gradients. Visually the   */
+        /* halo still reads, but the paint cost drops dramatically.     */
+        filter: blur(6px) !important;
+    }
+    /* Unified stats container: RespinCounter + RunningTotal as one
+       rounded box with an internal divider. RunningTotal's "HOLD TOTAL"
+       label is hidden — the number + "APE" already reads as the total,
+       and two stacked labels side-by-side crowds the bar. The bar is
+       hidden entirely when empty (non-bonus phases) so it doesn't
+       reserve vertical space or render a visible gold border line.
+       That empty-state pill was also stealing the centering budget
+       from the grid, which explains why centering looked off. */
+    .pd-bottom-bar:empty { display: none; }
+    .pd-bottom-bar {
+        gap: 0;
+        min-height: 56px;
+        padding: 0;
+        background: linear-gradient(180deg, #14102a 0%, #07050d 100%);
+        border: 1px solid var(--pd-gold-lo);
+        border-radius: 10px;
+        max-width: min(520px, 92cqw);
+        margin: 0 auto;
+        overflow: hidden;
+    }
+    .pd-respin-counter {
+        position: static;
+        top: auto;
+        right: auto;
+        padding: 6px 16px;
+        background: transparent;
+        border: none;
+        border-right: 1px solid var(--pd-gold-lo);
+        border-radius: 0;
+        flex: 0 0 auto;
+        /* Drop the inset highlight + drop-shadow — the cells sit
+           flush inside the unified bottom-bar now, no border for
+           the highlight to ride and no detached card to drop a
+           shadow under. The inset top line was reading as a faint
+           floating stroke above the label. */
+        box-shadow: none;
+    }
+    .pd-respin-counter__label {
+        font-size: 8px;
+        letter-spacing: 0.18em;
+        margin-bottom: 2px;
+    }
+    .pd-respin-counter__value { font-size: 20px; }
+    .pd-running-total {
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        padding: 6px 16px;
+        flex: 1 1 auto;
+        justify-content: center;
+        box-shadow: none;
+    }
+    .pd-running-total__label { display: none; }
+    .pd-running-total__value { font-size: 20px; }
+    /* Scale the chunky in-cell decorations down so they're proportional
+       to the small mobile cell size (~70px wide on a 360px viewport
+       vs ~104px on desktop). 8cqw on the grid container = ~28px at
+       360w, ~58px at 720w — the diamond stays the same RELATIVE size. */
+    .pd-symbol--empty-pan::before {
+        font-size: clamp(14px, 8cqw, 36px);
+    }
+    .pd-cell--marker .pd-cell__card {
+        box-shadow:
+            inset 0 0 0 1px rgba(255, 215, 100, 0.85),
+            inset 0 0 0 1.5px rgba(212, 165, 116, 0.35),
+            inset 0 0 12px rgba(255, 200, 80, 0.45),
+            inset 0 0 22px rgba(255, 200, 80, 0.18),
+            0 0 8px rgba(255, 200, 80, 0.25);
+    }
+    .pd-grid {
+        outline-width: 2px;
+        outline-offset: 1px;
+    }
+}
+.pd-root--in-window.pd-narrow {
+    padding: 10px 6px 14px !important;
+    justify-content: center !important;
+}
+.pd-root.pd-narrow .pd-logo { display: none; }
+.pd-root--in-window.pd-narrow .pd-grid {
+    width: min(90cqh, 98cqw, 720px) !important;
+    height: min(90cqh, 98cqw, 720px) !important;
+}
+.pd-narrow .pd-jackpot-bar-wrap { bottom: 10px; gap: 8px; }
+.pd-narrow .pd-jackpot-bar {
+    gap: clamp(6px, 2vw, 14px);
+    font-size: 9px;
+}
+.pd-narrow .pd-jackpot-tier__gem {
+    width: clamp(44px, 12vw, 56px);
+    height: clamp(44px, 12vw, 56px);
+}
+.pd-narrow .pd-jackpot-disclaimer { font-size: 13px; }
+.pd-narrow .pd-jackpot-tier__gem .pd-gem__halo {
+    inset: -45%;
+    filter: blur(8px);
+}
+.pd-narrow .pd-chest__halo { filter: blur(6px) !important; }
+.pd-narrow .pd-bottom-bar:empty { display: none; }
+.pd-narrow .pd-bottom-bar {
+    gap: 0;
+    min-height: 56px;
+    padding: 0;
+    background: linear-gradient(180deg, #14102a 0%, #07050d 100%);
+    border: 1px solid var(--pd-gold-lo);
+    border-radius: 10px;
+    max-width: min(520px, 92cqw);
+    margin: 0 auto;
+    overflow: hidden;
+}
+.pd-narrow .pd-respin-counter {
+    position: static;
+    top: auto;
+    right: auto;
+    padding: 6px 16px;
+    background: transparent;
+    border: none;
+    border-right: 1px solid var(--pd-gold-lo);
+    border-radius: 0;
+    flex: 0 0 auto;
+    /* Same reasoning as the @media narrow rule above — clear the
+       inset highlight + drop-shadow that the standalone-card
+       desktop variant uses. Inside the unified bottom-bar there's
+       no border for the highlight to ride, so it reads as a faint
+       floating line above the label. */
+    box-shadow: none;
+}
+.pd-narrow .pd-respin-counter__label {
+    font-size: 8px;
+    letter-spacing: 0.18em;
+    margin-bottom: 2px;
+}
+.pd-narrow .pd-respin-counter__value { font-size: 20px; }
+.pd-narrow .pd-running-total {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 6px 16px;
+    flex: 1 1 auto;
+    justify-content: center;
+    box-shadow: none;
+}
+.pd-narrow .pd-running-total__label { display: none; }
+.pd-narrow .pd-running-total__value { font-size: 20px; }
+/* Same in-cell decoration scaling as the @media block above —
+   shrink the diamond placeholder, the marker cell's gold ring +
+   inner glows, and the grid's outer outline so they stay
+   proportional to the small mobile cell size. */
+.pd-narrow .pd-symbol--empty-pan::before {
+    font-size: clamp(14px, 8cqw, 36px);
+}
+.pd-narrow .pd-cell--marker .pd-cell__card {
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 215, 100, 0.85),
+        inset 0 0 0 1.5px rgba(212, 165, 116, 0.35),
+        inset 0 0 12px rgba(255, 200, 80, 0.45),
+        inset 0 0 22px rgba(255, 200, 80, 0.18),
+        0 0 8px rgba(255, 200, 80, 0.25);
+}
+.pd-narrow .pd-grid {
+    outline-width: 2px;
+    outline-offset: 1px;
+}
+
+
+/* ---------------------------------------------------------------- */
+/* SECTION 2 · NARROW + VIEW 0 (bet-setup screen)                   */
+/* ---------------------------------------------------------------- */
+/* Logo shown, grid shrunk (fits between logo and jackpots), root   */
+/* switches to flex-start with padding-top for logo clearance.      */
+
+@media (max-width: 1023px) {
+    .pd-root--in-window.pd-view-0 {
+        padding-top: 108px !important;
+        justify-content: flex-start !important;
+    }
+    .pd-root.pd-view-0 .pd-logo {
+        display: block;
+        width: min(280px, 72%);
+        height: auto;
+        max-height: 88px;
+    }
+    .pd-root--in-window.pd-view-0 .pd-grid {
+        width: min(76cqh, 96cqw, 560px) !important;
+        height: min(76cqh, 96cqw, 560px) !important;
+        scale: 1;
+    }
+}
+.pd-root--in-window.pd-narrow.pd-view-0 {
+    padding-top: 94px !important;
+    justify-content: flex-start !important;
+}
+.pd-root.pd-narrow.pd-view-0 .pd-logo {
+    display: block;
+    width: min(280px, 72%);
+    height: auto;
+    max-height: 88px;
+}
+.pd-root--in-window.pd-narrow.pd-view-0 .pd-grid {
+    width: min(76cqh, 96cqw, 560px) !important;
+    height: min(76cqh, 96cqw, 560px) !important;
+    scale: 1;
+}
+
+
+/* ---------------------------------------------------------------- */
+/* SECTION 3 · NARROW + VIEW 1 (during base spin)                   */
+/* ---------------------------------------------------------------- */
+/* Takes the base narrow rules from Section 1 directly: centered    */
+/* grid, no logo, full 84cqh grid size. No overrides needed — this  */
+/* is documented here so future edits know no view-1 rules live     */
+/* anywhere else.                                                   */
+
+
+/* ---------------------------------------------------------------- */
+/* SECTION 4 · NARROW + VIEW 2 (post-spin / end card)               */
+/* ---------------------------------------------------------------- */
+/* Same base as view 1, with a slight grid shrink when a payout     */
+/* celebration overlay is present.                                  */
+
+@media (max-width: 1023px) {
+    .pd-root--in-window.pd-view-2.pd-has-win .pd-grid {
+        scale: 0.9;
+    }
+}
+.pd-root--in-window.pd-narrow.pd-view-2.pd-has-win .pd-grid {
+    scale: 0.9;
+}
+
+
+/* ---------------------------------------------------------------- */
+/* SECTION 5 · NARROW + BONUS PHASES                                */
+/* ---------------------------------------------------------------- */
+/* Applies to holdTrigger / holdRespin / holdComplete / celebrating. */
+/* Grid pinned to top via flex-start so the bottom-bar with the     */
+/* RespinCounter + HoldTotal has clear room at the foot. Grid       */
+/* further shrunk to 72cqh so the stats row doesn't clip. Miss-zoom */
+/* scale disabled (scale: 1) so chest reveals don't throw the grid  */
+/* off-center.                                                      */
+
+@media (max-width: 1023px) {
+    .pd-root--in-window.pd-phase-holdTrigger,
+    .pd-root--in-window.pd-phase-holdRespin,
+    .pd-root--in-window.pd-phase-holdComplete,
+    .pd-root--in-window.pd-phase-celebrating {
+        justify-content: center !important;
+        gap: 14px;
+    }
+    .pd-root--in-window.pd-phase-holdTrigger .pd-grid,
+    .pd-root--in-window.pd-phase-holdRespin .pd-grid,
+    .pd-root--in-window.pd-phase-holdComplete .pd-grid,
+    .pd-root--in-window.pd-phase-celebrating .pd-grid {
+        width: min(78cqh, 98cqw, 680px) !important;
+        height: min(78cqh, 98cqw, 680px) !important;
+    }
+    .pd-root.pd-phase-holdTrigger,
+    .pd-root.pd-phase-holdRespin,
+    .pd-root.pd-phase-holdComplete {
+        scale: 1 !important;
+    }
+}
+.pd-root--in-window.pd-narrow.pd-phase-holdTrigger,
+.pd-root--in-window.pd-narrow.pd-phase-holdRespin,
+.pd-root--in-window.pd-narrow.pd-phase-holdComplete,
+.pd-root--in-window.pd-narrow.pd-phase-celebrating {
+    justify-content: center !important;
+    gap: 14px;
+}
+.pd-root--in-window.pd-narrow.pd-phase-holdTrigger .pd-grid,
+.pd-root--in-window.pd-narrow.pd-phase-holdRespin .pd-grid,
+.pd-root--in-window.pd-narrow.pd-phase-holdComplete .pd-grid,
+.pd-root--in-window.pd-narrow.pd-phase-celebrating .pd-grid {
+    width: min(78cqh, 98cqw, 680px) !important;
+    height: min(78cqh, 98cqw, 680px) !important;
+}
+.pd-root.pd-narrow.pd-phase-holdTrigger,
+.pd-root.pd-narrow.pd-phase-holdRespin,
+.pd-root.pd-narrow.pd-phase-holdComplete {
+    scale: 1 !important;
+}
+
+.pd-jackpot-tier {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    padding: 0;
+    background: transparent;
+}
+
+/* Gem wrapper — oversized so the gem reads like a hero element beneath
+   the grid. The halo is pushed further out in this context to give a
+   stronger bloom without touching the board-gem defaults. */
+.pd-jackpot-tier__gem {
+    width: clamp(54px, 5.5vw, 76px);
+    height: clamp(54px, 5.5vw, 76px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+.pd-jackpot-tier__gem .pd-gem__halo {
+    inset: -55%;
+    filter: blur(10px);
+}
+
+/* Two-line on-gem label for jackpots: tier name stacked over current
+   value. Lives inside .pd-gem__label, so it inherits the jackpot
+   seesaw automatically. Value line reads slightly smaller so MINI,
+   MINOR, MAJOR, GRAND stays the dominant word. */
+.pd-jackpot-gem-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    gap: 2px;
+}
+.pd-jackpot-gem-label__tier {
+    font-size: 1em;
+}
+.pd-jackpot-gem-label__value {
+    font-size: 0.8em;
+    opacity: 0.95;
+}
+
+
+.pd-respin-counter {
+    position: absolute;
+    top: var(--pd-respin-top);
+    right: var(--pd-respin-right);
+    background:
+        linear-gradient(180deg, #14102a 0%, #07050d 100%);
+    border: 1px solid var(--pd-gold-lo);
+    border-radius: 8px;
+    padding: 10px 18px;
+    text-align: center;
+    font-family: var(--pd-font-display);
+    z-index: 10;
+    min-width: 130px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 6px 18px rgba(0, 0, 0, 0.7);
+}
+
+.pd-respin-counter__label {
+    font-size: 9px;
+    color: var(--pd-text-mute);
+    letter-spacing: 0.22em;
+    margin-bottom: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.pd-respin-counter__value {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--pd-gold-hi);
+    font-family: var(--pd-font-value);
+    text-shadow: 0 0 10px var(--pd-gold-glow);
+}
+
+.pd-respin-counter--warn .pd-respin-counter__value {
+    color: var(--pd-warn);
+}
+
+.pd-respin-counter--danger .pd-respin-counter__value {
+    color: var(--pd-danger);
+    animation: pd-heartbeat 0.8s ease-in-out infinite;
+}
+
+.pd-respin-counter--reset {
+    animation: pd-counter-reset 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pd-running-total {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 10px;
+    font-family: var(--pd-font-display);
+    padding: 8px 22px;
+    background: linear-gradient(180deg, #14102a 0%, #07050d 100%);
+    border: 1px solid var(--pd-gold-lo);
+    border-radius: 8px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 6px 16px rgba(0, 0, 0, 0.6);
+}
+
+/* Reserved bottom slot — always in the flex flow so the grid never moves
+   when its content (RunningTotal during bonus, LAST WIN at game-over)
+   appears or disappears. Sized to comfortably fit either child. */
+.pd-bottom-bar {
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.pd-running-total__label {
+    font-size: 11px;
+    color: var(--pd-text-mute);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.pd-last-win {
+    font-family: var(--pd-font-display);
+    font-size: 18px;
+    color: var(--pd-text-mute);
+    white-space: nowrap;
+}
+.pd-last-win strong {
+    color: var(--pd-gold);
+    font-weight: 700;
+    margin-left: 6px;
+}
+
+.pd-running-total__value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--pd-gold-hi);
+    font-family: var(--pd-font-value);
+    text-shadow: 0 0 8px var(--pd-gold-glow);
+}
+
+/* ============================================================================ */
+/* CELEBRATION OVERLAY                                                          */
+/* ============================================================================ */
+
+.pd-celebration {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 50;
+}
+
+.pd-celebration__text {
+    position: relative;
+    isolation: isolate;
+    padding: 0.2em 0.7em;
+    font-family: var(--pd-font-display);
+    font-weight: 900;
+    /* White text + layered dark outline via directional text-shadows.
+       `-webkit-text-stroke` would look cleaner but it fills tight letter
+       counters (the hole in "A", "P", etc.) with the stroke color —
+       creating a weird dark triangle inside the A. 8-way text-shadow
+       simulates a stroke without touching counters. */
+    color: #fffaf0;
+    text-shadow:
+        -2px -2px 0 rgba(26, 8, 56, 0.95),
+         2px -2px 0 rgba(26, 8, 56, 0.95),
+        -2px  2px 0 rgba(26, 8, 56, 0.95),
+         2px  2px 0 rgba(26, 8, 56, 0.95),
+        -2px  0   0 rgba(26, 8, 56, 0.95),
+         2px  0   0 rgba(26, 8, 56, 0.95),
+         0   -2px 0 rgba(26, 8, 56, 0.95),
+         0    2px 0 rgba(26, 8, 56, 0.95),
+         0 0 12px rgba(255, 215, 130, 0.9),
+         0 0 28px rgba(255, 215, 130, 0.5),
+         0 4px 10px rgba(0, 0, 0, 0.8);
+    font-size: clamp(42px, 10vw, 84px);
+    letter-spacing: 0.08em;
+    text-align: center;
+    animation: pd-celebration-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Long-cut gem backdrop — real SVG with faceted polygons, same visual
+   language as the grid gems. Sits absolutely inset behind text, with a
+   shimmer stripe layered on top (clipped to the same hexagonal silhouette).
+   The outer container handles the pulse glow via animated drop-shadow. */
+.pd-gem-backdrop {
+    position: absolute;
+    /* Hug the text: small inset so the gem is proportional to its label
+       rather than ballooning across the entire viewport. Horizontal a bit
+       wider than vertical so the elongated-gem aspect still reads. */
+    inset: -0.1em -0.45em;
+    pointer-events: none;
+    z-index: -1;
+}
+.pd-gem-backdrop__svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.pd-gem-backdrop__shimmer {
+    position: absolute;
+    inset: 0;
+    /* Same elongated hexagon as the SVG polygon so shimmer stays on the gem. */
+    clip-path: polygon(
+        0% 50%,
+        12.5% 0%,
+        87.5% 0%,
+        100% 50%,
+        87.5% 100%,
+        12.5% 100%
+    );
+    background-image: linear-gradient(110deg,
+        transparent 38%,
+        rgba(255, 255, 255, 0.0) 45%,
+        rgba(255, 255, 255, 0.7) 50%,
+        rgba(255, 255, 255, 0.0) 55%,
+        transparent 62%);
+    background-size: 250% 100%;
+    background-repeat: no-repeat;
+    animation: pd-celebration-gem-shimmer 2.8s linear infinite;
+    mix-blend-mode: screen;
+}
+
+.pd-celebration__amount {
+    position: relative;
+    isolation: isolate;
+    margin-top: 48px;
+    padding: 0.2em 0.7em;
+    font-family: var(--pd-font-value);
+    font-size: clamp(24px, 5.5vw, 44px);
+    color: #fffaf0;
+    text-shadow:
+        -1.5px -1.5px 0 rgba(58, 28, 0, 0.95),
+         1.5px -1.5px 0 rgba(58, 28, 0, 0.95),
+        -1.5px  1.5px 0 rgba(58, 28, 0, 0.95),
+         1.5px  1.5px 0 rgba(58, 28, 0, 0.95),
+        -1.5px  0    0 rgba(58, 28, 0, 0.95),
+         1.5px  0    0 rgba(58, 28, 0, 0.95),
+         0    -1.5px 0 rgba(58, 28, 0, 0.95),
+         0     1.5px 0 rgba(58, 28, 0, 0.95),
+         0 0 10px rgba(255, 215, 100, 0.8),
+         0 3px 8px rgba(0, 0, 0, 0.85);
+    font-weight: 900;
+}
+.pd-celebration__text-inner,
+.pd-celebration__amount-inner,
+.pd-trigger-overlay__text-inner {
+    position: relative;
+    z-index: 1;
+}
+
+.pd-trigger-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 60;
+}
+
+.pd-trigger-overlay__text {
+    position: relative;
+    isolation: isolate;
+    padding: 0.25em 0.8em;
+    font-family: var(--pd-font-display);
+    font-weight: 900;
+    /* Sized against the gamebox container, not the viewport — 8vw blew
+       the text wider than the 720px gamebox on larger viewports,
+       clipping the H and S. cqw scales with the actual game window. */
+    font-size: clamp(22px, 5.5cqw, 44px);
+    color: #fffaf0;
+    text-shadow:
+        -2px -2px 0 rgba(26, 8, 56, 0.95),
+         2px -2px 0 rgba(26, 8, 56, 0.95),
+        -2px  2px 0 rgba(26, 8, 56, 0.95),
+         2px  2px 0 rgba(26, 8, 56, 0.95),
+        -2px  0   0 rgba(26, 8, 56, 0.95),
+         2px  0   0 rgba(26, 8, 56, 0.95),
+         0   -2px 0 rgba(26, 8, 56, 0.95),
+         0    2px 0 rgba(26, 8, 56, 0.95),
+         0 0 14px rgba(255, 215, 130, 0.9),
+         0 0 32px rgba(255, 215, 130, 0.55),
+         0 4px 8px rgba(0, 0, 0, 0.85);
+    letter-spacing: 0.1em;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.pd-trigger-overlay__text span {
+    display: inline-block;
+    opacity: 0;
+    animation: pd-letter-stagger 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* ============================================================================ */
+/* PARTICLE                                                                     */
+/* ============================================================================ */
+
+.pd-particle {
+    position: absolute;
+    pointer-events: none;
+    border-radius: 50%;
+    z-index: 30;
+}
+/* "Behind the gem" variant. Particles are appended INSIDE the cell (see
+   ParticleEngine.burstAtElement) so they live in the cell's stacking
+   context. z-index 0 puts them above .pd-cell__card (z-index 0, earlier
+   in DOM) and below .pd-gem (z-index 1) — sparks are masked by the
+   opaque gem silhouette and visible through the transparent edges of
+   the gem PNG, reading as "emerging from behind the gem". When a spark
+   flies past the cell edge (cell has overflow:visible) it remains
+   visible on the dark grid backdrop. */
+.pd-particle--behind {
+    z-index: 0;
+}
+
+.pd-ambient-dust {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.pd-ambient-dust__speck {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: var(--pd-gold-hi);
+    border-radius: 50%;
+    box-shadow: 0 0 4px var(--pd-gold-glow);
+    opacity: 0.6;
+    animation: pd-dust-float linear infinite;
+}
+
+/* ============================================================================ */
+/* CONTROLS                                                                     */
+/* ============================================================================ */
+
+.pd-spin-button {
+    font-family: var(--pd-font-display);
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    color: #1a0800;
+    background: linear-gradient(180deg, var(--pd-gold-hi), var(--pd-gold) 40%, var(--pd-gold-lo));
+    border: 3px solid var(--pd-gold-deep);
+    border-radius: 14px;
+    padding: 14px 32px;
+    min-width: 180px;
+    min-height: 56px;
+    cursor: pointer;
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.6),
+        inset 0 2px 4px rgba(255, 255, 255, 0.4);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.pd-spin-button:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow:
+        0 6px 16px rgba(0, 0, 0, 0.7),
+        inset 0 2px 4px rgba(255, 255, 255, 0.5);
+}
+
+.pd-spin-button:not(:disabled):active {
+    transform: translateY(1px);
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.6),
+        inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.pd-spin-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    filter: saturate(0.6);
+}
+
+.pd-spin-button--ready {
+    animation: pd-spin-ready-pulse 2s ease-in-out infinite;
+}
+
+/* ============================================================================ */
+/* GOLD RUSH METER                                                              */
+/* ============================================================================ */
+
+.pd-meter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 520px;
+    font-family: var(--pd-font-value);
+    font-size: 11px;
+    color: var(--pd-text-mute);
+}
+
+.pd-meter__icon {
+    font-size: 16px;
+}
+
+.pd-meter__track {
+    flex: 1;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--pd-gold-deep);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.pd-meter__fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--pd-gold-lo), var(--pd-gold));
+    transition: width 0.4s ease-out;
+}
+
+.pd-meter__label {
+    min-width: 48px;
+    text-align: right;
+}
+
+/* ============================================================================ */
+/* KEYFRAMES                                                                    */
+/* ============================================================================ */
+
+/* Reel direction: DOWN (like a real slot-machine drum). Strip starts
+   translated UP (showing a later item) and scrolls DOWN to translateY(0),
+   so items enter from the TOP of the viewport and exit at the BOTTOM. */
+@keyframes pd-strip-spin-loop {
+    /* Strip layout [target, 5 teasers, ...pool×2]. Pool of 12 starts at
+       item index 6. Loop Y moves between item 6 (pool[0]) and item 18
+       (pool[12] == pool[0] due to doubling) so the wrap is invisible. */
+    from { transform: translateY(-1800%); }
+    to   { transform: translateY(-600%); }
+}
+
+/* Deceleration: strip translated up by -300% initially (showing item 3),
+   scrolls DOWN to translateY(0), where item 0 (the target, rendered as its
+   proper static component) sits centered in the viewport. Slight overshoot
+   below zero gives the click sensation. */
+@keyframes pd-strip-decelerate {
+    /* Strip lands flat at translateY(0) — the gem's separate constant-  */
+    /* duration bounce (pd-cell-land-subtle) is the click-in animation.  */
+    /* Previously the strip had its own overshoot at 92% (translateY     */
+    /* 6%) that scaled with --pd-spin-decel duration, making the click   */
+    /* feel speed-tier-dependent even though the gem bounce is constant. */
+    0%   { transform: translateY(-600%); }
+    100% { transform: translateY(0); }
+}
+
+/* Respin-only decel: scrolls the strip downward through pool/teaser */
+/* into the target. Standard cascade-style "next gem drops in from   */
+/* above" — same direction the existing decel already had, but uses  */
+/* `both` fill mode so the start frame is set on mount (no jump).    */
+@keyframes pd-strip-respin-drop {
+    /* Flat landing — gem bounce handles the click feel, constant 280ms. */
+    0%   { transform: translateY(-300%); }
+    100% { transform: translateY(0);     }
+}
+.pd-root.pd-phase-holdRespin .pd-reel-strip--decel,
+.pd-root.pd-phase-holdTrigger .pd-reel-strip--decel {
+    animation: pd-strip-respin-drop var(--pd-spin-decel) cubic-bezier(0.18, 0.55, 0.25, 1) both !important;
+    filter: none !important;
+    scale: 1 1 !important;
+}
+
+/* Landing-highlight pulse on the cell frame: grows from subtle to bright
+   over the decelerate duration, then fades as the cell settles. */
+@keyframes pd-cell-landing-pulse {
+    0%   { box-shadow: inset 0 0 8px rgba(255, 200, 80, 0.15), 0 0 4px rgba(255, 200, 80, 0.1); }
+    60%  { box-shadow: inset 0 0 22px rgba(255, 200, 80, 0.55), 0 0 18px rgba(255, 200, 80, 0.3); }
+    100% { box-shadow: inset 0 0 18px rgba(255, 200, 80, 0.35), 0 0 12px rgba(255, 200, 80, 0.2); }
+}
+
+@keyframes pd-reel-bounce {
+    0%   { transform: translateY(-8px); filter: blur(4px); }
+    60%  { transform: translateY(3px);  filter: blur(0); }
+    100% { transform: translateY(0);    filter: blur(0); }
+}
+
+/* Subtle land: pure squash at the already-visible position. No translateY
+   so the symbol stays locked to wherever the decel strip left it. */
+@keyframes pd-cell-land-subtle {
+    /* 18% amplitude — visibly elastic on mobile, still tasteful. */
+    0%   { transform: scaleY(1.18) scaleX(0.88); }
+    55%  { transform: scaleY(0.86) scaleX(1.12); }
+    100% { transform: scaleY(1)    scaleX(1); }
+}
+
+/* Brief highlight pulse on the cell frame at the moment of lock. */
+@keyframes pd-cell-frame-click {
+    0%   { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+    40%  { box-shadow: inset 0 0 8px rgba(255, 215, 0, 0.4), 0 0 18px rgba(255, 215, 0, 0.2); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+}
+
+@keyframes pd-gold-slam {
+    0%   { transform: translateY(-40px) scale(1.3); opacity: 0; }
+    50%  { transform: translateY(5px)   scale(0.95); opacity: 1; }
+    100% { transform: translateY(0)     scale(1); }
+}
+
+@keyframes pd-gold-pulse {
+    0%, 100% { opacity: 0; }
+    50%      { opacity: 1; }
+}
+
+@keyframes pd-grand-shimmer {
+    0%, 100% { filter: brightness(1) hue-rotate(0deg); }
+    50%      { filter: brightness(1.2) hue-rotate(10deg); }
+}
+
+@keyframes pd-marker-beg {
+    from { box-shadow: inset 0 0 0 2px var(--pd-cell-marker-ring), 0 0 8px rgba(220, 38, 38, 0.3); }
+    to   { box-shadow: inset 0 0 0 2px rgba(255, 100, 50, 0.8), 0 0 24px rgba(255, 100, 50, 0.6); }
+}
+
+@keyframes pd-heartbeat {
+    0%, 100% { transform: scale(1); }
+    25%      { transform: scale(1.1); }
+    50%      { transform: scale(1); }
+    75%      { transform: scale(1.08); }
+}
+
+@keyframes pd-counter-reset {
+    0%   { transform: scale(0.5); opacity: 0; color: var(--pd-ok); }
+    50%  { transform: scale(1.3); opacity: 1; }
+    100% { transform: scale(1);   opacity: 1; }
+}
+
+@keyframes pd-screen-shake {
+    0%, 100% { transform: translate(0); }
+    10% { transform: translate(-3px, 2px); }
+    20% { transform: translate(3px, -2px); }
+    30% { transform: translate(-2px, -3px); }
+    40% { transform: translate(2px, 3px); }
+    50% { transform: translate(-3px, -1px); }
+    60% { transform: translate(3px, 1px); }
+    70% { transform: translate(-1px, 3px); }
+    80% { transform: translate(1px, -3px); }
+    90% { transform: translate(-2px, 2px); }
+}
+
+@keyframes pd-rumble {
+    0%, 100% { transform: translate(0); }
+    25%      { transform: translate(0.3px, -0.3px); }
+    50%      { transform: translate(-0.3px, 0.3px); }
+    75%      { transform: translate(0.2px, 0.2px); }
+}
+
+@keyframes pd-earthquake {
+    0%   { transform: translate(0); }
+    10%  { transform: translate(-1.2px, -0.8px); }
+    20%  { transform: translate(1.2px, 0.8px); }
+    30%  { transform: translate(-0.8px, 1.2px); }
+    40%  { transform: translate(0.8px, -1.2px); }
+    50%  { transform: translate(-1.2px, 0.4px); }
+    60%  { transform: translate(1.2px, -0.4px); }
+    70%  { transform: translate(-0.4px, 1.2px); }
+    80%  { transform: translate(0.4px, -1.2px); }
+    90%  { transform: translate(-2px, 2px); }
+    100% { transform: translate(0); }
+}
+
+@keyframes pd-dust-float {
+    from {
+        transform: translate(0, 100vh) scale(1);
+        opacity: 0;
+    }
+    10%  { opacity: 0.8; }
+    90%  { opacity: 0.8; }
+    to {
+        transform: translate(40px, -20vh) scale(0.6);
+        opacity: 0;
+    }
+}
+
+@keyframes pd-celebration-pop {
+    0%   { transform: scale(0.2); opacity: 0; }
+    50%  { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pd-letter-stagger {
+    0%   { transform: translateY(-24px) scale(0.8); opacity: 0; }
+    60%  { transform: translateY(2px)  scale(1.05); opacity: 1; }
+    100% { transform: translateY(0)    scale(1); opacity: 1; }
+}
+
+/* Slow gem-body pulse — outer glow swells in size and intensity via
+   layered drop-shadows on the SVG element itself. Drop-shadow respects
+   the SVG's polygon outline (unlike box-shadow, which would glow as a
+   plain rectangle). Palette-specific glows defined below. */
+.pd-gem-backdrop--amethyst .pd-gem-backdrop__svg {
+    animation: pd-celebration-gem-pulse-amethyst 2.4s ease-in-out infinite;
+}
+.pd-gem-backdrop--gold .pd-gem-backdrop__svg {
+    animation: pd-celebration-gem-pulse-gold 2.4s ease-in-out infinite;
+}
+@keyframes pd-celebration-gem-pulse-amethyst {
+    0%, 100% {
+        filter:
+            drop-shadow(0 0 6px rgba(184, 144, 255, 0.45))
+            drop-shadow(0 0 18px rgba(184, 144, 255, 0.25));
+    }
+    50% {
+        filter:
+            drop-shadow(0 0 12px rgba(184, 144, 255, 0.8))
+            drop-shadow(0 0 36px rgba(184, 144, 255, 0.55))
+            drop-shadow(0 0 60px rgba(255, 215, 130, 0.3));
+    }
+}
+@keyframes pd-celebration-gem-pulse-gold {
+    0%, 100% {
+        filter:
+            drop-shadow(0 0 6px rgba(255, 215, 100, 0.5))
+            drop-shadow(0 0 18px rgba(255, 215, 100, 0.3));
+    }
+    50% {
+        filter:
+            drop-shadow(0 0 12px rgba(255, 215, 100, 0.85))
+            drop-shadow(0 0 36px rgba(255, 215, 100, 0.6))
+            drop-shadow(0 0 60px rgba(255, 180, 80, 0.4));
+    }
+}
+
+/* ============================================================================ */
+/* MOBILE PERFORMANCE OVERRIDES                                                 */
+/* ============================================================================ */
+/* iOS Safari (and Android low-end Chrome) GPU dies under sustained box-shadow  */
+/* blur, drop-shadow filters, and animated pseudo-elements. The desktop look    */
+/* is preserved; narrow viewports get a stripped-down render that ships frames. */
+/* Both @media and .pd-narrow paths so whichever predicate the browser uses     */
+/* wins. Targets the highest-cost effects only — gameplay clarity is preserved. */
+
+@media (max-width: 1023px) {
+    /* Board-cell halos + shimmers: animated pseudo-elements rendered behind  */
+    /* every gem in the 5×5 grid. ~50 always-painting layers gone.            */
+    .pd-grid .pd-gem__halo,
+    .pd-grid .pd-gem__shimmer { display: none; }
+
+    /* Particle box-shadows: the inner glow on every spawned spark. Particles */
+    /* still spawn + animate, just without the GPU-thrashing blur halo.      */
+    .pd-particle { box-shadow: none !important; }
+
+    /* "Last empty marker" infinite breathing animation — runs forever during */
+    /* tension-3, repainting box-shadow every frame on the most expensive    */
+    /* element on screen. Keep static highlight, drop the breathe.           */
+    .pd-cell--marker.pd-cell--last-empty .pd-cell__card { animation: none !important; }
+
+    /* Locked-cell pulse pseudo: opacity-only animation so cheap on desktop, */
+    /* but on iOS Safari each :before/:after of a transformed parent forces  */
+    /* a layer. Cut on narrow.                                               */
+    .pd-cell--locked .pd-cell__card { box-shadow: 0 0 8px var(--pd-gold-glow) !important; }
+}
+.pd-narrow .pd-grid .pd-gem__halo,
+.pd-narrow .pd-grid .pd-gem__shimmer { display: none; }
+.pd-narrow .pd-particle { box-shadow: none !important; }
+.pd-narrow .pd-cell--marker.pd-cell--last-empty .pd-cell__card { animation: none !important; }
+.pd-narrow .pd-cell--locked .pd-cell__card { box-shadow: 0 0 8px var(--pd-gold-glow) !important; }
+
+/* Earlier I bumped --pd-land-subtle to 220ms on narrow to give iOS   */
+/* more frames for the bounce — but the JS `cellBounceMs` timer that  */
+/* clears `isStopping` is a separate value (120ms fast / 100ms turbo  */
+/* / 250ms slow). When CSS > JS, the strip unmounts mid-animation at  */
+/* the squashed-wide 55% keyframe and the elastic return is never     */
+/* painted. Keeping the CSS var at the speed-table value so CSS and   */
+/* JS stay aligned. The bounce completes before the strip unmounts.   */
+
+/* Drop the per-cell `will-change: transform` on narrow. At 25 cells  */
+/* in flight that's 25 promoted compositor layers — iOS Safari has a */
+/* hard layer count cap, past which it falls back to CPU. Letting    */
+/* the cells share the parent layer is slower in theory but actually */
+/* SMOOTHER in practice on mobile.                                   */
+@media (max-width: 1023px) {
+    .pd-cell--stopping .pd-symbol,
+    .pd-cell--stopping .pd-nugget,
+    .pd-cell--stopping .pd-gem,
+    .pd-reel-viewport .pd-reel-strip { will-change: auto !important; }
+}
+.pd-narrow .pd-cell--stopping .pd-symbol,
+.pd-narrow .pd-cell--stopping .pd-nugget,
+.pd-narrow .pd-cell--stopping .pd-gem,
+.pd-narrow .pd-reel-viewport .pd-reel-strip { will-change: auto !important; }
+
+/* Diagonal shimmer stripe sweeps across the gem body. The stripe extends
+   well past the clip-path on either side via a gradient that sits in a
+   wide background-size, so the animation just slides background-position
+   instead of transforming the element (which would compose with the
+   text's pop animation in confusing ways). */
+@keyframes pd-celebration-gem-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+@keyframes pd-spin-ready-pulse {
+    0%, 100% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 0 0 0 var(--pd-gold-glow); }
+    50%      { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 0 0 8px transparent; }
+}
+
+/* Reduce motion: disable ambient and pulse animations for accessibility. */
+@media (prefers-reduced-motion: reduce) {
+    .pd-cell--locked,
+    .pd-cell--just-locked,
+    .pd-respin-counter--danger .pd-respin-counter__value,
+    .pd-root.pd-rumble,
+    .pd-root.pd-earthquake,
+    .pd-ambient-dust__speck,
+    .pd-nugget--grand,
+    .pd-spin-button--ready {
+        animation: none !important;
+    }
+
+    /* tension-3 transform removed unconditionally now */
+}
+
+/* ============================================================================ */
+/* INFO MODAL — "How To Play"                                                   */
+/* Trigger button (top-left of setup card) + gem-themed modal with explanatory  */
+/* sections that re-use the same gem language as the rest of the game.          */
+/* ============================================================================ */
+
+/* ---- Trigger button (faceted gem silhouette, top-left of game window) ---- */
+.pd-info-btn {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    background: linear-gradient(160deg, var(--pd-gold-hi), var(--pd-gold) 55%, var(--pd-gold-lo));
+    border: 1px solid var(--pd-gold-deep);
+    /* Faceted hexagonal gem silhouette */
+    clip-path: polygon(50% 0, 100% 28%, 100% 72%, 50% 100%, 0 72%, 0 28%);
+    cursor: pointer;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 12px var(--pd-gold-glow);
+    transition: transform 120ms ease, box-shadow 200ms ease;
+}
+.pd-info-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 16px var(--pd-gold-glow-strong);
+}
+.pd-info-btn:active { transform: scale(0.96); }
+.pd-info-btn__glyph {
+    font-family: var(--pd-font-display);
+    font-weight: 800;
+    font-size: 18px;
+    color: #2a1a0a;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+    line-height: 1;
+    transform: translateY(-1px);
+}
+.pd-info-btn--pulse {
+    animation: pd-info-btn-pulse 2.4s ease-in-out infinite;
+}
+@keyframes pd-info-btn-pulse {
+    0%, 100% { box-shadow: 0 0 10px var(--pd-gold-glow); }
+    50%      { box-shadow: 0 0 22px var(--pd-gold-glow-strong); }
+}
+
+/* ---- Modal backdrop ---- */
+.pd-info-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(7, 5, 13, 0.72);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    animation: pd-info-fade-in 200ms ease-out forwards;
+}
+@keyframes pd-info-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* ---- Modal card ---- */
+.pd-info-card {
+    width: min(440px, 94vw);
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(160deg, var(--pd-bg-3), var(--pd-bg-2) 60%, var(--pd-bg-1));
+    border: 1.5px solid var(--pd-gold);
+    border-radius: 14px;
+    box-shadow:
+        0 18px 42px rgba(0, 0, 0, 0.7),
+        0 0 28px var(--pd-gold-glow);
+    overflow: hidden;
+    isolation: isolate;
+    animation: pd-info-card-rise 240ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes pd-info-card-rise {
+    from { transform: translateY(14px) scale(0.96); opacity: 0; }
+    to   { transform: translateY(0)    scale(1);    opacity: 1; }
+}
+
+/* ---- Card header w/ gem backdrop ---- */
+.pd-info-card__header {
+    position: relative;
+    padding: 18px 16px 14px;
+    border-bottom: 1px solid rgba(212, 165, 116, 0.25);
+    flex-shrink: 0;
+}
+.pd-info-card__title-wrap {
+    position: relative;
+    isolation: isolate;
+    display: inline-block;
+    padding: 6px 18px;
+}
+.pd-info-card__title {
+    position: relative;
+    z-index: 1;
+    font-family: var(--pd-font-display);
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: 0.04em;
+    color: #2a1c00;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.pd-info-card__close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    background: rgba(7, 5, 13, 0.7);
+    border: 1px solid var(--pd-gold-deep);
+    clip-path: polygon(50% 0, 100% 28%, 100% 72%, 50% 100%, 0 72%, 0 28%);
+    color: var(--pd-gold-hi);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 120ms ease, background 200ms ease;
+}
+.pd-info-card__close:hover {
+    background: rgba(212, 165, 116, 0.2);
+    transform: scale(1.08);
+}
+
+/* ---- Tab nav (gem-shaped pills) ---- */
+.pd-info-card__tabs {
+    display: flex;
+    gap: 6px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(212, 165, 116, 0.18);
+    overflow-x: auto;
+    flex-shrink: 0;
+    scrollbar-width: none;
+}
+.pd-info-card__tabs::-webkit-scrollbar { display: none; }
+.pd-info-tab {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(212, 165, 116, 0.28);
+    clip-path: polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0 50%);
+    color: var(--pd-text-mute);
+    font-family: var(--pd-font-display);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: color 160ms ease, background 160ms ease;
+}
+.pd-info-tab:hover {
+    color: var(--pd-text);
+    background: rgba(212, 165, 116, 0.08);
+}
+.pd-info-tab--active {
+    color: #2a1a0a;
+    background: linear-gradient(160deg, var(--pd-gold-hi), var(--pd-gold));
+    border-color: var(--pd-gold-deep);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* ---- Body (scroll container) ---- */
+.pd-info-card__body {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 14px 16px 18px;
+    flex: 1 1 auto;
+    color: var(--pd-text);
+    font-family: var(--pd-font-body);
+    /* Firefox scrollbar (gold thumb on dark track) */
+    scrollbar-width: thin;
+    scrollbar-color: var(--pd-gold) rgba(7, 5, 13, 0.6);
+}
+/* WebKit gem-shaped scrollbar */
+.pd-info-card__body::-webkit-scrollbar {
+    width: 12px;
+}
+.pd-info-card__body::-webkit-scrollbar-track {
+    background: rgba(7, 5, 13, 0.6);
+    border-radius: 6px;
+    margin: 4px 0;
+}
+.pd-info-card__body::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--pd-gold-hi), var(--pd-gold) 50%, var(--pd-gold-lo));
+    /* Faceted gem profile — vertical emerald cut */
+    clip-path: polygon(50% 0, 100% 8%, 100% 92%, 50% 100%, 0 92%, 0 8%);
+    border: 1px solid var(--pd-gold-deep);
+}
+.pd-info-card__body::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #fff4cc, var(--pd-gold-hi) 50%, var(--pd-gold));
+}
+
+/* ---- Section common ---- */
+.pd-info-section {
+    padding: 12px 0 18px;
+    border-bottom: 1px dashed rgba(212, 165, 116, 0.18);
+}
+.pd-info-section:last-of-type { border-bottom: none; }
+.pd-info-section__title {
+    margin: 0 0 6px;
+    font-family: var(--pd-font-display);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--pd-gold-hi);
+}
+.pd-info-section__body {
+    margin: 0 0 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--pd-text);
+}
+.pd-info-section__body strong {
+    color: var(--pd-gold-hi);
+    font-weight: 700;
+}
+.pd-info-section__caption {
+    margin: 8px 0 0;
+    font-size: 11px;
+    color: var(--pd-text-mute);
+    font-style: italic;
+}
+
+/* ---- Mini grid (Markers + HoldGems) ---- */
+.pd-info-mini-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 3px;
+    width: 160px;
+    aspect-ratio: 1;
+    margin: 8px auto 4px;
+    padding: 4px;
+    background: rgba(7, 5, 13, 0.6);
+    border: 1px solid rgba(212, 165, 116, 0.3);
+    border-radius: 4px;
+}
+/* Mirrors the real .pd-cell__card — onyx tile w/ subtle inner highlight. */
+.pd-info-mini-cell {
+    position: relative;
+    background:
+        radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.04) 0%, transparent 55%),
+        linear-gradient(180deg, #14102a 0%, #07050d 100%);
+    border-radius: 2px;
+    transition: box-shadow 0.2s ease;
+}
+/* Marker cells: same gold inner-ring + warm inner-glow as the real
+   .pd-cell--marker .pd-cell__card (paydirt.styles.css L508-519). The
+   diamond is the FORMATION (4 cells in a +); cells themselves are normal
+   onyx tiles whose BORDER glows gold. Scaled down for the mini grid. */
+.pd-info-mini-cell--marker {
+    background:
+        radial-gradient(ellipse at 50% 50%, rgba(255, 215, 100, 0.18) 0%, transparent 65%),
+        radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 55%),
+        linear-gradient(180deg, #1f1838 0%, #0a0618 100%);
+    box-shadow:
+        inset 0 0 0 1.5px rgba(255, 215, 100, 0.85),
+        inset 0 0 0 2px rgba(212, 165, 116, 0.35),
+        inset 0 0 8px rgba(255, 200, 80, 0.45),
+        0 0 4px rgba(255, 200, 80, 0.25);
+}
+/* Markers section animation: each marker brightens to the LIT state
+   (.pd-cell--marker.pd-cell--lit, paydirt.styles.css L889) one at a time,
+   then settles back. Uses the real --pd-cell-marker-ring-lit token. */
+.pd-info-mini-grid .pd-info-mini-cell--marker {
+    animation: pd-info-marker-pulse 2.4s ease-in-out infinite;
+}
+.pd-info-mini-grid .pd-info-mini-cell--marker:nth-of-type(8)  { animation-delay: 0ms; }
+.pd-info-mini-grid .pd-info-mini-cell--marker:nth-of-type(12) { animation-delay: 600ms; }
+.pd-info-mini-grid .pd-info-mini-cell--marker:nth-of-type(14) { animation-delay: 1200ms; }
+.pd-info-mini-grid .pd-info-mini-cell--marker:nth-of-type(18) { animation-delay: 1800ms; }
+@keyframes pd-info-marker-pulse {
+    0%, 100% {
+        box-shadow:
+            inset 0 0 0 1.5px rgba(255, 215, 100, 0.85),
+            inset 0 0 0 2px rgba(212, 165, 116, 0.35),
+            inset 0 0 8px rgba(255, 200, 80, 0.45),
+            0 0 4px rgba(255, 200, 80, 0.25);
+    }
+    25% {
+        box-shadow:
+            inset 0 0 0 2px var(--pd-cell-marker-ring-lit),
+            inset 0 0 0 3px rgba(255, 200, 80, 0.5),
+            inset 0 0 14px rgba(255, 220, 100, 0.6),
+            0 0 12px var(--pd-gold-glow-strong),
+            0 0 22px var(--pd-gold-glow);
+    }
+}
+/* HoldGems section: all 4 markers slam to the LIT state in seed order
+   (uses the real .pd-cell--marker.pd-cell--lit shadow stack), then
+   transition into the LOCKED pulse (real pd-gold-pulse keyframe is
+   re-imported below for the inset overlay). */
+.pd-info-mini-grid--hold .pd-info-mini-cell--fills {
+    animation: pd-info-hold-lit 3.2s ease-out infinite;
+}
+.pd-info-mini-grid--hold .pd-info-mini-cell--fills::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    box-shadow:
+        0 0 12px var(--pd-gold-glow-strong),
+        inset 0 0 8px rgba(255, 215, 0, 0.4);
+    opacity: 0;
+    animation: pd-gold-pulse 2s ease-in-out infinite;
+    animation-delay: 1.4s;
+    pointer-events: none;
+}
+@keyframes pd-info-hold-lit {
+    0% {
+        box-shadow:
+            inset 0 0 0 1.5px rgba(255, 215, 100, 0.85),
+            inset 0 0 0 2px rgba(212, 165, 116, 0.35),
+            inset 0 0 8px rgba(255, 200, 80, 0.45);
+        transform: scale(1);
+    }
+    18% {
+        box-shadow:
+            inset 0 0 0 2.5px var(--pd-cell-marker-ring-lit),
+            inset 0 0 0 4px rgba(255, 200, 80, 0.5),
+            inset 0 0 18px rgba(255, 220, 100, 0.7),
+            0 0 16px var(--pd-gold-glow-strong);
+        transform: scale(1.08);
+    }
+    35%, 100% {
+        box-shadow:
+            inset 0 0 0 2px var(--pd-cell-marker-ring-lit),
+            inset 0 0 0 3px rgba(255, 200, 80, 0.5),
+            inset 0 0 12px rgba(255, 220, 100, 0.55),
+            0 0 8px var(--pd-gold-glow);
+        transform: scale(1);
+    }
+}
+
+/* ---- Respin demo ---- */
+.pd-info-respin-demo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin: 12px 0 4px;
+    padding: 14px 10px;
+    background: rgba(7, 5, 13, 0.5);
+    border: 1px solid rgba(212, 165, 116, 0.25);
+    border-radius: 8px;
+}
+.pd-info-respin-counter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+.pd-info-respin-counter__label {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--pd-text-mute);
+}
+.pd-info-respin-counter__value {
+    position: relative;
+    width: 32px;
+    height: 36px;
+    font-family: var(--pd-font-display);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--pd-gold-hi);
+    text-shadow: 0 1px 4px var(--pd-gold-glow);
+}
+.pd-info-respin-counter__digit {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+}
+/* Cycle: 3 (idle) → 2 (decremented) → 3 (reset by hit) */
+.pd-info-respin-demo .pd-info-respin-counter__digit:nth-child(1) {
+    animation: pd-info-digit-3 3.4s linear infinite;
+}
+.pd-info-respin-demo .pd-info-respin-counter__digit:nth-child(2) {
+    animation: pd-info-digit-2 3.4s linear infinite;
+}
+.pd-info-respin-demo .pd-info-respin-counter__digit:nth-child(3) {
+    animation: pd-info-digit-reset 3.4s linear infinite;
+}
+.pd-info-demo-static .pd-info-respin-counter__digit:nth-child(1) { opacity: 1; }
+.pd-info-respin-demo:not([data-active="1"]) .pd-info-respin-counter__digit:nth-child(1) { opacity: 1; }
+@keyframes pd-info-digit-3 {
+    0%, 25%   { opacity: 1; }
+    26%, 100% { opacity: 0; }
+}
+@keyframes pd-info-digit-2 {
+    0%, 25%   { opacity: 0; }
+    30%, 65%  { opacity: 1; }
+    66%, 100% { opacity: 0; }
+}
+@keyframes pd-info-digit-reset {
+    0%, 65%   { opacity: 0; }
+    70%, 80%  { opacity: 1; transform: scale(1.4); color: var(--pd-gold-hi); text-shadow: 0 0 14px var(--pd-gold-glow-strong); }
+    100%      { opacity: 1; transform: scale(1); }
+}
+.pd-info-respin-arrow {
+    color: var(--pd-text-mute);
+    font-size: 22px;
+}
+.pd-info-respin-cell {
+    width: 48px;
+    height: 48px;
+    /* Same onyx tile as a real cell card */
+    background:
+        radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.04) 0%, transparent 55%),
+        linear-gradient(180deg, #14102a 0%, #07050d 100%);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.pd-info-respin-cell__gem {
+    width: 80%;
+    height: 80%;
+    position: relative;
+    transform: translateY(-160%);
+    opacity: 0;
+}
+/* Container for the real <PaydirtGem> — sized so the gem image fills it. */
+.pd-info-respin-cell__gem .pd-gem {
+    width: 100%;
+    height: 100%;
+}
+.pd-info-respin-demo .pd-info-respin-cell__gem {
+    animation: pd-info-gem-drop 3.4s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+@keyframes pd-info-gem-drop {
+    0%, 60%   { transform: translateY(-160%); opacity: 0; }
+    72%       { transform: translateY(0);     opacity: 1; }
+    78%       { transform: translateY(0) scale(1.15); }
+    85%       { transform: translateY(0) scale(0.92); }
+    92%       { transform: translateY(0) scale(1.04); }
+    100%      { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* ---- Chest demo: real gem-chest.webp + scoped pd-chest-flip-spin reveal ---- */
+.pd-info-chest-demo {
+    display: flex;
+    justify-content: center;
+    margin: 12px 0 4px;
+    padding: 14px;
+    background: rgba(7, 5, 13, 0.5);
+    border: 1px solid rgba(212, 165, 116, 0.25);
+    border-radius: 8px;
+}
+.pd-info-chest-cell {
+    position: relative;
+    width: 88px;
+    height: 88px;
+    background:
+        radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.04) 0%, transparent 55%),
+        linear-gradient(180deg, #14102a 0%, #07050d 100%);
+    border-radius: 4px;
+    overflow: visible;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    isolation: isolate;
+}
+.pd-info-chest-cell__img {
+    width: 86%;
+    height: 86%;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+    /* Real chest tile uses no per-pixel filter — keep raw image */
+}
+/* The reveal overlay uses the same .pd-chest-flip class as the live game.
+   Position it absolutely over the chest cell. The scoped variant below
+   sizes it to fit the 88px demo cell (live version sizes to a real cell). */
+.pd-info-chest-flip {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    /* Override the live game's z-index:120 — inside the modal there's no
+       game grid above, and z-index:120 would punch through other modal
+       layers. 2 keeps it above the chest tile only. */
+    z-index: 2;
+    /* perspective inherited intentionally via the more-specific .pd-chest-flip
+       rule (declared earlier) — but the cascade order for same-specificity
+       single-class selectors picks the LAST declaration, so re-state it here
+       to keep the 3D rotation depth working. */
+    perspective: 500px;
+}
+
+/* ---- Jackpot tier row ---- */
+.pd-info-jackpot-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin: 12px 0 4px;
+    padding: 12px 8px;
+    background: rgba(7, 5, 13, 0.5);
+    border: 1px solid rgba(212, 165, 116, 0.25);
+    border-radius: 8px;
+}
+.pd-info-jackpot-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+}
+.pd-info-jackpot-gem {
+    width: 44px;
+    height: 44px;
+    position: relative;
+}
+.pd-info-jackpot-name {
+    font-family: var(--pd-font-display);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--pd-gold-hi);
+}
+.pd-info-jackpot-payout {
+    font-size: 10px;
+    color: var(--pd-text-mute);
+    tabular-nums: true;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Reduced-motion respect: no animated info-modal loops */
+@media (prefers-reduced-motion: reduce) {
+    .pd-info-btn--pulse,
+    .pd-info-card,
+    .pd-info-mini-grid .pd-info-mini-cell--marker,
+    .pd-info-mini-grid--hold .pd-info-mini-cell--fills,
+    .pd-info-mini-grid--hold .pd-info-mini-cell--fills::after,
+    .pd-info-respin-demo .pd-info-respin-counter__digit,
+    .pd-info-respin-demo .pd-info-respin-cell__gem,
+    .pd-info-chest-flip .pd-chest-flip__face {
+        animation: none !important;
+    }
+}
