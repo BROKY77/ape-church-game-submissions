@@ -51,6 +51,7 @@ import {
     GAME_CONFIG,
     pickCelebrationTier,
     isMarker,
+    paydirt,
     type SymbolType,
 } from "./paydirtConfig";
 import {
@@ -74,7 +75,12 @@ import PaydirtWindow from "./PaydirtWindow";
 import PaydirtSetupCard from "./PaydirtSetupCard";
 
 interface PaydirtComponentProps {
-    game: Game;
+    /** Optional Game manifest. The local template's app/page.tsx passes
+     *  this explicitly. The submissions-repo dynamic route renders the
+     *  default export with NO props (`<Game />` from the auto-generated
+     *  registry), so we fall back to the in-file `paydirt` config import
+     *  when missing — keeps both integration paths working. */
+    game?: Game;
 }
 
 /** Derive the live hold total from grid state. Mirrors paydirtMath's payout
@@ -297,7 +303,7 @@ function goldSymbolFor(
 // Main component.
 // ----------------------------------------------------------------------------
 
-function PaydirtComponentInner({ game }: PaydirtComponentProps) {
+function PaydirtComponentInner({ game = paydirt }: PaydirtComponentProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const replayIdString = searchParams.get("id");
