@@ -7,7 +7,7 @@ import {
     GuessDirection,
     SUIT_SYMBOLS,
     getCardRankLabel,
-} from "@/components/submissions/hilo/hiloConfig";
+} from "./hiloConfig";
 
 interface CardHistoryEntry {
     card: Card;

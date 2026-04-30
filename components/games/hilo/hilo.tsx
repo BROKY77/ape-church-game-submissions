@@ -4,8 +4,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import GameWindow from "@/components/shared/GameWindow";
-import hiloWindow from "./hiloWindow";
-import hiloSetupCard from "./hiloSetupCard";
+import HiloWindow from "./hiloWindow";
+import HiloSetupCard from "./hiloSetupCard";
 import { bytesToHex } from "viem";
 import { randomBytes, Game } from "@/lib/games";
 import "./hilo.style.css";
@@ -1169,7 +1169,7 @@ const MyGame: React.FC<MyGameProps> = ({ game }) => {
                 onMusicMutedChange={setIsMusicMuted}
                 onSfxMutedChange={setIsSfxMuted}
             >
-                <hiloWindow
+                <HiloWindow
                     currentCard={roundState.currentCard}
                     revealedCard={roundState.revealedCard}
                     isSfxMuted={isSfxMuted}
@@ -1202,7 +1202,7 @@ const MyGame: React.FC<MyGameProps> = ({ game }) => {
                 />
             </GameWindow>
 
-            <hiloSetupCard
+            <HiloSetupCard
                 currentView={currentView}
                 betAmount={betAmount}
                 setBetAmount={hasActivePackage ? () => {} : setBetAmount}
