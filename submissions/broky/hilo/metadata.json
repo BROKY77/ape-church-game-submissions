@@ -26,10 +26,10 @@
   ],
   "thumbnail": "/hiLo/card.png",
   "banner": "/hiLo/banner.png",
-  "mainComponent": "hiLo.tsx",
-  "windowComponent": "hiLoWindow.tsx",
-  "setupComponent": "hiLoSetupCard.tsx",
-  "configFile": "hiLoConfig.ts",
+  "mainComponent": "hilo.tsx",
+  "windowComponent": "hiloWindow.tsx",
+  "setupComponent": "hiloSetupCard.tsx",
+  "configFile": "hiloConfig.ts",
   "version": "1.0.0",
   "submittedAt": "2026-04-30"
 }

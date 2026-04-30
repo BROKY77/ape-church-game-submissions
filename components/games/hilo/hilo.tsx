@@ -4,11 +4,11 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import GameWindow from "@/components/shared/GameWindow";
-import MyGameWindow from "./MyGameWindow";
-import MyGameSetupCard from "./MyGameSetupCard";
+import hiloWindow from "./hiloWindow";
+import hiloSetupCard from "./hiloSetupCard";
 import { bytesToHex } from "viem";
 import { randomBytes, Game } from "@/lib/games";
-import "./my-game.style.css";
+import "./hilo.style.css";
 import {
     Card,
     GuessDirection,
@@ -17,7 +17,7 @@ import {
     createDeckFromRandomWord,
     getRankOutcomes,
     getStepMultiplier,
-} from "@/components/submissions/hilo/myGameConfig";
+} from "@/components/submissions/hilo/hiloConfig";
 
 interface MyGameProps {
     game: Game;
@@ -1169,7 +1169,7 @@ const MyGame: React.FC<MyGameProps> = ({ game }) => {
                 onMusicMutedChange={setIsMusicMuted}
                 onSfxMutedChange={setIsSfxMuted}
             >
-                <MyGameWindow
+                <hiloWindow
                     currentCard={roundState.currentCard}
                     revealedCard={roundState.revealedCard}
                     isSfxMuted={isSfxMuted}
@@ -1202,7 +1202,7 @@ const MyGame: React.FC<MyGameProps> = ({ game }) => {
                 />
             </GameWindow>
 
-            <MyGameSetupCard
+            <hiloSetupCard
                 currentView={currentView}
                 betAmount={betAmount}
                 setBetAmount={hasActivePackage ? () => {} : setBetAmount}

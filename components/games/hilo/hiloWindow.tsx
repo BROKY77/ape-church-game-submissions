@@ -7,7 +7,7 @@ import {
     GuessDirection,
     SUIT_SYMBOLS,
     getCardRankLabel,
-} from "@/components/submissions/hilo/myGameConfig";
+} from "@/components/submissions/hilo/hiloConfig";
 
 interface CardHistoryEntry {
     card: Card;
@@ -16,7 +16,7 @@ interface CardHistoryEntry {
     outcome: "start" | "win" | "loss" | "skip";
 }
 
-interface MyGameWindowProps {
+interface hiloWindowProps {
     currentCard: Card | null;
     revealedCard: Card | null;
     isSfxMuted: boolean;
@@ -50,7 +50,7 @@ interface MyGameWindowProps {
 
 const isRedSuit = (card: Card) => card.suit === "hearts" || card.suit === "diamonds";
 
-const MyGameWindow: React.FC<MyGameWindowProps> = ({
+const hiloWindow: React.FC<hiloWindowProps> = ({
     currentCard,
     revealedCard,
     isSfxMuted,
@@ -567,4 +567,4 @@ const CardFace: React.FC<{
     );
 };
 
-export default MyGameWindow;
+export default hiloWindow;
