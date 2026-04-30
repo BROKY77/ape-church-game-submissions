@@ -1,6 +1,6 @@
 {
   "team": "broky",
-  "gameName": "hi-lo",
+  "gameName": "hilo",
   "displayTitle": "HI-LO",
   "description": "HiLo is a quick wagering game, where the player has to guess whether the next card will be higher or lower than the current one. The player can cash out at any time, or keep going to increase the multiplier.",
   "authors": [
@@ -24,8 +24,8 @@
     "cards",
     "game"
   ],
-  "thumbnail": "/hiLo/card.png",
-  "banner": "/hiLo/banner.png",
+  "thumbnail": "/hilo/card.png",
+  "banner": "/hilo/banner.png",
   "mainComponent": "hilo.tsx",
   "windowComponent": "hiloWindow.tsx",
   "setupComponent": "hiloSetupCard.tsx",
