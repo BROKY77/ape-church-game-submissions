@@ -17,7 +17,7 @@ import {
     createDeckFromRandomWord,
     getRankOutcomes,
     getStepMultiplier,
-} from "@/components/submissions/hilo/hiloConfig";
+} from "./hiloConfig";
 
 interface MyGameProps {
     game: Game;
