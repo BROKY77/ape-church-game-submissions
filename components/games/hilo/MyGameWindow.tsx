@@ -7,7 +7,7 @@ import {
     GuessDirection,
     SUIT_SYMBOLS,
     getCardRankLabel,
-} from "@/components/submissions/hi-lo/myGameConfig";
+} from "@/components/submissions/hilo/myGameConfig";
 
 interface CardHistoryEntry {
     card: Card;
@@ -300,7 +300,7 @@ const MyGameWindow: React.FC<MyGameWindowProps> = ({
     }, [isSfxMuted]);
 
     React.useEffect(() => {
-        slideSfxRef.current = new Audio("/submissions/hi-lo/sfx/card_slide.mp3");
+        slideSfxRef.current = new Audio("/submissions/hilo/sfx/card_slide.mp3");
         slideSfxRef.current.preload = "auto";
 
         return () => {
@@ -447,10 +447,10 @@ const MyGameWindow: React.FC<MyGameWindowProps> = ({
                                     <img
                                         src={
                                             entry.outcome === "loss"
-                                                ? "/submissions/hi-lo/x_white.svg"
+                                                ? "/submissions/hilo/x_white.svg"
                                                 : entry.outcome === "skip"
-                                                    ? "/submissions/hi-lo/arrow_white.svg"
-                                                    : "/submissions/hi-lo/checkmark_white.svg"
+                                                    ? "/submissions/hilo/arrow_white.svg"
+                                                    : "/submissions/hilo/checkmark_white.svg"
                                         }
                                         alt={
                                             entry.outcome === "loss"

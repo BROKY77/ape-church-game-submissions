@@ -17,7 +17,7 @@ import {
     createDeckFromRandomWord,
     getRankOutcomes,
     getStepMultiplier,
-} from "@/components/submissions/hi-lo/myGameConfig";
+} from "@/components/submissions/hilo/myGameConfig";
 
 interface MyGameProps {
     game: Game;
@@ -149,7 +149,7 @@ const MyGame: React.FC<MyGameProps> = ({ game }) => {
     const bgmRef = useRef<HTMLAudioElement | null>(null);
 
     useEffect(() => {
-        const audio = new Audio("/submissions/hi-lo/sfx/win_v2.mp3");
+        const audio = new Audio("/submissions/hilo/sfx/win_v2.mp3");
         audio.preload = "auto";
         cashoutSfxRef.current = audio;
         return () => {
@@ -159,7 +159,7 @@ const MyGame: React.FC<MyGameProps> = ({ game }) => {
     }, []);
 
     useEffect(() => {
-        const audio = new Audio("/submissions/hi-lo/sfx/lose_v2.mp3");
+        const audio = new Audio("/submissions/hilo/sfx/lose_v2.mp3");
         audio.preload = "auto";
         loseSfxRef.current = audio;
         return () => {
@@ -169,7 +169,7 @@ const MyGame: React.FC<MyGameProps> = ({ game }) => {
     }, []);
 
     useEffect(() => {
-        const audio = new Audio("/submissions/hi-lo/audio/casino_background.mp3");
+        const audio = new Audio("/submissions/hilo/audio/casino_background.mp3");
         audio.preload = "auto";
         audio.loop = true;
         audio.volume = BACKGROUND_MUSIC_VOLUME;
