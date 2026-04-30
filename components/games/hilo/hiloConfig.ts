@@ -9,7 +9,7 @@ export const myGame: Game = {
     banner: "/submissions/hilo/banner.png",
     advanceToNextStateAsset: "/submissions/hilo/advance-button.png",
     themeColorBackground: "#22c55e",
-    song: "/submissions/hilo/audio/song.mp3",
+    song: "/submissions/hilo/audio/casino_background.mp3",
     payouts: {
         0: { 0: { 0: 10000 } },
     },
