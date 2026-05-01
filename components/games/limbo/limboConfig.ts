@@ -4,7 +4,7 @@ export const myGame: Game = {
     title: "Limbo",
     description: "Set a target multiplier and try to hit it.",
     gameAddress: "0x1234567890123456789012345678901234567890",
-    gameBackground: "/submissions/limbo/background.png",
+    gameBackground: "/submissions/limbo/background.svg",
     card: "/submissions/limbo/card.png",
     banner: "/submissions/limbo/banner.png",
     advanceToNextStateAsset: "/submissions/limbo/advance-button.png",
