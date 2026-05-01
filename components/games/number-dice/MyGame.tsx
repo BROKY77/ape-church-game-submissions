@@ -218,12 +218,13 @@ const MyGameComponent: React.FC<MyGameComponentProps> = ({ game }) => {
 
     return (
         <div>
-            <div className="flex flex-col lg:flex-row gap-4 sm:gap-8 lg:gap-10">
+            <div className="flex flex-col lg:flex-row lg:items-stretch gap-4 sm:gap-8 lg:gap-10">
                 <GameWindow
                     game={gameData}
                     currentGameId={currentGameId}
                     isLoading={isLoading}
                     isGameFinished={gameOver}
+                    customHeightMobile="min(100vw, 36rem)"
                     onPlayAgain={handlePlayAgain}
                     playAgainText={playAgainText}
                     onRewatch={handleRewatch}
