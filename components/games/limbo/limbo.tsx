@@ -14,11 +14,8 @@ import {
     drawLimboMultiplierFromWord,
     getTargetForWinChance,
     getWinChanceForTarget,
+    myGame,
 } from "./limboConfig";
-
-interface MyGameProps {
-    game: Game;
-}
 
 interface LimboRoundState {
     currentMultiplier: number;
@@ -70,7 +67,9 @@ const AUTO_TICK_INTERVAL_MS = 50;
 const AUTO_ADVANCE_DELAY_MS = 320;
 const floorToTwoDecimals = (value: number) => Math.floor(value * 100) / 100;
 
-const MyGame: React.FC<MyGameProps> = ({ game }) => {
+const MyGame: React.FC = () => {
+    const game: Game = myGame;
+    
     const [currentGameId, setCurrentGameId] = useState<bigint>(
         BigInt(bytesToHex(new Uint8Array(randomBytes(32))))
     );
