@@ -8,7 +8,7 @@ import AxeRouletteWindow, { SpinPhase } from "./AxeRouletteWindow";
 import AxeRouletteSetupCard from "./AxeRouletteSetupCard";
 import { bytesToHex, Hex } from "viem";
 import { toast } from "sonner";
-import { WHEEL_SLICES } from "./axeRouletteConfig";
+import { axeRouletteGame, WHEEL_SLICES } from "./axeRouletteConfig";
 
 // Animation timing (ms)
 const TX_DELAY      = 600;  // simulated transaction
@@ -21,7 +21,9 @@ interface AxeRouletteComponentProps {
   game: Game;
 }
 
-const AxeRouletteComponent: React.FC<AxeRouletteComponentProps> = ({ game }) => {
+const AxeRouletteComponent: React.FC = () => {
+  const game: Game = axeRouletteGame;
+  
   const router = useRouter();
   const searchParams = useSearchParams();
   const replayIdString = searchParams.get("id");
