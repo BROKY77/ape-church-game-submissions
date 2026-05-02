@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import useSound from "use-sound";
 import GameWindow from "@/components/shared/GameWindow";
-import MyGameWindow from "./limboWindow";
-import MyGameSetupCard from "./limboSetupCard";
+import LimboGameWindow from "./limboWindow";
+import LimboGameSetupCard from "./limboSetupCard";
 import { bytesToHex } from "viem";
 import { randomBytes, Game } from "@/lib/games";
 import {
@@ -14,9 +14,8 @@ import {
     drawLimboMultiplierFromWord,
     getTargetForWinChance,
     getWinChanceForTarget,
-    myGame,
+    limboGame,
 } from "./limboConfig";
-
 interface LimboRoundState {
     currentMultiplier: number;
     payout: number | null;
@@ -60,6 +59,7 @@ const INITIAL_ROUND_STATE: LimboRoundState = {
 
 const DEFAULT_TARGET_MULTIPLIER = 2;
 const DEFAULT_POOL_MAX_PAYOUT = 10000;
+const MIN_BET_AMOUNT = 1;
 const MANUAL_REVEAL_DURATION_MS = 820;
 const AUTO_REVEAL_DURATION_MS = 460;
 const MANUAL_TICK_INTERVAL_MS = 70;
@@ -67,15 +67,15 @@ const AUTO_TICK_INTERVAL_MS = 50;
 const AUTO_ADVANCE_DELAY_MS = 320;
 const floorToTwoDecimals = (value: number) => Math.floor(value * 100) / 100;
 
-const MyGame: React.FC = () => {
-    const game: Game = myGame;
-    
+const LimboGame: React.FC = () => {
+    const game: Game = limboGame;
+
     const [currentGameId, setCurrentGameId] = useState<bigint>(
         BigInt(bytesToHex(new Uint8Array(randomBytes(32))))
     );
 
     const [currentView, setCurrentView] = useState<0 | 1 | 2>(0);
-    const [betAmount, setBetAmount] = useState(1);
+    const [betAmount, setBetAmount] = useState(MIN_BET_AMOUNT);
     const [numberOfSpins, setNumberOfSpins] = useState(1);
     const [betMode, setBetMode] = useState<"manual" | "auto">("manual");
     const [autoBetCount, setAutoBetCount] = useState(10);
@@ -149,8 +149,8 @@ const MyGame: React.FC = () => {
     };
 
     // SFX
-    const [playWin] = useSound("/submissions/limbo/sfx/win_v2.mp3", { volume: 0.5 });
-    const [playLose] = useSound("/submissions/limbo/sfx/lose_v2.mp3", { volume: 0.5 });
+    const [playWin] = useSound("/limbo/sfx/win_v2.mp3", { volume: 0.5 });
+    const [playLose] = useSound("/limbo/sfx/lose_v2.mp3", { volume: 0.5 });
 
     const applyPayout = (isWin: boolean, payout: number, isAutoRound = false) => {
         if (isAutoRound) {
@@ -238,7 +238,7 @@ const MyGame: React.FC = () => {
     };
 
     const playGame = async (options?: { noPayment?: boolean; isAutoRound?: boolean }) => {
-        if (betAmount <= 0 || roundState.isResolving || roundState.isLoading) return;
+        if (betAmount < MIN_BET_AMOUNT || roundState.isResolving || roundState.isLoading) return;
 
         const isAutoRound = options?.isAutoRound === true;
 
@@ -325,7 +325,7 @@ const MyGame: React.FC = () => {
     };
 
     const startAutobet = () => {
-        if (isAutoBetting || betAmount <= 0) return;
+        if (isAutoBetting || betAmount < MIN_BET_AMOUNT) return;
 
         const hasPurchasedAutoRounds = remainingAutoBets > 0;
         const rounds = hasPurchasedAutoRounds ? remainingAutoBets : Math.max(1, autoBetCount);
@@ -365,7 +365,7 @@ const MyGame: React.FC = () => {
         resetTimers();
         setCurrentGameId(BigInt(bytesToHex(new Uint8Array(randomBytes(32)))));
         setCurrentView(0);
-        setBetAmount(options?.preserveBetAmount ? betAmount : 1);
+        setBetAmount(options?.preserveBetAmount ? Math.max(MIN_BET_AMOUNT, betAmount) : MIN_BET_AMOUNT);
         setNumberOfSpins(1);
         setBetMode("manual");
         setAutoBetCount(10);
@@ -425,12 +425,6 @@ const MyGame: React.FC = () => {
         );
     };
 
-    const handleStateAdvance = useCallback(() => {
-        if (isAutoBetting && currentView === 2 && remainingAutoBets > 0) {
-            void playGame({ noPayment: true, isAutoRound: true });
-        }
-    }, [isAutoBetting, currentView, remainingAutoBets, playGame]);
-
     useEffect(() => {
         if (!isAutoBetting || currentView !== 2) return;
 
@@ -440,7 +434,7 @@ const MyGame: React.FC = () => {
         }
 
         autoActionTimeoutRef.current = setTimeout(() => {
-            handleStateAdvance();
+            void playGame({ noPayment: true, isAutoRound: true });
         }, AUTO_ADVANCE_DELAY_MS);
 
         return () => {
@@ -449,7 +443,7 @@ const MyGame: React.FC = () => {
                 autoActionTimeoutRef.current = null;
             }
         };
-    }, [isAutoBetting, currentView, remainingAutoBets, handleStateAdvance]);
+    }, [isAutoBetting, currentView, remainingAutoBets, playGame]);
 
     useEffect(() => {
         return () => resetTimers();
@@ -531,22 +525,23 @@ const MyGame: React.FC = () => {
                 isGamePaused={false}
                 resultModalDelayMs={250}
             >
-                <MyGameWindow
+                <LimboGameWindow
                     recentMultipliers={recentMultipliers}
                     currentMultiplier={roundState.currentMultiplier}
                     isRolling={roundState.isResolving}
                     isWin={roundState.isWin}
                     targetMultiplier={targetMultiplier}
                     winChance={winChance}
+                    houseEdge={activeHouseEdge}
                     onTargetMultiplierChange={updateTargetFromInput}
                     onWinChanceChange={updateChanceFromInput}
                 />
             </GameWindow>
 
-            <MyGameSetupCard
+            <LimboGameSetupCard
                 currentView={currentView}
                 betAmount={betAmount}
-                setBetAmount={setBetAmount}
+                setBetAmount={(amount) => setBetAmount(Math.max(MIN_BET_AMOUNT, amount))}
                 numberOfSpins={numberOfSpins}
                 setNumberOfSpins={setNumberOfSpins}
                 betMode={betMode}
@@ -570,4 +565,4 @@ const MyGame: React.FC = () => {
         </div>
     );
 };
-export default MyGame;
+export default LimboGame;

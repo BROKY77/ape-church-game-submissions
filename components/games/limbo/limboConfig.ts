@@ -1,13 +1,13 @@
 import { Game } from "@/lib/games";
 
-export const myGame: Game = {
+export const limboGame: Game = {
     title: "Limbo",
     description: "Set a target multiplier and try to hit it.",
     gameAddress: "0x1234567890123456789012345678901234567890",
     gameBackground: "/submissions/limbo/background.png",
     card: "/submissions/limbo/card.png",
     banner: "/submissions/limbo/banner.png",
-    advanceToNextStateAsset: "/submissions/limbo/advance-button.png",
+    advanceToNextStateAsset: "/submissions/limbo/arrow_white.svg",
     themeColorBackground: "#22c55e",
     song: "/submissions/limbo/audio/song.mp3",
     payouts: {
