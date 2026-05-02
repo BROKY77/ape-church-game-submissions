@@ -18,7 +18,7 @@ import {
     createMinePositions,
     getMinesMultiplier,
     getSafeTileCount,
-} from "@/components/games/mines/minesConfig";
+} from "./minesConfig";
 
 interface MinesProps {
     game: Game;
