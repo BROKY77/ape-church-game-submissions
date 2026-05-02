@@ -13,7 +13,7 @@
 }
 @font-face {
     font-family: "Nohemi";
-    src: url("/limbo/nohemi/Nohemi/Web-TT/Nohemi-SemiBold.woff2") format("woff2");
+    src: url("/submissions/limbo/nohemi/Nohemi/Web-TT/Nohemi-SemiBold.woff2") format("woff2");
     font-weight: 600;
     font-style: normal;
     font-display: swap;
@@ -21,7 +21,7 @@
 
 @font-face {
     font-family: "Afacad";
-    src: url("/limbo/afacad/Afacad-Regular.ttf") format("truetype");
+    src: url("/submissions/limbo/afacad/Afacad-Regular.ttf") format("truetype");
     font-weight: 400;
     font-style: normal;
     font-display: swap;
