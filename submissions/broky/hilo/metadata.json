@@ -30,6 +30,6 @@
   "windowComponent": "hiloWindow.tsx",
   "setupComponent": "hiloSetupCard.tsx",
   "configFile": "hiloConfig.ts",
-  "version": "1.0.0",
-  "submittedAt": "2026-04-30"
+  "version": "2.0.0",
+  "submittedAt": "2026-05-02"
 }
