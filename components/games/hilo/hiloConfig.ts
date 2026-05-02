@@ -18,7 +18,7 @@ export const myGame: Game = {
 export type GuessDirection = "higher" | "lower" | "same";
 export type Suit = "hearts" | "diamonds" | "clubs" | "spades";
 
-export const HOUSE_EDGE = 0.9885;
+export const HOUSE_EDGE = 0.98;
 export const TOTAL_RANKS = 13;
 
 export interface Card {
