@@ -10,7 +10,7 @@ import {
     clampWinChance,
     getTargetForWinChance,
     getWinChanceForTarget,
-} from "@/components/games/limbo/limboConfig";
+} from "./limboConfig";
 
 interface RecentMultiplierResult {
     id: number;
