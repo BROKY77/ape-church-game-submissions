@@ -271,6 +271,7 @@ const MyGameWindow: React.FC<MyGameWindowProps> = ({
     const higherPayout = higherDisplay.multiplier > 0 ? runningAmount * higherDisplay.multiplier : 0;
     const topCard = revealedCard ?? currentCard;
     const topCardKey = topCard ? `${topCard.rank}-${topCard.suit}` : "hidden";
+    const shouldCenterHistory = history.length <= 2;
     const latestOutcome = history.length > 0 ? history[history.length - 1].outcome : null;
     const topCardResultFlash =
         revealedCard && (latestOutcome === "win" || latestOutcome === "loss")
@@ -426,7 +427,7 @@ const MyGameWindow: React.FC<MyGameWindowProps> = ({
             <div className={"hilo-history-row"}>
                 <div
                     ref={historyScrollRef}
-                    className={"hilo-history-scroll"}
+                    className={`${"hilo-history-scroll"} ${shouldCenterHistory ? "hilo-history-scroll-centered" : ""}`}
                     onPointerDown={handleHistoryPointerDown}
                     onPointerMove={handleHistoryPointerMove}
                     onPointerUp={handleHistoryPointerUp}
