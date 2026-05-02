@@ -4,8 +4,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import GameWindow from "@/components/shared/GameWindow";
-import MinesWindow from "./MinesWindow";
-import MinesSetupCard from "./MinesSetupCard";
+import MinesWindow from "./minesWindow";
+import MinesSetupCard from "./minesSetupCard";
 import { bytesToHex } from "viem";
 import { randomBytes, Game } from "@/lib/games";
 import "./mines.style.css";

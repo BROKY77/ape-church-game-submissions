@@ -26,9 +26,9 @@
   ],
   "thumbnail": "/mines/card.png",
   "banner": "/mines/banner.png",
-  "mainComponent": "Mines.tsx",
-  "windowComponent": "MinesWindow.tsx",
-  "setupComponent": "MinesSetupCard.tsx",
+  "mainComponent": "mines.tsx",
+  "windowComponent": "minesWindow.tsx",
+  "setupComponent": "minesSetupCard.tsx",
   "configFile": "minesConfig.ts",
   "version": "1.0.0",
   "submittedAt": "2026-05-01"
