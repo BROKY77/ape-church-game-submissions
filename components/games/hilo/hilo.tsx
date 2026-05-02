@@ -18,7 +18,10 @@ import {
     getRankOutcomes,
     getStepMultiplier,
 } from "./hiloConfig";
-import { myGame as hiloGame } from "./hiloConfig";
+
+interface MyGameProps {
+    game: Game;
+}
 
 interface CardHistoryEntry {
     card: Card;
@@ -85,9 +88,7 @@ const toSafePositiveInt = (value: number, fallback = 1, maxValue = Number.POSITI
     return Math.min(maxValue, Math.max(1, Math.floor(value)));
 };
 
-const MyGame: React.FC = () => {
-    const game: Game = hiloGame;
-    
+const MyGame: React.FC<MyGameProps> = ({ game }) => {
     const searchParams = useSearchParams();
     const replayId = searchParams.get("id");
 

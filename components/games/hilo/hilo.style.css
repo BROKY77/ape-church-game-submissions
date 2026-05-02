@@ -829,25 +829,29 @@ body.hilo-suppress-result-open .absolute.inset-0.z-30 {
 
 @media (max-width: 768px) {
     .hilo-root {
-        padding: 12px;
+        justify-content: flex-start;
+        padding: 8px 12px 12px;
+        gap: 4px;
     }
 
     .hilo-table-shell {
         gap: 12px;
-        padding: 10px;
+        margin-top: 0;
+        min-height: 202px;
+        padding: 4px 8px;
     }
 
     .hilo-guide-card {
-        width: 74px;
-        min-height: 110px;
+        width: 66px;
+        min-height: 100px;
     }
 
     .hilo-guide-value {
-        font-size: 30px;
+        font-size: 26px;
     }
 
     .hilo-guide-copy {
-        font-size: 9px;
+        font-size: 8px;
     }
 
     .hilo-header {
@@ -863,34 +867,143 @@ body.hilo-suppress-result-open .absolute.inset-0.z-30 {
     }
 
     .hilo-card {
-        width: 104px;
-        height: 148px;
+        width: 92px;
+        height: 132px;
     }
 
     .hilo-card-shadow-1,
     .hilo-card-shadow-2 {
-        width: 104px;
-        height: 148px;
+        width: 92px;
+        height: 132px;
     }
 
     .hilo-card-center {
-        font-size: 46px;
+        font-size: 40px;
     }
 
     .hilo-card-corner {
-        font-size: 21px;
+        font-size: 18px;
     }
 
     .hilo-action-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 4px;
+        margin-top: -8px;
+    }
+
+    .hilo-center-actions {
+        gap: 6px;
+    }
+
+    .hilo-center-actions .hilo-action-btn,
+    .hilo-center-actions .hilo-cashout-btn {
+        width: 104px;
+        min-width: 104px;
+    }
+
+    .hilo-action-btn,
+    .hilo-cashout-btn {
+        height: 34px;
+        padding: 6px 8px !important;
+        font-size: 12px !important;
+        line-height: 1 !important;
+    }
+
+    .hilo-action-content {
+        gap: 4px;
+    }
+
+    .hilo-action-btn small {
+        font-size: 10px;
     }
 
     .hilo-cashout-btn {
-        min-width: 0;
+        min-width: 104px;
     }
 
     .hilo-profit-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+        margin-top: -2px;
+        margin-bottom: 0;
+    }
+
+    .hilo-profit-box {
+        padding: 6px 7px;
+    }
+
+    .hilo-profit-box p {
+        font-size: 10px;
+    }
+
+    .hilo-profit-box strong {
+        font-size: 14px;
+    }
+
+    .hilo-history-row {
+        min-height: 84px;
+        margin-top: -2px;
+        padding: 6px;
+    }
+
+    .hilo-history-scroll {
+        gap: 6px;
+    }
+
+    .hilo-history-item {
+        min-width: 48px;
+        gap: 2px;
+    }
+
+    .hilo-history-card,
+    .hilo-card-compact {
+        width: 48px;
+        height: 66px;
+    }
+
+    .hilo-card-compact .hilo-card-center {
+        font-size: 20px;
+    }
+
+    .hilo-card-compact .hilo-card-corner {
+        left: 5px;
+        top: 3px;
+        font-size: 10px;
+    }
+
+    .hilo-card-compact .hilo-card-corner-bottom {
+        right: 5px;
+        bottom: 3px;
+    }
+
+    .hilo-history-label {
+        width: 48px;
+        height: 14px;
+        font-size: 8px;
+        padding: 0 3px;
+    }
+
+    .hilo-history-connector {
+        top: 24px;
+        left: -8px;
+        width: 15px;
+        height: 15px;
+        border-radius: 6px;
+    }
+
+    .hilo-history-connector-icon {
+        width: 8px;
+        height: 8px;
+    }
+
+    .hilo-history-connector-icon-check {
+        width: 7px;
+        height: 7px;
+    }
+
+    .hilo-history-connector-icon-loss {
+        width: 6px;
+        height: 6px;
     }
 }
 
@@ -1014,4 +1127,5 @@ body.hilo-suppress-result-open .absolute.inset-0.z-30 {
     background: #1D262D;
     border: 1px solid rgba(255, 255, 255, 0.08);
 }
+
 

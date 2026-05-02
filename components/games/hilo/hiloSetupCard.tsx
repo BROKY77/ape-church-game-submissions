@@ -6,7 +6,7 @@ import BetAmountInput from "@/components/shared/BetAmountInput";
 type RankAction = "lower" | "higher" | "skip";
 const MAX_BET_ROUNDS = 99999;
 
-interface hiloSetupCardProps {
+interface MyGameSetupCardProps {
     currentView: 0 | 1 | 2;
     betAmount: number;
     setBetAmount: (amount: number) => void;
@@ -53,7 +53,7 @@ interface hiloSetupCardProps {
     autoNeedsRounds: boolean;
 }
 
-const hiloSetupCard: React.FC<hiloSetupCardProps> = ({
+const MyGameSetupCard: React.FC<MyGameSetupCardProps> = ({
     currentView,
     betAmount,
     setBetAmount,
@@ -608,4 +608,5 @@ const hiloSetupCard: React.FC<hiloSetupCardProps> = ({
     );
 };
 
-export default hiloSetupCard;
+export default MyGameSetupCard;
+

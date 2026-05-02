@@ -16,7 +16,7 @@ interface CardHistoryEntry {
     outcome: "start" | "win" | "loss" | "skip";
 }
 
-interface hiloWindowProps {
+interface MyGameWindowProps {
     currentCard: Card | null;
     revealedCard: Card | null;
     isSfxMuted: boolean;
@@ -50,7 +50,7 @@ interface hiloWindowProps {
 
 const isRedSuit = (card: Card) => card.suit === "hearts" || card.suit === "diamonds";
 
-const hiloWindow: React.FC<hiloWindowProps> = ({
+const MyGameWindow: React.FC<MyGameWindowProps> = ({
     currentCard,
     revealedCard,
     isSfxMuted,
@@ -567,4 +567,5 @@ const CardFace: React.FC<{
     );
 };
 
-export default hiloWindow;
+export default MyGameWindow;
+
