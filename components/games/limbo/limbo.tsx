@@ -149,8 +149,8 @@ const LimboGame: React.FC = () => {
     };
 
     // SFX
-    const [playWin] = useSound("/limbo/sfx/win_v2.mp3", { volume: 0.5 });
-    const [playLose] = useSound("/limbo/sfx/lose_v2.mp3", { volume: 0.5 });
+    const [playWin] = useSound("/submissions/limbo/sfx/win_v2.mp3", { volume: 0.5 });
+    const [playLose] = useSound("/submissions/limbo/sfx/lose_v2.mp3", { volume: 0.5 });
 
     const applyPayout = (isWin: boolean, payout: number, isAutoRound = false) => {
         if (isAutoRound) {
