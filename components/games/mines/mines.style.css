@@ -1195,6 +1195,13 @@ body.hilo-suppress-result-open .absolute.inset-0.z-30 {
         transform: translate(-7px, -5px) scale(1.15);
     }
 
+    .mines-root .absolute.bottom-4.right-4 {
+        bottom: 4px;
+        right: 4px;
+        transform: scale(0.72);
+        transform-origin: bottom right;
+    }
+
     .hilo-root {
         padding: 12px;
     }

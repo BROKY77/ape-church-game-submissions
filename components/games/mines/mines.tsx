@@ -140,12 +140,12 @@ const Mines: React.FC<MinesProps> = ({ game }) => {
     const purchasedRoundsRemainingRef = useRef(0);
     const cashoutSfxRef = useRef<HTMLAudioElement | null>(null);
     const diamondSfxPoolRef = useRef<HTMLAudioElement[]>([]);
-    const diamondSfxPoolCursorRef = useRef(0);
     const loseSfxRef = useRef<HTMLAudioElement | null>(null);
     const loseBombSfxRef = useRef<HTMLAudioElement | null>(null);
     const notEnoughSfxRef = useRef<HTMLAudioElement | null>(null);
     const autoTileSelectSfxRef = useRef<HTMLAudioElement | null>(null);
-    const bgmRef = useRef<HTMLAudioElement | null>(null);
+    const audioCtxRef = useRef<AudioContext | null>(null);
+    const bgmGainRef = useRef<GainNode | null>(null);
 
     useEffect(() => {
         const audio = new Audio("/submissions/mines/sfx/win_v2.mp3");
@@ -164,11 +164,9 @@ const Mines: React.FC<MinesProps> = ({ game }) => {
             return audio;
         });
         diamondSfxPoolRef.current = pool;
-        diamondSfxPoolCursorRef.current = 0;
         return () => {
             diamondSfxPoolRef.current.forEach((audio) => audio.pause());
             diamondSfxPoolRef.current = [];
-            diamondSfxPoolCursorRef.current = 0;
         };
     }, []);
 
@@ -214,34 +212,42 @@ const Mines: React.FC<MinesProps> = ({ game }) => {
     }, []);
 
     useEffect(() => {
-        const audio = new Audio("/submissions/mines/audio/casino_background.mp3");
-        audio.preload = "auto";
-        audio.loop = true;
-        audio.volume = BACKGROUND_MUSIC_VOLUME;
-        bgmRef.current = audio;
+        const ctx = new AudioContext();
+        audioCtxRef.current = ctx;
 
-        if (!isMusicMuted) {
-            void audio.play().catch(() => {
-                // Browser autoplay can be blocked until user interacts.
-            });
-        }
+        const gain = ctx.createGain();
+        gain.gain.value = isMusicMuted ? 0 : BACKGROUND_MUSIC_VOLUME;
+        gain.connect(ctx.destination);
+        bgmGainRef.current = gain;
+
+        void fetch("/submissions/mines/audio/song.mp3")
+            .then((r) => r.arrayBuffer())
+            .then((buf) => ctx.decodeAudioData(buf))
+            .then((decoded) => {
+                if (audioCtxRef.current !== ctx) return;
+                const source = ctx.createBufferSource();
+                source.buffer = decoded;
+                source.loop = true;
+                source.connect(gain);
+                source.start(0);
+            })
+            .catch(() => {});
 
         return () => {
-            audio.pause();
-            bgmRef.current = null;
+            void ctx.close();
+            audioCtxRef.current = null;
+            bgmGainRef.current = null;
         };
     }, []);
 
     useEffect(() => {
-        const audio = bgmRef.current;
-        if (!audio) return;
+        const gain = bgmGainRef.current;
+        const ctx = audioCtxRef.current;
+        if (!gain) return;
 
-        audio.volume = BACKGROUND_MUSIC_VOLUME;
-        audio.muted = isMusicMuted;
-        if (!isMusicMuted && audio.paused) {
-            void audio.play().catch(() => {
-                // Browser autoplay can be blocked until user interacts.
-            });
+        gain.gain.value = isMusicMuted ? 0 : BACKGROUND_MUSIC_VOLUME;
+        if (!isMusicMuted && ctx && ctx.state === "suspended") {
+            void ctx.resume();
         }
     }, [isMusicMuted]);
 
@@ -249,17 +255,8 @@ const Mines: React.FC<MinesProps> = ({ game }) => {
 
     const playDiamondSfx = (): void => {
         if (isSfxMuted || diamondSfxPoolRef.current.length === 0) return;
-
-        const available = diamondSfxPoolRef.current.find((audio) => audio.paused || audio.ended);
-        const fallback = diamondSfxPoolRef.current[
-            diamondSfxPoolCursorRef.current % diamondSfxPoolRef.current.length
-        ];
-        const audio = available ?? fallback;
-
-        diamondSfxPoolCursorRef.current += 1;
-        audio.currentTime = 0;
+        const audio = diamondSfxPoolRef.current[0].cloneNode() as HTMLAudioElement;
         void audio.play().catch(() => {});
-
     };
 
     const safePurchasedRoundsRemaining = toSafeNonNegativeInt(purchasedRoundsRemaining, 0);
@@ -1124,7 +1121,7 @@ const Mines: React.FC<MinesProps> = ({ game }) => {
     }, [isAutoBetting, currentView, remainingAutoBets, autoRoundsPlayed]);
 
     return (
-        <div className="flex flex-col lg:flex-row gap-4 sm:gap-8 lg:gap-10">
+        <div className="mines-root flex flex-col lg:flex-row gap-4 sm:gap-8 lg:gap-10">
             <GameWindow
                 game={game}
                 currentGameId={currentGameId}
